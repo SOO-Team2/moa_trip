@@ -21,6 +21,8 @@
 
 .logo-icon {
   color: #7C3AED;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* 네비게이션 */
