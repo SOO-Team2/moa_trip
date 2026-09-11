@@ -6,7 +6,7 @@ class Users(models.Model):
     user_id = models.CharField(max_length=20, primary_key=True, db_column='USER_ID')
     nickname = models.CharField(max_length=20, db_column='NICKNAME')
     email = models.CharField(max_length=255, db_column='EMAIL')
-    pw = models.CharField(max_length=20, db_column='PW')
+    pw = models.CharField(max_length=255, db_column='PW')
     join_date = models.DateField(db_column='JOIN_DATE')
 
     class Meta:

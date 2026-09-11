@@ -1,9 +1,15 @@
+import uuid
+from django.contrib.auth.hashers import make_password, check_password
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
-#from .models import Region, TouristSpot, Users
+from django.utils import timezone
+from .forms import LoginForm, SignupForm
+from .models import Region, TouristSpot, Users
+
 
 def main(request):
     return render(request, 'main.html')
+
 
 # ===== 임시 더미 데이터 (나중에 Region, TouristSpot 모델의 실제 쿼리셋으로 교체) =====
 DUMMY_REGIONS = [
@@ -20,48 +26,22 @@ DUMMY_REGIONS = [
 ]
 
 DUMMY_SPOTS = [
-    {
-        'id': 1, 'name': '관광지 A', 'address': '지역명', 'fee': 0,
-        'rating': 4.6, 'review_count': 212, 'pet_allowed': True,
-        'image': None, 'region_code': 'jeju',
-    },
-    {
-        'id': 2, 'name': '관광지 B', 'address': '지역명', 'fee': 5000,
-        'rating': 4.8, 'review_count': 1043, 'pet_allowed': False,
-        'image': None, 'region_code': 'jeju',
-    },
-    {
-        'id': 3, 'name': '관광지 C', 'address': '지역명', 'fee': 0,
-        'rating': 4.7, 'review_count': 486, 'pet_allowed': True,
-        'image': None, 'region_code': 'jeju',
-    },
-    {
-        'id': 4, 'name': '관광지 D', 'address': '지역명', 'fee': 0,
-        'rating': 4.4, 'review_count': 298, 'pet_allowed': True,
-        'image': None, 'region_code': 'jeju',
-    },
+    {'id': 1, 'name': '관광지 A', 'address': '지역명', 'fee': 0, 'rating': 4.6, 'review_count': 212, 'pet_allowed': True, 'image': None, 'region_code': 'jeju'},
+    {'id': 2, 'name': '관광지 B', 'address': '지역명', 'fee': 5000, 'rating': 4.8, 'review_count': 1043, 'pet_allowed': False, 'image': None, 'region_code': 'jeju'},
+    {'id': 3, 'name': '관광지 C', 'address': '지역명', 'fee': 0, 'rating': 4.7, 'review_count': 486, 'pet_allowed': True, 'image': None, 'region_code': 'jeju'},
+    {'id': 4, 'name': '관광지 D', 'address': '지역명', 'fee': 0, 'rating': 4.4, 'review_count': 298, 'pet_allowed': True, 'image': None, 'region_code': 'jeju'},
 ]
+
 
 def explore(request):
     region = request.GET.get('region', 'jeju')
     page_number = request.GET.get('page', 1)
 
-    # ===== API/DB 연동 전: 더미 데이터 사용 =====
     valid_codes = [r['code'] for r in DUMMY_REGIONS]
     if region not in valid_codes:
         region = 'jeju'
 
     spots = [s for s in DUMMY_SPOTS if s['region_code'] == region]
-
-    # ===== 나중에 이 두 줄을 아래 실제 쿼리로 교체 =====
-    # regions_qs = Region.objects.all()
-    # spots_qs = TouristSpot.objects.filter(region__code=region)
-
-    # all_regions = Region.objects.all()
-    # if not all_regions.filter(code=region).exists():
-    #     region = 'jeju'
-
-    # spots = TouristSpot.objects.filter(region__code=region)
 
     paginator = Paginator(spots, 12)
     page_obj = paginator.get_page(page_number)
@@ -70,26 +50,58 @@ def explore(request):
         'page_obj': page_obj,
         'region': region,
         'regions': DUMMY_REGIONS,
-        #'regions': all_regions,
         'total_count': len(spots),
-        #total_count': spots.count(),
-
     }
     return render(request, 'explore.html', context)
+
 
 def mypage(request):
     # user_id = request.session.get('user_id')
     # if not user_id:
     #     return redirect('login')
-
     # user = Users.objects.get(pk=user_id)
+    # context = {...}
+    return render(request, 'mypage.html')
 
-    # context = {
-    #     "user": user,
-    #     "favorites": user.favorite_set.select_related("spot"),
-    #     "reviews": user.review_set.select_related("spot"),
-    #     "itineraries": user.itinerary_set.all(),
-    #     "pet_ok": request.GET.get("pet_ok") == "1",
-    #     "free_only": request.GET.get("free") == "1",
-    # }
-    return render(request, "mypage.html") #context )
+
+def login_view(request):
+    login_form = LoginForm()
+    signup_form = SignupForm()
+    active_tab = 'login'
+
+    if request.method == 'POST' and 'password2' not in request.POST:
+        login_form = LoginForm(request.POST)
+        if login_form.is_valid():
+            email = login_form.cleaned_data['email']
+            password = login_form.cleaned_data['password']
+            try:
+                user = Users.objects.get(email=email)
+            except Users.DoesNotExist:
+                user = None
+
+            if user is not None and check_password(password, user.pw):
+                request.session['user_id'] = user.user_id
+                if not login_form.cleaned_data['remember']:
+                    request.session.set_expiry(0)
+                return redirect('main')
+            login_form.add_error(None, '이메일 또는 비밀번호가 올바르지 않습니다.')
+
+    elif request.method == 'POST':
+        active_tab = 'signup'
+        signup_form = SignupForm(request.POST)
+        if signup_form.is_valid():
+            user = Users.objects.create(
+                user_id=uuid.uuid4().hex[:20],
+                email=signup_form.cleaned_data['email'],
+                nickname=signup_form.cleaned_data['nickname'],
+                pw=make_password(signup_form.cleaned_data['password']),
+                join_date=timezone.now().date(),
+            )
+            request.session['user_id'] = user.user_id
+            return redirect('main')
+
+    return render(request, 'login.html', {
+        'login_form': login_form,
+        'signup_form': signup_form,
+        'active_tab': active_tab,
+    })
