@@ -1,10 +1,7 @@
-from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', views.main, name='main'),
-    path('explore/', views.explore, name='explore'),
-    path('mypage/', views.mypage, name='mypage'),
+    path('', views.base, name='base'),
+    path('spot/<str:spot_code>/', views.spot_detail, name='spot_detail'),
 ]

@@ -1,70 +1,45 @@
-from django.shortcuts import render, redirect
-from django.core.paginator import Paginator
-#from .models import Region, TouristSpot, Users
+from django.shortcuts import render
+from django.db.models import Avg, Count
+from .models import Touristspot, Review, Weathercache
 
-def main(request):
-    return render(request, 'main.html')
 
-# ===== 임시 더미 데이터 (나중에 Region, TouristSpot 모델의 실제 쿼리셋으로 교체) =====
-DUMMY_REGIONS = [
-    {'code': 'seoul', 'name': '서울특별시'},
-    {'code': 'gyeonggi', 'name': '경기도'},
-    {'code': 'chungnam', 'name': '충청남도'},
-    {'code': 'chungbuk', 'name': '충청북도'},
-    {'code': 'jeju', 'name': '제주도'},
-    {'code': 'gangwon', 'name': '강원도'},
-    {'code': 'gyeongbuk', 'name': '경상북도'},
-    {'code': 'gyeongnam', 'name': '경상남도'},
-    {'code': 'jeonbuk', 'name': '전라북도'},
-    {'code': 'jeonnam', 'name': '전라남도'},
-]
+def base(request):
+    spots = (
+        Touristspot.objects
+        .annotate(avg_rating=Avg('review__rating'), review_count=Count('review'))
+        .order_by('-avg_rating')[:4]
+    )
+    return render(request, 'base.html', {'spots': spots})
 
-DUMMY_SPOTS = [
-    {
-        'id': 1, 'name': '관광지 A', 'address': '지역명', 'fee': 0,
-        'rating': 4.6, 'review_count': 212, 'pet_allowed': True,
-        'image': None, 'region_code': 'jeju',
-    },
-    {
-        'id': 2, 'name': '관광지 B', 'address': '지역명', 'fee': 5000,
-        'rating': 4.8, 'review_count': 1043, 'pet_allowed': False,
-        'image': None, 'region_code': 'jeju',
-    },
-    {
-        'id': 3, 'name': '관광지 C', 'address': '지역명', 'fee': 0,
-        'rating': 4.7, 'review_count': 486, 'pet_allowed': True,
-        'image': None, 'region_code': 'jeju',
-    },
-    {
-        'id': 4, 'name': '관광지 D', 'address': '지역명', 'fee': 0,
-        'rating': 4.4, 'review_count': 298, 'pet_allowed': True,
-        'image': None, 'region_code': 'jeju',
-    },
-]
 
-def explore(request):
-    region = request.GET.get('region', 'jeju')
-    page_number = request.GET.get('page', 1)
+def spot_detail(request, spot_code):
+    spot = (
+        Touristspot.objects
+        .filter(spot_code=spot_code)
+        .annotate(avg_rating=Avg('review__rating'))
+        .first()
+    )
 
-    # ===== API/DB 연동 전: 더미 데이터 사용 =====
-    valid_codes = [r['code'] for r in DUMMY_REGIONS]
-    if region not in valid_codes:
-        region = 'jeju'
+    if spot:
+        reviews = spot.review_set.all().order_by('-create_date')
+        weathers = Weathercache.objects.filter(region=spot.region).order_by('forecast_date')
+    else:
+        reviews = Review.objects.none()
+        weathers = Weathercache.objects.none()
 
-    spots = [s for s in DUMMY_SPOTS if s['region_code'] == region]
+    today_weather = weathers.first() if weathers.exists() else None
 
-    # ===== 나중에 이 두 줄을 아래 실제 쿼리로 교체 =====
-    # regions_qs = Region.objects.all()
-    # spots_qs = TouristSpot.objects.filter(region__code=region)
+    weekday_kr = ['월', '화', '수', '목', '금', '토', '일']
 
-    # all_regions = Region.objects.all()
-    # if not all_regions.filter(code=region).exists():
-    #     region = 'jeju'
-
-    # spots = TouristSpot.objects.filter(region__code=region)
-
-    paginator = Paginator(spots, 12)
-    page_obj = paginator.get_page(page_number)
+    weekly_weather = []
+    for i, w in enumerate(weathers[:7]):
+        weekly_weather.append({
+            'label': '오늘' if i == 0 else weekday_kr[w.forecast_date.weekday()],
+            'date': w.forecast_date,
+            'desc': w.weather_condition,
+            'temp_high': w.temp_high,
+            'precip_pct': w.precip_pct,
+        })
 
     context = {
         'page_obj': page_obj,
