@@ -10,19 +10,33 @@
 {% block content %}
 <div class="login-shell">
 
-  <aside class="login-intro">
-    <h1>로그인 /<br>회원가입</h1>
-  </aside>
-
   <div class="login-brand">
-    <div class="brand-highlight">
-      <svg class="brand-pin" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2C7.6 2 4 5.6 4 10c0 6 8 12 8 12s8-6 8-12c0-4.4-3.6-8-8-8z" stroke="#FFFFFF" stroke-width="1.6" stroke-linejoin="round"/>
-        <circle cx="12" cy="10" r="2.6" fill="#FFFFFF"/>
-      </svg>
-      <span>모아트립</span>
-    </div>
+  <span class="brand-deco brand-deco--1">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2C7.6 2 4 5.6 4 10c0 6 8 12 8 12s8-6 8-12c0-4.4-3.6-8-8-8z" stroke="#FFFFFF" stroke-width="1.6"/></svg>
+  </span>
+  <span class="brand-deco brand-deco--2">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#FFFFFF" stroke-width="1.6"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke="#FFFFFF" stroke-width="1.6"/></svg>
+  </span>
+  <span class="brand-deco brand-deco--3">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M4 16l4-6 3 4 3-5 6 7" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </span>
+
+  <div class="brand-highlight">
+    <svg class="brand-pin" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2C7.6 2 4 5.6 4 10c0 6 8 12 8 12s8-6 8-12c0-4.4-3.6-8-8-8z" stroke="#FFFFFF" stroke-width="1.6" stroke-linejoin="round"/>
+      <circle cx="12" cy="10" r="2.6" fill="#FFFFFF"/>
+    </svg>
+    <span>모아트립</span>
   </div>
+
+  <p class="brand-tagline">반려동물과 함께, 어디든 떠나보세요</p>
+
+  <div class="brand-tags">
+    <span>🐾 반려동물 동반</span>
+    <span>🎉 지역 축제</span>
+    <span>☀️ 실시간 날씨</span>
+  </div>
+</div>
 
   <div class="login-panel">
     <div class="tab-row" role="tablist">
@@ -37,15 +51,25 @@
     <form class="auth-form {% if active_tab == 'signup' %}hidden{% endif %}" id="form-login" method="post" action="{% url 'login' %}">
       {% csrf_token %}
       {% for field in login_form %}
-      <div class="form-field">
-        {{ field.label_tag }}
-        {{ field }}
-      </div>
+        {% if field.field.widget.input_type == 'checkbox' %}
+        <div class="form-field form-field--checkbox">
+          <label>
+            {{ field }}
+            {{ field.label }}
+          </label>
+        </div>
+        {% else %}
+        <div class="form-field">
+          {{ field.label_tag }}
+          {{ field }}
+        </div>
+        {% endif %}
       {% endfor %}
       {% if login_form.non_field_errors %}
       <div class="form-error show">{{ login_form.non_field_errors.0 }}</div>
       {% endif %}
       <div class="form-options">
+        <a href="#">아이디 찾기</a>
         <a href="#">비밀번호 찾기</a>
       </div>
       <button type="submit" class="btn-submit">로그인</button>
@@ -55,10 +79,19 @@
       {% csrf_token %}
       <input type="hidden" name="password2" value="1">
       {% for field in signup_form %}
-      <div class="form-field">
-        {{ field.label_tag }}
-        {{ field }}
-      </div>
+        {% if field.field.widget.input_type == 'checkbox' %}
+        <div class="form-field form-field--checkbox">
+          <label>
+            {{ field }}
+            {{ field.label }}
+          </label>
+        </div>
+        {% else %}
+        <div class="form-field">
+          {{ field.label_tag }}
+          {{ field }}
+        </div>
+        {% endif %}
       {% endfor %}
       {% if signup_form.non_field_errors %}
       <div class="form-error show">{{ signup_form.non_field_errors.0 }}</div>

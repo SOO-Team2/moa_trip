@@ -12,31 +12,10 @@ body {
 /* ===== 3단 레이아웃 ===== */
 .login-shell {
   display: grid;
-  grid-template-columns: 280px 1fr 420px;
+  grid-template-columns: 1fr 420px;
   max-width: 1200px;
   margin: 0 auto;
   min-height: calc(100vh - 64px); /* 64px = .site-header 높이 */
-}
-
-/* ===== 좌측: 안내 ===== */
-.login-intro {
-  padding: 56px 32px;
-}
-.login-intro h1 {
-  font-size: 30px;
-  font-weight: 800;
-  line-height: 1.25;
-  letter-spacing: -0.02em;
-  margin: 0 0 20px;
-  position: relative;
-  padding-left: 18px;
-  border-left: 4px solid var(--purple);
-}
-.login-intro p {
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--text-sub);
-  margin: 0;
 }
 
 /* ===== 중앙: 브랜드 패널 ===== */
@@ -50,8 +29,10 @@ body {
   background-size: auto, auto, 22px 22px, auto;
   padding: 40px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
   overflow: hidden;
 }
 
@@ -74,6 +55,71 @@ body {
   color: var(--white);
   letter-spacing: -0.01em;
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.18);
+}
+
+.brand-tagline {
+  margin-top: 16px;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.85);
+  position: relative;
+  padding-top: 16px;
+}
+.brand-tagline::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.brand-deco {
+  position: absolute;
+  opacity: 0.18;
+}
+.brand-deco svg {
+  width: 100%;
+  height: 100%;
+}
+.brand-deco--1 {
+  width: 64px;
+  height: 64px;
+  top: 12%;
+  left: 10%;
+  transform: rotate(-12deg);
+}
+.brand-deco--2 {
+  width: 48px;
+  height: 48px;
+  bottom: 14%;
+  right: 14%;
+}
+.brand-deco--3 {
+  width: 40px;
+  height: 40px;
+  top: 62%;
+  left: 16%;
+  transform: rotate(8deg);
+}
+
+.brand-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+.brand-tags span {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  color: var(--white);
 }
 
 /* ===== 우측: 폼 패널 ===== */
@@ -124,6 +170,21 @@ body {
   font-weight: 600;
   color: var(--text);
 }
+
+/* 체크박스 필드: 체크박스가 텍스트 앞에 오는 한 줄 레이아웃 */
+.form-field--checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.form-field--checkbox input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--purple);
+  flex-shrink: 0;
+}
 .form-field input {
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -144,8 +205,9 @@ body {
 /* 로그인 유지 / 비밀번호 찾기 · 약관 동의 행 */
 .form-options {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
+  gap: 12px;
   font-size: 13px;
   color: var(--text-sub);
 }
@@ -199,9 +261,6 @@ body {
 @media (max-width: 900px) {
   .login-shell {
     grid-template-columns: 1fr;
-  }
-  .login-intro {
-    padding: 32px 24px 0;
   }
   .login-brand {
     order: -1;
