@@ -1,0 +1,199 @@
+/* ===== 마이페이지 전용 스타일 =====
+   --purple, --purple-bg, --line, --text, --text-sub, --white, --radius
+   는 base.css :root에 이미 정의된 값을 그대로 사용 */
+
+.page{
+  max-width:1200px;
+  margin:0 auto;
+  padding:40px 32px 80px;
+}
+.page-title{
+  font-size:22px;
+  font-weight:700;
+  margin:0 0 24px;
+  color:var(--text);
+}
+
+/* 프로필 카드 */
+.profile-card{
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:24px 28px;
+  display:flex;
+  align-items:center;
+  gap:20px;
+}
+.avatar{
+  width:56px;height:56px;border-radius:50%;
+  background:var(--purple-bg);flex-shrink:0;
+  overflow:hidden;
+}
+.avatar img{
+  width:100%;height:100%;object-fit:cover;
+  display:block;
+}
+.profile-info{flex:1;}
+.profile-info .role{font-size:12px;color:var(--text-sub);margin-bottom:2px;}
+.profile-info .name{font-size:18px;font-weight:700;margin-bottom:4px;color:var(--text);}
+.profile-info .meta{font-size:13px;color:var(--text-sub);}
+.profile-stats{display:flex;gap:32px;text-align:center;}
+.profile-stats .stat b{display:block;font-size:20px;color:var(--text);}
+.profile-stats .stat span{font-size:12px;color:var(--text-sub);}
+
+/* 탭 */
+.tabs{
+  display:flex;gap:28px;
+  border-bottom:1px solid var(--line);
+  margin:28px 0 24px;
+}
+.tabs button{
+  background:none;border:none;padding:12px 2px;
+  font-size:15px;color:var(--text-sub);cursor:pointer;
+  border-bottom:2px solid transparent;
+}
+.tabs button.active{
+  color:var(--purple);font-weight:700;
+  border-bottom-color:var(--purple);
+}
+
+/* 2단 레이아웃 */
+.mypage-layout{display:flex;gap:32px;align-items:flex-start;}
+.main-col{flex:1;min-width:0;}
+.side-col{width:300px;flex-shrink:0;}
+
+.section-head{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;
+}
+.section-head.sub{margin-top:-8px;}
+.section-head h2{font-size:16px;font-weight:700;margin:0;color:var(--text);}
+
+.nav-arrows{display:flex;gap:6px;}
+.nav-arrows span{
+  width:28px;height:28px;border-radius:50%;
+  border:1px solid var(--line);background:var(--white);
+  color:var(--purple);font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+}
+
+.filter-chips{display:flex;gap:8px;}
+.filter-chips a{
+  border:1px solid var(--line);background:var(--white);
+  border-radius:20px;padding:6px 14px;font-size:13px;
+  color:var(--text-sub);text-decoration:none;
+}
+.filter-chips a.active{
+  background:var(--purple-bg);color:var(--purple);
+  border-color:var(--purple-bg);font-weight:600;
+}
+
+/* 즐겨찾기 카드 그리드 */
+.fav-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.fav-card{
+  background:var(--white);border:1px solid var(--line);
+  border-radius:var(--radius);overflow:hidden;
+}
+.fav-card .thumb{
+  height:110px;background:var(--purple-bg);
+  display:flex;align-items:flex-start;padding:8px;
+  font-size:12px;color:var(--text-sub);
+}
+.fav-card .body{padding:12px 14px 14px;}
+.fav-card .title{font-size:14px;font-weight:700;margin-bottom:4px;color:var(--text);}
+.fav-card .loc{font-size:12px;color:var(--text-sub);}
+.fav-add{
+  border:1.5px dashed var(--line);border-radius:var(--radius);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text-sub);font-size:13px;min-height:158px;
+  text-decoration:none;
+}
+.fav-placeholder{
+  border-style:dashed;
+  background:var(--white);
+}
+.fav-placeholder .thumb{
+  background:#F5F3FA;
+}
+.fav-placeholder .title,
+.fav-placeholder .loc{
+  color:var(--text-sub);
+}
+
+/* 후기 그리드 */
+.review-section{margin-top:36px;}
+.review-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:16px;
+}
+.review-item{
+  display:flex;gap:14px;padding:16px;
+  border:1px solid var(--line);border-radius:var(--radius);
+}
+.review-item .thumb{
+  width:56px;height:56px;border-radius:8px;background:var(--purple-bg);
+  flex-shrink:0;font-size:11px;color:var(--text-sub);
+  display:flex;align-items:center;justify-content:center;
+}
+.review-body{flex:1;min-width:0;}
+.review-top{display:flex;justify-content:space-between;align-items:baseline;}
+.review-top .r-title{font-size:14px;font-weight:700;color:var(--text);}
+.review-top .r-date{font-size:12px;color:var(--text-sub);}
+.review-text{font-size:13px;color:var(--text-sub);margin-top:4px;line-height:1.5;}
+
+.review-placeholder{
+  border-style:dashed;
+  background:var(--white);
+}
+.review-placeholder .thumb{
+  background:#F5F3FA;
+}
+.review-placeholder .r-title,
+.review-placeholder .review-text{
+  color:var(--text-sub);
+}
+
+/* 우측 사이드바 */
+.side-block{
+  background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px 18px 8px;margin-bottom:16px;
+}
+.side-block-head{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;
+}
+.side-block-head h3{font-size:15px;font-weight:700;margin:0;color:var(--text);}
+
+.btn-add-itinerary{
+  border:1px solid var(--purple);background:var(--white);
+  color:var(--purple);font-size:12px;font-weight:600;
+  border-radius:20px;padding:5px 12px;white-space:nowrap;
+  text-decoration:none;
+}
+.btn-add-itinerary:hover{background:var(--purple-bg);}
+
+.itinerary-card{padding:14px 0;border-bottom:1px solid var(--line);}
+.itinerary-card:last-child{border-bottom:none;}
+.itinerary-card .i-title{font-size:14px;font-weight:700;margin-bottom:4px;color:var(--text);}
+.itinerary-card .i-meta{font-size:12px;color:var(--text-sub);margin-bottom:10px;}
+.itinerary-actions{display:flex;gap:8px;align-items:center;}
+.delete-form{display:inline;margin:0;}
+
+.btn{
+  display:inline-block;border:none;border-radius:6px;padding:7px 14px;
+  font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;
+  line-height:1;
+}
+.btn-primary{background:var(--purple);color:var(--white);}
+.btn-ghost{background:none;color:var(--text-sub);}
+.btn-ghost:hover{color:var(--text);}
+
+.itinerary-placeholder{
+  border:1.5px dashed var(--line);
+  border-radius:var(--radius);
+  padding:20px 16px;
+  text-align:center;
+}
+.itinerary-placeholder .i-title{
+  font-size:14px;font-weight:700;color:var(--text-sub);margin-bottom:4px;
+}
+.itinerary-placeholder .i-meta{
+  font-size:12px;color:var(--text-sub);margin-bottom:0;
+}

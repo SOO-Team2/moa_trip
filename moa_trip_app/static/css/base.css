@@ -1,0 +1,272 @@
+/* ===== 전역 리셋 ===== */
+*{
+  box-sizing:border-box;
+}
+
+/* ===== 공통 변수 (기존 파일에 :root가 이미 있다면 이 블록은 생략) ===== */
+:root{
+  --purple:#7C3AED;
+  --purple-bg:#FAF5FF;
+  --line:#EEEEEE;
+  --text:#222222;
+  --text-sub:#666666;
+  --white:#FFFFFF;
+  --radius:10px;
+}
+
+/* ===== 탐색 페이지: 레이아웃 ===== */
+.layout{
+  display:grid;
+  grid-template-columns:280px 1fr;
+  max-width:1440px;
+  margin:0 auto;
+}
+
+/* ===== 좌측: 인트로 + 필터 ===== */
+.intro{
+  padding:40px 28px;
+  border-right:1px solid var(--line);
+}
+.intro h1{
+  font-size:26px;
+  font-weight:700;
+  color:var(--text);
+  margin-bottom:16px;
+  letter-spacing:-0.02em;
+}
+.intro p{
+  font-size:14px;
+  color:var(--text-sub);
+  margin-bottom:32px;
+}
+.filter-panel{
+  border-top:1px solid var(--line);
+  padding-top:24px;
+}
+.filter-panel h2{
+  font-size:15px;
+  font-weight:700;
+  margin-bottom:16px;
+}
+.filter-group{
+  padding:18px 0;
+  border-bottom:1px solid var(--line);
+}
+.filter-group--last{
+  border-bottom:none;
+}
+.filter-group h3{
+  font-size:12px;
+  font-weight:600;
+  color:var(--text-sub);
+  margin-bottom:10px;
+}
+.chip-row{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.chip{
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:6px 14px;
+  font-size:13px;
+  background:var(--white);
+  cursor:pointer;
+}
+.chip.active{
+  border-color:var(--purple);
+  color:var(--purple);
+  background:var(--purple-bg);
+  font-weight:600;
+}
+.filter-actions{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:22px;
+}
+.btn-apply{
+  background:var(--purple);
+  color:var(--white);
+  border:none;
+  border-radius:var(--radius);
+  padding:12px;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+}
+.btn-reset{
+  background:none;
+  border:none;
+  font-size:13px;
+  color:var(--text-sub);
+  text-decoration:underline;
+  cursor:pointer;
+  align-self:flex-start;
+}
+.footer-mark{
+  margin-top:40px;
+  font-size:11px;
+  color:#B0AEB8;
+  letter-spacing:0.02em;
+}
+
+/* ===== 우측: 콘텐츠 ===== */
+.content{
+  padding:40px 36px;
+}
+.content-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  margin-bottom:8px;
+}
+.content-header h2{
+  font-size:22px;
+  font-weight:700;
+  color:var(--text);
+}
+.result-count{
+  font-size:13px;
+  color:var(--text-sub);
+  margin-bottom:20px;
+}
+.sort-row{
+  display:flex;
+  gap:8px;
+}
+.sort-btn{
+  border:1px solid var(--line);
+  background:var(--white);
+  border-radius:999px;
+  padding:7px 16px;
+  font-size:13px;
+  cursor:pointer;
+  color:var(--text-sub);
+}
+.sort-btn.active{
+  border-color:var(--purple);
+  color:var(--purple);
+  font-weight:600;
+}
+
+/* ===== 카드 ===== */
+.card-grid{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:20px;
+  margin-top:8px;
+}
+.card{
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  overflow:hidden;
+  transition:box-shadow .15s ease;
+}
+.card:hover{
+  box-shadow:0 6px 18px rgba(124,58,237,0.10);
+}
+.card-thumb{
+  height:170px;
+  background:#EFEAF7;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#A99CC4;
+  font-size:13px;
+}
+.card-body{
+  padding:18px 20px 20px;
+}
+.badge{
+  display:inline-block;
+  background:var(--purple-bg);
+  color:var(--purple);
+  font-size:12px;
+  font-weight:600;
+  padding:4px 10px;
+  border-radius:6px;
+  margin-bottom:10px;
+}
+.card-title{
+  font-size:17px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+.card-meta{
+  font-size:13px;
+  color:var(--text-sub);
+  padding-bottom:14px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:12px;
+}
+.card-footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:13px;
+}
+.card-rating{
+  color:var(--text);
+  font-weight:600;
+}
+.card-rating span{
+  color:var(--text-sub);
+  font-weight:400;
+  margin-left:2px;
+}
+.card-add{
+  color:var(--purple);
+  font-weight:600;
+}
+
+/* ===== 페이지네이션 ===== */
+.pagination{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin-top:36px;
+}
+.page-num{
+  width:34px;height:34px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:8px;
+  font-size:13px;
+  color:var(--text-sub);
+  cursor:pointer;
+}
+.page-num.active{
+  background:var(--purple);
+  color:var(--white);
+  font-weight:600;
+}
+.page-dots{
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text-sub);
+  font-size:13px;
+}
+/* ===== 지역 링크 ===== */
+.region-list{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:2px 8px;
+}
+.region-link{
+  display:block;
+  font-size:14px;
+  color:var(--text);
+  padding:8px 10px;
+  border-radius:6px;
+  text-decoration:none;
+}
+.region-link:hover{
+  background:var(--purple-bg);
+  color:var(--purple);
+}
+.region-link.active{
+  background:var(--purple-bg);
+  color:var(--purple);
+  font-weight:700;
+}
