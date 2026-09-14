@@ -56,6 +56,7 @@
 .header-auth {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .btn-auth {
@@ -71,4 +72,13 @@
 .btn-auth:hover {
   border-color: var(--purple);
   color: var(--purple);
+}
+/* 회원가입: 테두리만 있는 보조 버튼으로 구분 */
+.btn-auth--ghost {
+  border-color: transparent;
+  color: var(--text-sub);
+}
+.btn-auth--ghost:hover {
+  color: var(--purple);
+  border-color: var(--line);
 }

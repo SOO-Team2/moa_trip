@@ -1,6 +1,24 @@
 from django.db import models
 
 
+<<<<<<< HEAD
+=======
+# ===== 회원 =====
+class Users(models.Model):
+    user_id = models.CharField(max_length=20, primary_key=True, db_column='USER_ID')
+    nickname = models.CharField(max_length=20, db_column='NICKNAME')
+    email = models.CharField(max_length=255, db_column='EMAIL')
+    pw = models.CharField(max_length=255, db_column='PW')
+    join_date = models.DateField(db_column='JOIN_DATE')
+
+    class Meta:
+        db_table = 'USERS'
+
+    def __str__(self):
+        return self.nickname
+    
+# ===== 지역 =====
+>>>>>>> 2365b38490fff92721b7193d72d60b4980e05894
 class Region(models.Model):
     region_code = models.CharField(db_column='REGION_CODE', primary_key=True, max_length=20)
     region_name = models.CharField(db_column='REGION_NAME', max_length=255)
