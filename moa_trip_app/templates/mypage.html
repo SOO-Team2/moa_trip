@@ -1,0 +1,174 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}마이페이지 · 모아트립{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/mypage.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page">
+
+  <h1 class="page-title">마이페이지</h1>
+
+  <!-- 프로필: 로그인한 사용자 정보 기준 (하드코딩 없음) -->
+  <div class="profile-card">
+    <div class="avatar">
+      {% if user.profile_image %}
+        <img src="{{ user.profile_image.url }}" alt="{{ user.nickname }} 프로필 이미지">
+      {% endif %}
+    </div>
+    <div class="profile-info">
+      <div class="role">회원</div>
+      <div class="name">{{ user.nickname }}</div>
+      <div class="meta">{{ user.email }} · {{ user.joined_at|date:"Y.m" }} 가입</div>
+    </div>
+    <div class="profile-stats">
+      <div class="stat"><b>{{ favorites|length }}</b><span>즐겨찾기</span></div>
+      <div class="stat"><b>{{ reviews|length }}</b><span>작성 후기</span></div>
+      <div class="stat"><b>{{ itineraries|length }}</b><span>저장 일정</span></div>
+    </div>
+  </div>
+
+  <!-- 탭 -->
+  <div class="tabs">
+    <button type="button" class="active">즐겨찾기</button>
+    <button type="button">작성한 후기</button>
+    <button type="button">여행 일정</button>
+    <button type="button">계정 설정</button>
+  </div>
+
+  <div class="layout mypage-layout">
+    <!-- 메인 컬럼 -->
+    <div class="main-col">
+
+      <div class="section-head">
+        <h2>즐겨찾기 {{ favorites|length }}곳</h2>
+      </div>
+      <div class="section-head sub">
+        <div class="nav-arrows">
+          <span aria-hidden="true">&lsaquo;</span>
+          <span aria-hidden="true">&rsaquo;</span>
+        </div>
+        <div class="filter-chips">
+          <a href="?pet_ok=1{% if free_only %}&free=1{% endif %}"
+             class="{% if pet_ok %}active{% endif %}">반려동물 OK</a>
+          <a href="?free=1{% if pet_ok %}&pet_ok=1{% endif %}"
+             class="{% if free_only %}active{% endif %}">무료</a>
+        </div>
+      </div>
+
+      <div class="fav-grid">
+        {% for spot in favorites %}
+        <div class="fav-card">
+          <div class="thumb">사진</div>
+          <div class="body">
+            <div class="title">{{ spot.name }}</div>
+            <div class="loc">{{ spot.address }}</div>
+          </div>
+        </div>
+        {% empty %}
+        <!-- 데이터 없을 때 그리드 구조 확인용 placeholder -->
+        <div class="fav-card fav-placeholder">
+          <div class="thumb"></div>
+          <div class="body">
+            <div class="title">즐겨찾기한 관광지가 없습니다</div>
+            <div class="loc">관광지를 담으면 여기에 표시됩니다</div>
+          </div>
+        </div>
+        <div class="fav-card fav-placeholder">
+          <div class="thumb"></div>
+          <div class="body">
+            <div class="title">&nbsp;</div>
+            <div class="loc">&nbsp;</div>
+          </div>
+        </div>
+        <div class="fav-card fav-placeholder">
+          <div class="thumb"></div>
+          <div class="body">
+            <div class="title">&nbsp;</div>
+            <div class="loc">&nbsp;</div>
+          </div>
+        </div>
+        {% endfor %}
+        <a href="{% url 'explore' %}" class="fav-add">+ 관광지 더 담기</a>
+      </div>
+
+      <div class="review-section">
+        <div class="section-head">
+          <h2>작성한 후기 {{ reviews|length }}</h2>
+        </div>
+
+        <div class="review-grid">
+          {% for review in reviews %}
+          <div class="review-item">
+            <div class="thumb">사진</div>
+            <div class="review-body">
+              <div class="review-top">
+                <span class="r-title">{{ review.spot_name }}</span>
+                <span class="r-date">{{ review.created_at|date:"Y.m.d" }}</span>
+              </div>
+              <div class="review-text">{{ review.content }}</div>
+            </div>
+          </div>
+          {% empty %}
+          <!-- 데이터 없을 때 카드 구조 확인용 placeholder -->
+          <div class="review-item review-placeholder">
+            <div class="thumb"></div>
+            <div class="review-body">
+              <div class="review-top">
+                <span class="r-title">작성한 후기가 없습니다</span>
+                <span class="r-date">&nbsp;</span>
+              </div>
+              <div class="review-text">방문한 관광지에 후기를 남기면 여기에 표시됩니다.</div>
+            </div>
+          </div>
+          <div class="review-item review-placeholder">
+            <div class="thumb"></div>
+            <div class="review-body">
+              <div class="review-top">
+                <span class="r-title">&nbsp;</span>
+                <span class="r-date">&nbsp;</span>
+              </div>
+              <div class="review-text">&nbsp;</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- 사이드바: 저장한 여행 일정 (서버 렌더링, JS 없음) -->
+    <div class="side-col">
+      <div class="side-block">
+        <div class="side-block-head">
+          <h3>저장한 여행 일정</h3>
+          <a href="{#}" class="btn-add-itinerary">+ 일정 추가</a>
+        </div>
+
+        {% for itinerary in itineraries %}
+        <div class="itinerary-card">
+          <div class="i-title">{{ itinerary.itinerary_title }}</div>
+          <div class="i-meta">{{ itinerary.meta }}</div>
+          <div class="itinerary-actions">
+            <a href="{% url 'itinerary_detail' itinerary.itinerary_code %}" class="btn btn-primary">열기</a>
+            <form action="{% url 'itinerary_delete' itinerary.itinerary_code %}" method="post" class="delete-form">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-ghost">삭제</button>
+            </form>
+          </div>
+        </div>
+        {% empty %}
+        <!-- 데이터 없을 때: 버튼 없이 안내 텍스트만 표시 -->
+            <div class="itinerary-placeholder">
+            <div class="i-title">저장된 여행 일정이 없습니다</div>
+            <div class="i-meta">위 버튼으로 새 일정을 추가하세요</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

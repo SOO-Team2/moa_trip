@@ -1,0 +1,22 @@
+<header class="site-header">
+  <a href="{% url 'main' %}" class="logo">
+    <span class="logo-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"></path>
+        <circle cx="12" cy="9" r="2.5"></circle>
+      </svg>
+    </span>
+    모아트립
+  </a>
+
+  <nav class="main-nav">
+    <a href="{% url 'explore' %}">관광지</a>
+    <a href="#">축제</a>
+    <a href="#">여행일정</a>
+  </nav>
+
+  <div class="header-auth">
+    <a href="{% url 'login' %}" class="btn-auth">로그인</a>
+    <a href="{% url 'login' %}" class="btn-auth btn-auth--ghost">회원가입</a>
+  </div>
+</header>
