@@ -150,33 +150,6 @@
     }
   ],
 
-  "festivals": [
-    {
-      "festival_id": "FEST001",
-      "region_code": "R01",
-      "festival_name": "제주 해녀 축제",
-      "start_date": "2026-09-05",
-      "end_date": "2026-09-14",
-      "festival_location": "제주시 구좌읍 해녀박물관 일대"
-    },
-    {
-      "festival_id": "FEST002",
-      "region_code": "R01",
-      "festival_name": "서귀포 칠십리 축제",
-      "start_date": "2026-09-10",
-      "end_date": "2026-09-20",
-      "festival_location": "서귀포시 천지연 폭포 광장 및 일대"
-    },
-    {
-      "festival_id": "FEST003",
-      "region_code": "R01",
-      "festival_name": "한라산 억새 축제",
-      "start_date": "2026-09-19",
-      "end_date": "2026-09-22",
-      "festival_location": "제주시 애월읍 새별오름 야외무대"
-    }
-  ],
-
   "weather_forecasts": [
     {
       "weather_condition": "맑음",
