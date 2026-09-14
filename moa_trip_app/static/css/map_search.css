@@ -1,0 +1,228 @@
+/* ==========================================================================
+   MAP SEARCH STYLES (map_search.css)
+   ========================================================================== */
+
+.map-search-container {
+  width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+/* Top Search & Chip Filters */
+.map-top-bar {
+  margin-bottom: 20px;
+}
+
+.map-search-input-wrap {
+  position: relative;
+  max-width: 540px;
+  margin-bottom: 16px;
+}
+
+.map-search-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 48px 0 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background-color: #ffffff;
+  font-size: 15px;
+  box-shadow: var(--shadow-sm);
+  outline: none;
+  transition: var(--transition);
+}
+
+.map-search-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.map-search-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-primary);
+  font-size: 18px;
+}
+
+/* Category Filter Chips */
+.map-chip-list {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-x: auto;
+}
+
+.map-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background-color: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.map-chip:hover,
+.map-chip.active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
+}
+
+/* Split Map Layout */
+.map-main-layout {
+  display: flex;
+  gap: 20px;
+  height: 640px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background-color: #ffffff;
+  box-shadow: var(--shadow-card);
+}
+
+/* Map Area (Flex: 1) */
+.map-canvas-area {
+  flex: 1;
+  position: relative;
+  background-color: #E2E8F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-canvas-placeholder {
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.map-marker-pin {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+  animation: bounce 1.5s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Right Spot List Panel (Fixed 380px) */
+.map-list-panel {
+  width: 380px;
+  height: 100%;
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+}
+
+.map-list-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.map-list-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.map-list-count {
+  font-size: 13px;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.map-list-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.map-spot-item {
+  display: flex;
+  gap: 14px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid #F3F4F6;
+  background-color: #ffffff;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.map-spot-item:hover,
+.map-spot-item.active {
+  border-color: var(--color-primary-light);
+  background-color: var(--color-primary-subtle);
+  transform: translateX(3px);
+}
+
+.map-spot-thumb {
+  width: 84px;
+  height: 84px;
+  border-radius: var(--radius-sm);
+  background-color: #E5E7EB;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.map-spot-thumb::after {
+  content: '📍';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  opacity: 0.4;
+}
+
+.map-spot-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.map-spot-info h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.map-spot-info p {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.map-spot-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

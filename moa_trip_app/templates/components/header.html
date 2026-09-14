@@ -1,9 +1,9 @@
 <header class="header">
 
   <!-- 로고 -->
-  <a href="#" class="header-logo">
+  <a href="{% url 'main' %}" class="header-logo">
     <span class="header-logo-icon">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"></path>
         <circle cx="12" cy="9" r="2.5"></circle>
       </svg>
@@ -13,13 +13,14 @@
 
   <!-- 메인 네비게이션 -->
   <nav class="header-nav">
-    <a href="#">관광지</a>
-    <a href="#">축제</a>
-    <a href="#">여행 일정</a>
+    <a href="{% url 'explore' %}">관광지</a>
+    <a href="{% url 'explore' %}">축제</a>
+    <a href="{% url 'planner' %}">여행 일정</a>
+    <a href="{% url 'mypage' %}">마이페이지</a>
   </nav>
 
   <!-- 우측 인증 -->
   <div class="header-auth">
-    <a href="#" class="btn-auth">로그인 / 회원가입</a>
+    <a href="{% url 'login' %}" class="btn-auth">로그인 / 회원가입</a>
   </div>
 </header>

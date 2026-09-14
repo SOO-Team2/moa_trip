@@ -1,15 +1,21 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=1200">
+    <title>{% block title %}모아트립{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
     <!-- 헤더 -->
     {% include 'components/header.html' %}
 
     <!-- 페이지별 본문 내용 -->
-    {% block content %}{% endblock %}
+    <main class="main-content-area">
+        {% block content %}{% endblock %}
+    </main>
 
     <!-- 푸터 -->
     {% include 'components/footer.html' %}

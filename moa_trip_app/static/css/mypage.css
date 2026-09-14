@@ -1,0 +1,411 @@
+/* ==========================================================================
+   MYPAGE STYLES (mypage.css)
+   ========================================================================== */
+
+.mypage-container {
+  width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+}
+
+.mypage-container > h1 {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 24px;
+  letter-spacing: -0.5px;
+}
+
+/* ==========================================================================
+   PROFILE & STATS HEADER
+   ========================================================================== */
+.mypage-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 32px 40px;
+  margin-bottom: 32px;
+  box-shadow: var(--shadow-card);
+}
+
+.profile-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, #C4B5FD 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  font-size: 32px;
+  font-weight: 800;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+}
+
+.profile-info h1 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.profile-info p {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+/* 3 Stats in a Row */
+.profile-stats-group {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding-left: 40px;
+  border-left: 1px solid var(--color-border);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-item span:first-child {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.stat-item span:last-child {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   TAB NAVIGATION
+   ========================================================================== */
+.mypage-nav {
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mypage-nav ul {
+  display: flex;
+  gap: 36px;
+}
+
+.mypage-nav li a {
+  display: inline-block;
+  padding: 14px 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  position: relative;
+  transition: var(--transition);
+}
+
+.mypage-nav li a:hover,
+.mypage-nav li.active a,
+.mypage-nav li:first-child a {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.mypage-nav li.active a::after,
+.mypage-nav li:first-child a::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-full);
+}
+
+/* ==========================================================================
+   MAIN CONTENT LAYOUT (Left Content + Right Itinerary Sidebar)
+   ========================================================================== */
+.mypage-main-layout {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.mypage-left-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+/* Bookmarks Section */
+.bookmark-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.bookmark-section-header h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.bookmark-nav-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.bookmark-nav-btns button {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: #ffffff;
+  color: var(--color-text);
+  font-weight: 700;
+  transition: var(--transition);
+}
+
+.bookmark-nav-btns button:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Spot Card Grid (3-column inside mypage) */
+.mypage-spot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.mypage-spot-card {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.mypage-spot-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-primary-light);
+  box-shadow: var(--shadow-card);
+}
+
+.mypage-spot-thumb {
+  width: 100%;
+  height: 140px;
+  background-color: #EDE9FE;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  font-size: 28px;
+}
+
+.mypage-spot-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 14px 16px 4px;
+}
+
+.mypage-spot-card p {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin: 0 16px 16px;
+}
+
+.add-spot-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 210px;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-card);
+  background-color: transparent;
+  transition: var(--transition);
+}
+
+.add-spot-card:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-subtle);
+}
+
+.add-spot-card button {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-primary);
+  padding: 12px 20px;
+}
+
+/* Reviews Section */
+.mypage-review-section h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 20px;
+}
+
+.mypage-review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mypage-review-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.review-thumb {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-sm);
+  background-color: #EDE9FE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.review-content {
+  flex: 1;
+}
+
+.review-content h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 6px;
+}
+
+.review-content p {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.review-date {
+  font-size: 12px;
+  color: var(--color-text-subtle);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   RIGHT SIDEBAR: SAVED ITINERARIES (320px)
+   ========================================================================== */
+.mypage-itinerary-aside {
+  flex: 0 0 320px;
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+  position: sticky;
+  top: 96px;
+}
+
+.mypage-itinerary-aside h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.itinerary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.itinerary-card {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: #FAFAFA;
+  transition: var(--transition);
+}
+
+.itinerary-card:hover {
+  background-color: #ffffff;
+  border-color: var(--color-primary-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.itinerary-card h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.itinerary-card p {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+}
+
+.itinerary-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.itinerary-actions button {
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.itinerary-actions button:first-child {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.itinerary-actions button:last-child {
+  background-color: transparent;
+  color: var(--color-danger);
+  border: 1px solid #FCA5A5;
+}

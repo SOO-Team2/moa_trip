@@ -1,0 +1,180 @@
+/* ==========================================================================
+   AUTH STYLES (auth.css) - LOGIN & SIGNUP
+   ========================================================================== */
+
+.auth-wrapper {
+  width: 1200px;
+  margin: 0 auto;
+  min-height: calc(100vh - 72px - 220px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+}
+
+.auth-card {
+  width: 880px;
+  min-height: 520px;
+  display: flex;
+  background-color: #ffffff;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(124, 58, 237, 0.14);
+  border: 1px solid var(--color-border);
+}
+
+/* ==========================================================================
+   LEFT: PURPLE GRADIENT BRAND PANEL (360px)
+   ========================================================================== */
+.auth-left-panel,
+.auth-card > section {
+  flex: 0 0 360px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #4F46E5 100%);
+  color: #ffffff;
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-left-panel::after {
+  content: '';
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.08);
+  bottom: -60px;
+  right: -60px;
+  pointer-events: none;
+}
+
+.auth-left-panel h2 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-left-panel h1 {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.5px;
+  margin-top: 40px;
+}
+
+/* ==========================================================================
+   RIGHT: WHITE FORM CONTAINER
+   ========================================================================== */
+.auth-right-panel,
+.auth-card > main {
+  flex: 1;
+  padding: 48px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #ffffff;
+}
+
+/* Tab Toggle */
+.auth-tabs,
+.auth-right-panel nav {
+  display: flex;
+  border-bottom: 2px solid #F3F4F6;
+  margin-bottom: 32px;
+}
+
+.auth-tabs a,
+.auth-right-panel nav a {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  position: relative;
+  text-align: center;
+}
+
+.auth-tabs a:hover,
+.auth-right-panel nav a:hover,
+.auth-tabs a.active,
+.auth-right-panel nav a:first-child {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.auth-tabs a.active::after,
+.auth-right-panel nav a:first-child::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--color-primary);
+}
+
+/* Auth Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.auth-field-group,
+.auth-form > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-field-group label,
+.auth-form label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.auth-field-group input,
+.auth-form input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--color-text);
+  background-color: #FAFAFA;
+  outline: none;
+  transition: var(--transition);
+}
+
+.auth-field-group input:focus,
+.auth-form input:focus {
+  background-color: #ffffff;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.auth-submit-btn,
+.auth-form > button {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  margin-top: 12px;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+  transition: var(--transition);
+}
+
+.auth-submit-btn:hover,
+.auth-form > button:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
