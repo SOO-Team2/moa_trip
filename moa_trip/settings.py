@@ -120,7 +120,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'moa_trip_app' / 'static']
+
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
@@ -130,3 +130,6 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+# 공공데이터 API
+KMA_API_KEY = 'a2QRrEzCmxvn5HHIDRG8ql2FCynA0kAFDsse7JJ50NrjBn%2BTmI5iunhQoNnNeUJElublkgv8FcYckdN8hYsh8g%3D%3D'

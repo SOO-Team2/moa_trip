@@ -165,10 +165,3 @@ class Itinerary(models.Model):
 
     def __str__(self):
         return f"{self.itinerary_title or self.itinerary_code} ({self.user.nickname})"
-
-
-# ==============================================================================
-# 하위 호환성 별칭 (Alias)
-# ==============================================================================
-Touristspot = TouristSpot
-Weathercache = WeatherCache

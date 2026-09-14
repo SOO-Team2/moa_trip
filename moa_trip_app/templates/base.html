@@ -3,112 +3,21 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>모아트립</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; color: #333; }
-
-        main { min-height: 70vh; padding: 40px; }
-
-        footer {
-            background-color: #fff;
-            border-top: 1px solid #eee;
-            padding: 60px 40px 30px;
-            margin-top: 60px;
-        }
-
-        .footer-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .footer-columns {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 60px;
-            margin-bottom: 50px;
-        }
-
-        .footer-col h4 {
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: #111;
-        }
-
-        .footer-col ul {
-            list-style: none;
-        }
-
-        .footer-col ul li {
-            margin-bottom: 10px;
-        }
-
-        .footer-col ul li a {
-            font-size: 13px;
-            color: #777;
-            text-decoration: none;
-        }
-
-        .footer-bottom {
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-            font-size: 12px;
-            color: #999;
-            line-height: 1.8;
-        }
-
-        .footer-bottom span {
-            margin-right: 12px;
-        }
-    </style>
+    <meta name="viewport" content="width=1200">
+    <title>{% block title %}모아트립{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- 헤더 -->
+    {% include 'components/header.html' %}
 
-    <main>
-        {% block content %}
-        {% endblock %}
-        <h1>   </h1> <!--메인페이지-->
+    <!-- 페이지별 본문 내용 -->
+    <main class="main-content-area">
+        {% block content %}{% endblock %}
     </main>
-    
-    <footer>
-        <div class="footer-inner">
-            <div class="footer-columns">
-                <div class="footer-col">
-                    <h4>소개</h4>
-                    <ul>
-                        <li><a href="#">모아트립 소개</a></li>
-                        <li><a href="#">모아트립 블로그</a></li>
-                        <li><a href="#">이용 가이드</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-col">
-                    <h4>이용약관</h4>
-                    <ul>
-                        <li><a href="#">약관</a></li>
-                        <li><a href="#">개인정보처리방침</a></li>
-                        <li><a href="#">쿠키 정책</a></li>
-                        <li><a href="#">버그 바운티 프로그램</a></li>
-                        <li><a href="#">위치기반서비스 이용약관</a></li>
-                        <li><a href="#">동물복지 정책</a></li>
-                    </ul>
-                </div>
-                
-            </div>
 
-            <div class="footer-bottom">
-                <div>
-                    © {% now "Y" %} 모아트립. All Rights Reserved.
-                    <span>모아트립</span>
-                    <span>대표 홍길동</span>
-                    <span>경기 성남</span>
-
-                </div>
-            </div>
-        </div>
-    </footer>
-
+    <!-- 푸터 -->
+    {% include 'components/footer.html' %}
 </body>
 </html>

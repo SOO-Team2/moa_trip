@@ -1,0 +1,355 @@
+/* ==========================================================================
+   SPOT DETAIL STYLES (spot_detail.css)
+   ========================================================================== */
+
+.spot-wrap {
+  width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 36px;
+}
+
+/* ==========================================================================
+   PHOTO GALLERY (1 Large + 2 Sub Photos Grid)
+   ========================================================================== */
+.spot-gallery {
+  width: 100%;
+  height: 380px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 8px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.spot-gallery > div {
+  background-color: #E5E7EB;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.spot-gallery > div:hover {
+  filter: brightness(0.95);
+}
+
+.spot-gallery .main-photo {
+  grid-row: 1 / span 2;
+  background: linear-gradient(135deg, #E0E7FF 0%, #EDE9FE 100%);
+  font-size: 18px;
+  color: var(--color-primary);
+}
+
+.spot-gallery .main-photo::after {
+  content: '🏖️';
+  position: absolute;
+  font-size: 64px;
+  opacity: 0.3;
+}
+
+.spot-gallery > div:nth-child(2)::after {
+  content: '🌊';
+  position: absolute;
+  font-size: 40px;
+  opacity: 0.3;
+}
+
+.spot-gallery .more-photo::after {
+  content: '🌅';
+  position: absolute;
+  font-size: 40px;
+  opacity: 0.3;
+}
+
+/* ==========================================================================
+   LEFT MAIN CONTENT (~760px)
+   ========================================================================== */
+.spot-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.spot-main > .tag {
+  margin-bottom: 12px;
+}
+
+.spot-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--color-text);
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.spot-sub {
+  font-size: 15px;
+  color: var(--color-text-muted);
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Info Table */
+.info-table {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 20px 24px;
+  margin-bottom: 40px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.info-table > div {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.info-table .label {
+  width: 120px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.info-table .value {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+/* 7-Day Weekly Weather Forecast */
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 16px;
+}
+
+.weekly-forecast {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+  margin-bottom: 44px;
+}
+
+.weather-item {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 8px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.weather-item:hover {
+  border-color: var(--color-primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(124, 58, 237, 0.08);
+}
+
+.weather-item .date {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+.weather-item .weather-icon {
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.weather-item .temp {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+/* Reviews Section */
+.review-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.review-write-btn {
+  padding: 8px 18px;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.review-write-btn:hover {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.review-item {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+}
+
+.r-top {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.r-writer {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.r-top > span:nth-child(2) {
+  font-size: 13px;
+  color: var(--color-rating);
+  font-weight: 600;
+}
+
+.r-content {
+  font-size: 14px;
+  color: var(--color-text);
+  line-height: 1.6;
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+   RIGHT STICKY SIDEBAR (~340px)
+   ========================================================================== */
+.spot-sidebar {
+  flex: 0 0 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 96px;
+  height: fit-content;
+}
+
+/* Today Weather Card */
+.weather-today {
+  background: linear-gradient(135deg, var(--color-primary-subtle) 0%, #ffffff 100%);
+  border: 1px solid var(--color-primary-light);
+  border-radius: var(--radius-card);
+  padding: 22px;
+  box-shadow: var(--shadow-card);
+}
+
+.weather-today > div:first-child {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 6px;
+}
+
+.w-temp {
+  font-size: 38px;
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.w-desc {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* Sidebar Action Buttons */
+.sidebar-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  border: 1px solid var(--color-border);
+  background-color: #ffffff;
+  color: var(--color-text);
+}
+
+.sidebar-btn:hover {
+  background-color: #F3F4F6;
+}
+
+.sidebar-btn.primary {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+}
+
+.sidebar-btn.primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Sidebar Mini Map */
+.sidebar-map {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.map-placeholder {
+  width: 100%;
+  height: 140px;
+  background-color: #E2E8F0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-placeholder::after {
+  content: '🗺️';
+  font-size: 32px;
+  opacity: 0.4;
+}
+
+.map-dot {
+  width: 14px;
+  height: 14px;
+  background-color: var(--color-primary);
+  border: 3px solid #ffffff;
+  border-radius: var(--radius-full);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 2;
+}
+
+.map-address {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

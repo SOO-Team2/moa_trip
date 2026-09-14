@@ -1,65 +1,148 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}모아트립{% endblock %}</title>
 
-  <link href="{% static 'css/base.css' %}" rel="stylesheet">
-  <link href="{% static 'css/header.css' %}" rel="stylesheet">
-  {% block extra_css %}{% endblock %}
-</head>
-<body>
+{% block title %}
+모아트립 - 나만의 감성 여행
+{% endblock %}
 
-  {% include 'header.html' %}
-  
-  {% block content %}
-  <section class="hero">
-    <div class="hero-inner">
-      <h1>반려동물과 함께,<br>어디든 떠나보세요</h1>
-      <p>공공데이터 기반으로 반려동물 동반 가능 여행지·축제·날씨 정보를 한곳에서 확인하세요.</p>
-      <div class="hero-actions">
-        <a href="{% url 'explore' %}" class="btn-hero-primary">관광지 둘러보기</a>
-        <a href="#features" class="btn-hero-ghost" id="scroll-features">더 알아보기</a>
-      </div>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <h1 class="hero-title">어디로 떠날까요?</h1>
+    <p class="hero-subtitle">취향과 일정에 꼭 맞는 국내 여행지와 축제를 한눈에 발견해보세요</p>
+    <div class="hero-actions">
+        <a href="{% url 'explore' %}" class="btn-primary">관광지 둘러보기</a>
+        <a href="{% url 'planner' %}" class="btn-outline hero-btn-outline">여행 일정 만들기</a>
     </div>
-  </section>
+</section>
 
-  <section class="features" id="features">
-    <div class="feature-grid">
-      <div class="feature-card">
-        <span class="feature-icon">🐾</span>
-        <h3>반려동물 동반 관광지</h3>
-        <p>대형견·소형견, 실내·실외 동반 가능 여부까지 필터링해서 찾아보세요.</p>
-      </div>
-      <div class="feature-card">
-        <span class="feature-icon">🎉</span>
-        <h3>지역 축제 정보</h3>
-        <p>가까운 지역에서 열리는 축제와 행사를 날짜별로 확인할 수 있습니다.</p>
-      </div>
-      <div class="feature-card">
-        <span class="feature-icon">🗺️</span>
-        <h3>나만의 여행일정</h3>
-        <p>관심 있는 장소를 모아 일정으로 만들고, 저장한 뒤 언제든 다시 확인하세요.</p>
-      </div>
+<div class="main-container">
+    <div class="section-wrapper">
+        <div class="section-header">
+            <h2 class="section-title">이번 주 추천 관광지</h2>
+            <a href="{% url 'explore' %}" class="link-more">전체 보기 &gt;</a>
+        </div>
+
+        <div class="spot-grid-4">
+            <!-- 관광지 1 -->
+            <div class="card spot-card">
+                <div class="spot-card-thumb">
+                    <img src="#" alt="협재해수욕장">
+                </div>
+                <div class="spot-card-badge">
+                    <span class="badge-pet">반려동물 OK</span>
+                </div>
+                <div class="spot-card-body">
+                    <h3><a href="{% url 'detail' %}">협재해수욕장</a></h3>
+                    <p class="spot-card-desc">제주 제주시 한림읍 · 무료</p>
+                </div>
+                <div class="spot-card-footer">
+                    <strong class="spot-card-rating">★ 4.6</strong>
+                    <span class="spot-review-count">(212)</span>
+                </div>
+            </div>
+
+            <!-- 관광지 2 -->
+            <div class="card spot-card">
+                <div class="spot-card-thumb">
+                    <img src="#" alt="경포해변">
+                </div>
+                <div class="spot-card-body">
+                    <h3><a href="{% url 'detail' %}">경포해변</a></h3>
+                    <p class="spot-card-desc">강원 강릉시 강문동 · 무료</p>
+                </div>
+                <div class="spot-card-footer">
+                    <strong class="spot-card-rating">★ 4.5</strong>
+                    <span class="spot-review-count">(874)</span>
+                </div>
+            </div>
+
+            <!-- 관광지 3 -->
+            <div class="card spot-card">
+                <div class="spot-card-thumb">
+                    <img src="#" alt="불국사">
+                </div>
+                <div class="spot-card-badge">
+                    <span class="badge-pet">반려동물 OK</span>
+                </div>
+                <div class="spot-card-body">
+                    <h3><a href="{% url 'detail' %}">불국사</a></h3>
+                    <p class="spot-card-desc">경북 경주시 진현동 · 6,000원</p>
+                </div>
+                <div class="spot-card-footer">
+                    <strong class="spot-card-rating">★ 4.7</strong>
+                    <span class="spot-review-count">(1,206)</span>
+                </div>
+            </div>
+
+            <!-- 관광지 4 -->
+            <div class="card spot-card">
+                <div class="spot-card-thumb">
+                    <img src="#" alt="오동도">
+                </div>
+                <div class="spot-card-body">
+                    <h3><a href="{% url 'detail' %}">오동도</a></h3>
+                    <p class="spot-card-desc">전남 여수시 수정동 · 무료</p>
+                </div>
+                <div class="spot-card-footer">
+                    <strong class="spot-card-rating">★ 4.4</strong>
+                    <span class="spot-review-count">(533)</span>
+                </div>
+            </div>
+        </div>
     </div>
-  </section>
 
-  <section class="cta">
-    <h2>지금 로그인하고 첫 여행을 계획해보세요</h2>
-    <a href="{% url 'login' %}" class="btn-hero-primary">시작하기</a>
-  </section>
-  {% endblock %}
+    <div class="section-wrapper">
+        <div class="section-header">
+            <h2 class="section-title">진행 중인 축제</h2>
+            <a href="{% url 'explore' %}" class="link-more">전체 보기 &gt;</a>
+        </div>
 
-  {% block extra_js %}
-  <script>
-  document.getElementById('scroll-features').addEventListener('click', function (e) {
-    e.preventDefault();
-    document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
-  });
-  </script>
-  {% endblock %}
+        <div class="festival-grid-3">
+            <!-- 축제 1 -->
+            <div class="card festival-card">
+                <div class="festival-card-thumb">
+                    <img src="#" alt="제주 해녀 축제">
+                </div>
+                <div class="festival-card-body">
+                    <span class="festival-date">09.05 — 09.14</span>
+                    <h3>제주 해녀 축제</h3>
+                    <p class="festival-location">제주시 구좌읍 해녀박물관</p>
+                </div>
+            </div>
 
-</body>
-</html>
+            <!-- 축제 2 -->
+            <div class="card festival-card">
+                <div class="festival-card-thumb">
+                    <img src="#" alt="서귀포 칠십리 축제">
+                </div>
+                <div class="festival-card-body">
+                    <span class="festival-date">09.10 — 09.20</span>
+                    <h3>서귀포 칠십리 축제</h3>
+                    <p class="festival-location">서귀포시 전지연 일대</p>
+                </div>
+            </div>
+
+            <!-- 축제 3 -->
+            <div class="card festival-card">
+                <div class="festival-card-thumb">
+                    <img src="#" alt="한라산 억새 축제">
+                </div>
+                <div class="festival-card-body">
+                    <span class="festival-date">09.19 — 09.22</span>
+                    <h3>한라산 억새 축제</h3>
+                    <p class="festival-location">제주시 애월읍 새별오름</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="cta-section">
+        <h2>지금 로그인하고 나만의 여행 만들기</h2>
+        <a href="{% url 'login' %}" class="btn-hero-primary">시작하기</a>
+    </section>
+</div>
+{% endblock %}

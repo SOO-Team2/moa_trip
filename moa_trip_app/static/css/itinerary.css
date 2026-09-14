@@ -1,0 +1,299 @@
+/* ==========================================================================
+   ITINERARY & PLANNER STYLES (itinerary.css)
+   ========================================================================== */
+
+.planner-container {
+  width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+}
+
+.planner-header {
+  margin-bottom: 28px;
+}
+
+.planner-header h1 {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--color-text);
+  letter-spacing: -0.5px;
+}
+
+/* 3-Column Desktop Layout (Left: Form | Center: Timeline | Right: Summary) */
+.planner-main-layout {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+}
+
+/* ==========================================================================
+   LEFT: ITINERARY CONFIG FORM (320px)
+   ========================================================================== */
+.planner-form-section {
+  flex: 0 0 320px;
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+}
+
+.planner-form-group {
+  margin-bottom: 20px;
+}
+
+.planner-form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.planner-form-group input,
+.planner-form-group select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--color-text);
+  background-color: #ffffff;
+  outline: none;
+  transition: var(--transition);
+}
+
+.planner-form-group input:focus,
+.planner-form-group select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+/* Companion Button Group */
+.companion-btn-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.companion-btn {
+  flex: 1;
+  padding: 8px 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.companion-btn:hover,
+.companion-btn.active {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.companion-pet-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-primary);
+  font-weight: 600;
+  background-color: var(--color-primary-light);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.btn-submit-planner {
+  width: 100%;
+  padding: 13px;
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+}
+
+.btn-submit-planner:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* ==========================================================================
+   CENTER: TIMELINE SECTION (Flex: 1)
+   ========================================================================== */
+.planner-timeline-section {
+  flex: 1;
+  min-width: 0;
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 28px;
+  box-shadow: var(--shadow-card);
+}
+
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.timeline-header h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text);
+  letter-spacing: -0.4px;
+}
+
+.btn-save-itinerary {
+  padding: 8px 18px;
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.btn-save-itinerary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Timeline Items with connecting line */
+.timeline-list {
+  position: relative;
+  padding-left: 28px;
+}
+
+.timeline-list::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 14px;
+  bottom: 24px;
+  width: 2px;
+  background-color: var(--color-primary-light);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -24px;
+  top: 18px;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+  z-index: 2;
+}
+
+.timeline-time-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  margin-bottom: 8px;
+}
+
+.timeline-card {
+  background-color: #FAFAFA;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  transition: var(--transition);
+}
+
+.timeline-card:hover {
+  background-color: #ffffff;
+  border-color: var(--color-primary-light);
+  box-shadow: var(--shadow-sm);
+  transform: translateX(4px);
+}
+
+.timeline-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.timeline-card p {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+/* Add Spot Button */
+.btn-add-timeline-spot {
+  width: 100%;
+  padding: 14px;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background-color: transparent;
+  transition: var(--transition);
+  margin-top: 12px;
+}
+
+.btn-add-timeline-spot:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-subtle);
+}
+
+/* ==========================================================================
+   RIGHT: SUMMARY & STATS PANEL (280px)
+   ========================================================================== */
+.planner-summary-section {
+  flex: 0 0 280px;
+  position: sticky;
+  top: 96px;
+}
+
+.summary-card {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+}
+
+.summary-card h3 {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.summary-card p {
+  font-size: 14px;
+  color: var(--color-text);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.summary-card p strong {
+  color: var(--color-primary);
+  font-weight: 700;
+}

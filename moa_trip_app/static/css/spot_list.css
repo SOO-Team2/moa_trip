@@ -1,0 +1,385 @@
+/* ==========================================================================
+   SPOT LIST & EXPLORE STYLES (spot_list.css)
+   ========================================================================== */
+
+.explore-layout {
+  width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+/* ==========================================================================
+   LEFT FILTER SIDEBAR (Fixed Width: 280px)
+   ========================================================================== */
+.explore-content-left {
+  flex: 0 0 280px;
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+  position: sticky;
+  top: 96px;
+}
+
+.explore-content-left > h1 {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.explore-filter h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 16px;
+}
+
+/* Filter Groups */
+.explore-filter-group,
+.explore-filter-region,
+.explore-filter-pet,
+.explore-filter-rating {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.explore-filter-region h3,
+.explore-filter-pet h3,
+.explore-filter-rating h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 12px;
+}
+
+/* Radio & Checkbox items */
+.filter-item,
+.explore-filter-region > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.filter-item input[type="radio"],
+.filter-item input[type="checkbox"],
+.explore-filter-region input[type="radio"],
+.explore-filter-pet input[type="checkbox"] {
+  accent-color: var(--color-primary);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.explore-filter-pet label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Rating filter button group */
+.explore-filter-rating > div {
+  display: flex;
+  gap: 8px;
+}
+
+.explore-filter-rating button,
+.rating-filter-btn {
+  flex: 1;
+  padding: 8px 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-align: center;
+  transition: var(--transition);
+}
+
+.explore-filter-rating button:hover,
+.explore-filter-rating button.active {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+/* Sidebar action buttons */
+.filter-actions,
+.explore-content-left > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.filter-actions button:first-child,
+.explore-content-left > div:last-child > button {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
+}
+
+.filter-actions button:first-child:hover,
+.explore-content-left > div:last-child > button:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.filter-reset-wrapper,
+.explore-content-left > div:last-child > div {
+  width: 100%;
+}
+
+.filter-reset-wrapper button,
+.explore-content-left > div:last-child > div > button {
+  width: 100%;
+  padding: 10px;
+  background-color: transparent;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.filter-reset-wrapper button:hover,
+.explore-content-left > div:last-child > div > button:hover {
+  background-color: #F3F4F6;
+  color: var(--color-text);
+}
+
+/* ==========================================================================
+   RIGHT CONTENT: SPOT GRID (2-Column)
+   ========================================================================== */
+.explore-content-right {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Header bar with count & sorting */
+.explore-content-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.explore-header-title-group,
+.explore-content-header > div:first-child {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.explore-content-header h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-text);
+  letter-spacing: -0.5px;
+}
+
+.explore-content-header > div:first-child > span {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.explore-sort-group,
+.explore-content-header > div:last-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.explore-content-header > div:last-child > span {
+  font-weight: 500;
+}
+
+.sort-btn,
+.explore-content-header button {
+  padding: 6px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background-color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.sort-btn:hover,
+.explore-content-header button:hover,
+.sort-btn.active,
+.explore-content-header button.active {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+}
+
+/* 2-Column Card Grid */
+.explore-grid-2,
+.explore-content-right > section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.explore-card,
+.explore-content-right article {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: var(--transition);
+}
+
+.explore-card:hover,
+.explore-content-right article:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-primary-light);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.explore-card-image {
+  width: 100%;
+  height: 200px;
+  background-color: #EDE9FE;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.explore-card-image::after {
+  content: '🏖️';
+  font-size: 40px;
+  opacity: 0.3;
+}
+
+.explore-card-image > span {
+  display: none;
+}
+
+.explore-card-body,
+.explore-content-right article > div:last-child {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.explore-card-tag {
+  align-self: flex-start;
+  margin-bottom: 8px;
+}
+
+.explore-card-body h3,
+.explore-content-right article h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 6px;
+}
+
+.explore-card-body p,
+.explore-content-right article p {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.explore-card-footer {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid #F3F4F6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-rating {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-rating);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-bookmark,
+.explore-card-footer button {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.btn-bookmark:hover,
+.explore-card-footer button:hover {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+/* Pagination */
+.explore-pagination,
+.explore-content-right > nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.explore-page-button {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background-color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  transition: var(--transition);
+}
+
+.explore-page-button:hover,
+.explore-page-button.active,
+.explore-page-button:first-child {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.25);
+}
