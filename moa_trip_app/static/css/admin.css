@@ -270,16 +270,3 @@
   color: #94A3B8;
   font-size: 13px;
 }
-
-.admin-table-bottom button {
-  padding: 8px 18px;
-  background-color: #DC2626;
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 700;
-  border-radius: var(--radius-sm);
-}
-
-.admin-table-bottom button:hover {
-  background-color: #B91C1C;
-}
