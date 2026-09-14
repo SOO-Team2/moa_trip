@@ -1,44 +1,31 @@
-<<<<<<< HEAD
-from django.shortcuts import render
-from django.db.models import Avg, Count
-from .models import Touristspot, Review, Weathercache
-=======
 import uuid
-from django.contrib.auth.hashers import make_password, check_password
 from django.shortcuts import render, redirect
+from django.db.models import Avg, Count
 from django.core.paginator import Paginator
 from django.utils import timezone
+from django.contrib.auth.hashers import make_password, check_password
+
 from .forms import LoginForm, SignupForm
-from .models import Region, TouristSpot, Users
-
->>>>>>> 2365b38490fff92721b7193d72d60b4980e05894
+from .models import Region, TouristSpot, Users, Review, WeatherCache
 
 
-<<<<<<< HEAD
+def main(request):
+    spots = (
+        TouristSpot.objects
+        .annotate(avg_rating=Avg('review__rating'), review_count=Count('review'))
+        .order_by('-avg_rating')[:4]
+    )
+    return render(request, 'main.html', {'spots': spots})
+
+
 def base(request):
     spots = (
-        Touristspot.objects
+        TouristSpot.objects
         .annotate(avg_rating=Avg('review__rating'), review_count=Count('review'))
         .order_by('-avg_rating')[:4]
     )
     return render(request, 'base.html', {'spots': spots})
 
-
-def spot_detail(request, spot_code):
-    spot = (
-        Touristspot.objects
-        .filter(spot_code=spot_code)
-        .annotate(avg_rating=Avg('review__rating'))
-        .first()
-    )
-
-    if spot:
-        reviews = spot.review_set.all().order_by('-create_date')
-        weathers = Weathercache.objects.filter(region=spot.region).order_by('forecast_date')
-    else:
-        reviews = Review.objects.none()
-        weathers = Weathercache.objects.none()
-=======
 
 # ===== 임시 더미 데이터 (나중에 Region, TouristSpot 모델의 실제 쿼리셋으로 교체) =====
 DUMMY_REGIONS = [
@@ -69,11 +56,38 @@ def explore(request):
     valid_codes = [r['code'] for r in DUMMY_REGIONS]
     if region not in valid_codes:
         region = 'jeju'
->>>>>>> 2365b38490fff92721b7193d72d60b4980e05894
+
+    spots = [s for s in DUMMY_SPOTS if s['region_code'] == region]
+
+    paginator = Paginator(spots, 12)
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'region': region,
+        'regions': DUMMY_REGIONS,
+        'total_count': len(spots),
+    }
+    return render(request, 'explore.html', context)
+
+
+def spot_detail(request, spot_code):
+    spot = (
+        TouristSpot.objects
+        .filter(spot_code=spot_code)
+        .annotate(avg_rating=Avg('review__rating'))
+        .first()
+    )
+
+    if spot:
+        reviews = spot.review_set.all().order_by('-create_date')
+        weathers = WeatherCache.objects.filter(region=spot.region).order_by('forecast_date')
+    else:
+        reviews = Review.objects.none()
+        weathers = WeatherCache.objects.none()
 
     today_weather = weathers.first() if weathers.exists() else None
 
-<<<<<<< HEAD
     weekday_kr = ['월', '화', '수', '목', '금', '토', '일']
 
     weekly_weather = []
@@ -85,27 +99,29 @@ def explore(request):
             'temp_high': w.temp_high,
             'precip_pct': w.precip_pct,
         })
-=======
-    paginator = Paginator(spots, 12)
-    page_obj = paginator.get_page(page_number)
->>>>>>> 2365b38490fff92721b7193d72d60b4980e05894
 
     context = {
-        'page_obj': page_obj,
-        'region': region,
-        'regions': DUMMY_REGIONS,
-        'total_count': len(spots),
+        'spot': spot,
+        'reviews': reviews,
+        'today_weather': today_weather,
+        'weekly_weather': weekly_weather,
     }
-    return render(request, 'explore.html', context)
+    return render(request, 'spot_detail.html', context)
 
 
 def mypage(request):
-    # user_id = request.session.get('user_id')
-    # if not user_id:
-    #     return redirect('login')
-    # user = Users.objects.get(pk=user_id)
-    # context = {...}
-    return render(request, 'mypage.html')
+    user_id = request.session.get('user_id')
+    user = None
+    if user_id:
+        try:
+            user = Users.objects.get(pk=user_id)
+        except Users.DoesNotExist:
+            user = None
+
+    context = {
+        'user': user,
+    }
+    return render(request, 'mypage.html', context)
 
 
 def login_view(request):
