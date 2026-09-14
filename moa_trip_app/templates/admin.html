@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}
+관리자 페이지
+{% endblock %}
+
+{% block content %}
+<aside>
+    <h3>관리</h3>
+    <ul>
+        <li><a href="#">회원 관리</a></li>
+        <li><a href="#">관광지 관리</a></li>
+        <li><a href="#">축제 관리</a></li>
+        <li><a href="#">후기 관리</a></li>
+    </ul>
+    <h3>시스템</h3>
+    <ul>
+        <li><a href="#">API 연동</a></li>
+        <li><a href="#">데이터 동기화</a></li>
+    </ul>
+</aside>
+
+<main>
+    <section>
+        <div>
+            <h3>8,412</h3>
+            <p>전체 회원</p>
+        </div>
+        <div>
+            <h3>142</h3>
+            <p>신규 가입</p>
+        </div>
+        <div>
+            <h3>23</h3>
+            <p>신고된 후기</p>
+        </div>
+        <div>
+            <h3>4/4</h3>
+            <p>API 상태</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>회원 관리</h2>
+        
+        <div>
+            <input type="text" placeholder="이메일 또는 닉네임 검색">
+        </div>
+        <div>
+            <button type="button">전체</button>
+            <button type="button">정지</button>
+            <button type="button">탈퇴</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col"><input type="checkbox"></th>
+                    <th scope="col">회원 ID</th>
+                    <th scope="col">닉네임</th>
+                    <th scope="col">이메일</th>
+                    <th scope="col">가입일</th>
+                    <th scope="col">후기</th>
+                    <th scope="col">상태</th>
+                    <th scope="col">관리</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>U-10428</td>
+                    <td>주원</td>
+                    <td>jw.choi@example.com</td>
+                    <td>2026.03.14</td>
+                    <td>7</td>
+                    <td>정상</td>
+                    <td><a href="#">상세</a></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>U-10427</td>
+                    <td>병진</td>
+                    <td>bj.park@example.com</td>
+                    <td>2026.03.14</td>
+                    <td>12</td>
+                    <td>정상</td>
+                    <td><a href="#">상세</a></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>U-10391</td>
+                    <td>여행러</td>
+                    <td>trip.kim@example.com</td>
+                    <td>2026.02.28</td>
+                    <td>41</td>
+                    <td>신고 3건</td>
+                    <td><a href="#">상세</a></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>U-10388</td>
+                    <td>명주</td>
+                    <td>mj.jung@example.com</td>
+                    <td>2026.02.21</td>
+                    <td>5</td>
+                    <td>정상</td>
+                    <td><a href="#">상세</a></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>U-10375</td>
+                    <td>보리아빠</td>
+                    <td>bori@example.com</td>
+                    <td>2026.02.09</td>
+                    <td>18</td>
+                    <td>정상</td>
+                    <td><a href="#">상세</a></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>U-10344</td>
+                    <td>jongseop</td>
+                    <td>js.lee@example.com</td>
+                    <td>2026.01.30</td>
+                    <td>2</td>
+                    <td>정지</td>
+                    <td><a href="#">상세</a></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div>
+            <p>1건 선택됨</p>
+            <div>
+                <button type="button">정지</button>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

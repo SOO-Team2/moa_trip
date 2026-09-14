@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}
+상세 페이지
+{% endblock %}
+
+{% block content %}
+<div class="spot-wrap">
+    <div class="spot-gallery">
+            <div class="main-photo">대표 사진</div>
+            <div>사진</div>
+            <div class="more-photo">사진</div>
+    </div>
+
+    <div class="spot-main">
+        <span class="tag">반려동물 동반 가능</span>
+
+        <div class="spot-title">협재해수욕장</div>
+        <div class="spot-sub">
+            제주특별자치도 제주시 한림읍 협재리 2497-1 · 평점 4.6 · 후기 212
+        </div>
+
+        <div class="info-table">
+            <div><span class="label">입장료</span><span class="value">무료</span></div>
+            <div><span class="label">주차</span><span class="value">공영주차장 200면</span></div>
+            <div><span class="label">반려동물</span><span class="value">동반 가능</span></div>
+            <div><span class="label">이용 시간</span><span class="value">상시 개방(수영 09:00-19:00)</span></div>
+            <div><span class="label">문의</span><span class="value">064-728-3994</span></div>
+        </div>
+
+        <div class="section-title">주간 예보</div>
+        <div class="weekly-forecast">
+            <div class="weather-item">
+                <div class="date">오늘 9/8</div>
+                <div class="weather-icon">☀️ 맑음</div>
+                <div class="temp">26°</div>
+            </div>
+
+            <div class="weather-item">
+                <div class="date">화 9/9</div>
+                <div class="weather-icon">☀️ 맑음</div>
+                <div class="temp">27°</div>
+            </div>
+
+            <div class="weather-item">
+                <div class="date">수 9/10</div>
+                <div class="weather-icon">☁️ 구름</div>
+                <div class="temp">25°</div>
+            </div>
+
+            <div class="weather-item">
+                <div class="date">목 9/11</div>
+                <div class="weather-icon">🌧️ 비</div>
+                <div class="temp">23°</div>
+            </div>
+
+            <div class="weather-item">
+                <div class="date">금 9/12</div>
+                <div class="weather-icon">☁️ 흐림</div>
+                <div class="temp">24°</div>
+            </div>
+
+            <div class="weather-item">
+                <div class="date">토 9/13</div>
+                <div class="weather-icon">☀️ 맑음</div>
+                <div class="temp">26°</div>
+            </div>
+
+            <div class="weather-item">
+                <div class="date">일 9/14</div>
+                <div class="weather-icon">☀️ 맑음</div>
+                <div class="temp">27°</div>
+            </div>
+        </div>
+
+        <div class="review-header">
+            <div class="section-title">후기 212</div>
+            <button class="review-write-btn">후기 작성</button>
+        </div>
+
+        <div class="review-item">
+            <div class="r-top">
+                <span class="r-writer">정명주</span>
+                <span>평점 5.0 · 2026.09.02</span>
+                <div class="r-content">강아지와 함께 해변을 걸을 수 있어서 좋았습니다. 주차장에서 해변까지 3분 정도.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="spot-sidebar">
+        <div class="weather-today">
+            <div>오늘</div>
+            <div class="w-temp">26°</div>
+            <div class="w-desc">맑음 · 강수확률 10%</div>
+        </div>
+
+        <button class="sidebar-btn primary">여행 일정에 추가</button>
+        <button class="sidebar-btn">즐겨찾기</button>
+
+        <div class="sidebar-map">
+            <div class="map-placeholder">
+                <div class="map-dot"></div>
+            </div>
+            <div class="map-address">제주시 한림읍 2497-1</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

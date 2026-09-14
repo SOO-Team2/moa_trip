@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}
+여행 일정
+{% endblock %}
+
+{% block content %}
+<header>
+    <h1>즐겨찾기로 여행 만들기</h1>
+</header>
+
+<main>
+    <section>
+        <div>
+            <label>여행 제목</label><br>
+            <input type="text" placeholder="예: 반려동물 동반 1일 여행">
+        </div>
+        <div>
+            <label>여행지</label><br>
+            <select>
+                <option value="jeju">제주도</option>
+                <option value="seoul">서울</option>
+                <option value="busan">부산</option>
+                <option value="gangwon">강원도</option>
+                <option value="gyeongju">경주</option>
+            </select>
+        </div>
+        <div>
+            <label>날짜</label><br>
+            <input type="text" value="2026. 09. 12 (토)">
+        </div>
+        <div>
+            <label>동행</label><br>
+            <button type="button">혼자</button>
+            <button type="button">가족</button>
+            <button type="button">친구</button>
+            <legend>반려동물과 함께</legend>
+        </div>
+        <div>
+            <button type="submit">여행 만들기</button>
+        </div>
+    </section>
+
+    <section>
+        <h2>제주도 · 반려동물 동반 1일 여행</h2>
+        <div>
+            <button type="button">일정 저장</button>
+        </div>
+        
+        <div>
+            <span>오전 09:00</span>
+            <div>
+                <h3>협재해수욕장</h3>
+                <p>무료 · 반려동물 동반 가능</p>
+            </div>
+        </div>
+        <div>
+            <span>11:30</span>
+            <div>
+                <h3>한담 해안 산책로</h3>
+                <p>무료 · 반려동물 동반 가능</p>
+            </div>
+        </div>
+        <div>
+            <span>오후 02:00</span>
+            <div>
+                <h3>사려니숲길</h3>
+                <p>무료 · 반려동물 동반 가능</p>
+            </div>
+        </div>
+        <div>
+            <span>저녁 06:00</span>
+            <div>
+                <h3>새별오름 일몰</h3>
+                <p>무료 · 반려동물 동반 가능</p>
+            </div>
+        </div>
+        <div>
+            <button type="button">+ 장소 직접 추가</button>
+        </div>
+    </section>
+
+    <section>
+        <div>
+            <h3>요약</h3>
+            <p>장소: 4곳</p>
+            <p>예상 비용: 34,000원</p>
+            <p>반려동물: 4곳 모두 동반 가능</p>
+        </div>
+    </section>
+</main>
+{% endblock %}

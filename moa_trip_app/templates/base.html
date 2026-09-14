@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+    <!-- 헤더 -->
+    {% include 'components/header.html' %}
+
+    <!-- 페이지별 본문 내용 -->
+    {% block content %}{% endblock %}
+
+    <!-- 푸터 -->
+    {% include 'components/footer.html' %}
+</body>
+</html>
