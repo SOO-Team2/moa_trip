@@ -1,0 +1,298 @@
+{
+  "regions": [
+    {
+      "region_code": "R01",
+      "region_name": "제주특별자치도"
+    },
+    {
+      "region_code": "R02",
+      "region_name": "강원특별자치도"
+    },
+    {
+      "region_code": "R03",
+      "region_name": "경상북도"
+    },
+    {
+      "region_code": "R04",
+      "region_name": "전라남도"
+    },
+    {
+      "region_code": "R05",
+      "region_name": "서울특별시"
+    },
+    {
+      "region_code": "R06",
+      "region_name": "부산광역시"
+    }
+  ],
+
+  "users": [
+    {
+      "user_id": "U-10428",
+      "nickname": "최주원",
+      "email": "jw.choi@example.com",
+      "pw": "test1234!",
+      "join_date": "2026-03-14"
+    },
+    {
+      "user_id": "U-10427",
+      "nickname": "박병진",
+      "email": "bj.park@example.com",
+      "pw": "test1234!",
+      "join_date": "2026-03-14"
+    },
+    {
+      "user_id": "U-10388",
+      "nickname": "정명주",
+      "email": "mj.jung@example.com",
+      "pw": "test1234!",
+      "join_date": "2026-02-21"
+    },
+    {
+      "user_id": "U-10375",
+      "nickname": "보리아빠",
+      "email": "bori@example.com",
+      "pw": "test1234!",
+      "join_date": "2026-02-09"
+    }
+  ],
+
+  "tourist_spots": [
+    {
+      "spot_code": "SPOT001",
+      "region_code": "R01",
+      "t_name": "협재해수욕장",
+      "address": "제주특별자치도 제주시 한림읍 협재리 2497-1",
+      "category": "자연/해변",
+      "entry_fee": 0,
+      "parking_info": "공영주차장 200면",
+      "operating_hours": "상시 개방 (수영 09:00 - 19:00)",
+      "phone": "064-728-3994",
+      "pet_allowed": true,
+      "rating": 4.6,
+      "review_count": 212,
+      "image_placeholder": "🏖️"
+    },
+    {
+      "spot_code": "SPOT002",
+      "region_code": "R02",
+      "t_name": "경포해변",
+      "address": "강원특별자치도 강릉시 강문동 산1-1",
+      "category": "자연/해변",
+      "entry_fee": 0,
+      "parking_info": "무료 공영주차장",
+      "operating_hours": "상시 개방",
+      "phone": "033-640-5129",
+      "pet_allowed": false,
+      "rating": 4.5,
+      "review_count": 874,
+      "image_placeholder": "🌊"
+    },
+    {
+      "spot_code": "SPOT003",
+      "region_code": "R03",
+      "t_name": "불국사",
+      "address": "경상북도 경주시 진현동 15-1",
+      "category": "문화/역사",
+      "entry_fee": 6000,
+      "parking_info": "유료 주차장 300면",
+      "operating_hours": "09:00 - 18:00 (연중무휴)",
+      "phone": "054-746-9913",
+      "pet_allowed": true,
+      "rating": 4.7,
+      "review_count": 1206,
+      "image_placeholder": "🏛️"
+    },
+    {
+      "spot_code": "SPOT004",
+      "region_code": "R04",
+      "t_name": "오동도",
+      "address": "전라남도 여수시 수정동 산1-11",
+      "category": "자연/섬",
+      "entry_fee": 0,
+      "parking_info": "유료 공영주차장",
+      "operating_hours": "상시 개방",
+      "phone": "061-659-1819",
+      "pet_allowed": false,
+      "rating": 4.4,
+      "review_count": 533,
+      "image_placeholder": "🏝️"
+    },
+    {
+      "spot_code": "SPOT005",
+      "region_code": "R01",
+      "t_name": "사려니숲길",
+      "address": "제주특별자치도 제주시 조천읍 교래리 산137-1",
+      "category": "자연/힐링",
+      "entry_fee": 0,
+      "parking_info": "임시주차장 50면",
+      "operating_hours": "09:00 - 17:00",
+      "phone": "064-900-8800",
+      "pet_allowed": true,
+      "rating": 4.8,
+      "review_count": 518,
+      "image_placeholder": "🌲"
+    },
+    {
+      "spot_code": "SPOT006",
+      "region_code": "R01",
+      "t_name": "새별오름",
+      "address": "제주특별자치도 제주시 애월읍 봉성리 산59-8",
+      "category": "자연/오름",
+      "entry_fee": 0,
+      "parking_info": "무료 대형주차장",
+      "operating_hours": "상시 개방",
+      "phone": "064-728-2752",
+      "pet_allowed": true,
+      "rating": 4.5,
+      "review_count": 342,
+      "image_placeholder": "⛰️"
+    }
+  ],
+
+  "festivals": [
+    {
+      "festival_id": "FEST001",
+      "region_code": "R01",
+      "festival_name": "제주 해녀 축제",
+      "start_date": "2026-09-05",
+      "end_date": "2026-09-14",
+      "festival_location": "제주시 구좌읍 해녀박물관 일대"
+    },
+    {
+      "festival_id": "FEST002",
+      "region_code": "R01",
+      "festival_name": "서귀포 칠십리 축제",
+      "start_date": "2026-09-10",
+      "end_date": "2026-09-20",
+      "festival_location": "서귀포시 천지연 폭포 광장 및 일대"
+    },
+    {
+      "festival_id": "FEST003",
+      "region_code": "R01",
+      "festival_name": "한라산 억새 축제",
+      "start_date": "2026-09-19",
+      "end_date": "2026-09-22",
+      "festival_location": "제주시 애월읍 새별오름 야외무대"
+    }
+  ],
+
+  "weather_forecasts": [
+    {
+      "weather_condition": "맑음",
+      "region_code": "R01",
+      "forecast_date": "2026-09-14",
+      "temp_high": 26,
+      "precip_pct": 10
+    },
+    {
+      "weather_condition": "맑음",
+      "region_code": "R01",
+      "forecast_date": "2026-09-15",
+      "temp_high": 27,
+      "precip_pct": 0
+    },
+    {
+      "weather_condition": "구름",
+      "region_code": "R01",
+      "forecast_date": "2026-09-16",
+      "temp_high": 25,
+      "precip_pct": 20
+    },
+    {
+      "weather_condition": "비",
+      "region_code": "R01",
+      "forecast_date": "2026-09-17",
+      "temp_high": 23,
+      "precip_pct": 80
+    },
+    {
+      "weather_condition": "흐림",
+      "region_code": "R01",
+      "forecast_date": "2026-09-18",
+      "temp_high": 24,
+      "precip_pct": 30
+    },
+    {
+      "weather_condition": "맑음",
+      "region_code": "R01",
+      "forecast_date": "2026-09-19",
+      "temp_high": 26,
+      "precip_pct": 10
+    },
+    {
+      "weather_condition": "맑음",
+      "region_code": "R01",
+      "forecast_date": "2026-09-20",
+      "temp_high": 27,
+      "precip_pct": 0
+    }
+  ],
+
+  "favorites": [
+    {
+      "fav_code": "FAV001",
+      "user_id": "U-10428",
+      "spot_code": "SPOT001"
+    },
+    {
+      "fav_code": "FAV002",
+      "user_id": "U-10428",
+      "spot_code": "SPOT005"
+    },
+    {
+      "fav_code": "FAV003",
+      "user_id": "U-10428",
+      "spot_code": "SPOT006"
+    }
+  ],
+
+  "reviews": [
+    {
+      "review_code": "REV001",
+      "user_id": "U-10388",
+      "spot_code": "SPOT001",
+      "rating": 5,
+      "create_date": "2026-09-02 14:30:00",
+      "content": "강아지와 함께 해변을 걸을 수 있어서 너무 좋았습니다. 주차장에서 해변까지 도보 3분 정도라 편리해요."
+    },
+    {
+      "review_code": "REV002",
+      "user_id": "U-10428",
+      "spot_code": "SPOT005",
+      "rating": 5,
+      "create_date": "2026-08-21 11:15:00",
+      "content": "반려견과 산책하기 최고의 평지 숲길입니다. 주차장이 다소 협소하니 오전 일찍 방문을 추천합니다."
+    }
+  ],
+
+  "itineraries": [
+    {
+      "itinerary_code": "ITN001",
+      "user_id": "U-10428",
+      "spot_code": "SPOT001",
+      "itinerary_title": "제주도 · 반려견 동반 1일 여행",
+      "itinerary_date": "2026-09-12",
+      "pet_accompanied": true,
+      "memo": "09:00 협재해수욕장 산책 및 사진 촬영"
+    },
+    {
+      "itinerary_code": "ITN002",
+      "user_id": "U-10428",
+      "spot_code": "SPOT005",
+      "itinerary_title": "제주도 · 반려견 동반 1일 여행",
+      "itinerary_date": "2026-09-12",
+      "pet_accompanied": true,
+      "memo": "14:00 사려니숲길 피톤치드 힐링 코스"
+    },
+    {
+      "itinerary_code": "ITN003",
+      "user_id": "U-10428",
+      "spot_code": "SPOT006",
+      "itinerary_title": "제주도 · 반려견 동반 1일 여행",
+      "itinerary_date": "2026-09-12",
+      "pet_accompanied": true,
+      "memo": "18:00 새별오름 억새밭 일몰 감상"
+    }
+  ]
+}
