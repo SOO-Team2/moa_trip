@@ -9,6 +9,7 @@ class Users(models.Model):
     nickname = models.CharField(db_column='NICKNAME', max_length=20, verbose_name='닉네임')
     email = models.CharField(db_column='EMAIL', max_length=255, verbose_name='이메일')
     pw = models.CharField(db_column='PW', max_length=20, verbose_name='비밀번호')
+    status = models.CharField(db_column='STATUS', max_length=20, default='정상', verbose_name='회원 상태') # 상태 컬럼 추가
     join_date = models.DateField(db_column='JOIN_DATE', blank=True, null=True, verbose_name='가입일자')
 
     class Meta:
@@ -52,6 +53,7 @@ class TouristSpot(models.Model):
     operating_hours = models.CharField(db_column='OPERATING_HOURS', max_length=255, verbose_name='운영 시간')
     phone = models.CharField(db_column='PHONE', max_length=20, verbose_name='문의 전화번호')
     pet_allowed = models.BooleanField(db_column='PET_ALLOWED', verbose_name='반려동물 동반 가능 여부')
+    image = models.ImageField(db_column='IMAGE', upload_to='tourist_spots/',  max_length=500, blank=True, null=True, verbose_name='이미지') # 이미지 컬럼 추가
 
     class Meta:
         managed = False
@@ -154,6 +156,7 @@ class Itinerary(models.Model):
     spot = models.ForeignKey(TouristSpot, on_delete=models.DO_NOTHING, db_column='SPOT_CODE', verbose_name='관광지')
     itinerary_title = models.CharField(db_column='ITINERARY_TITLE', max_length=255, blank=True, null=True, verbose_name='일정 제목')
     itinerary_date = models.DateField(db_column='ITINERARY_DATE', verbose_name='일정 일자')
+    companion = models.CharField(db_column='COMPANION', max_length=20, blank=True, null=True, verbose_name='동행') # 동행 컬럼 추가
     pet_accompanied = models.BooleanField(db_column='PET_ACCOMPANIED', verbose_name='반려동물 동반 여부')
     memo = models.CharField(db_column='MEMO', max_length=255, blank=True, null=True, verbose_name='메모')
 
