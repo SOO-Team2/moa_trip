@@ -4,5 +4,6 @@ __pycache__/
 *.pyo
 *.pyd
 menv/
+.venv/
 .env
 *.env

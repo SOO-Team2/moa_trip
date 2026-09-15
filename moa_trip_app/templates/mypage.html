@@ -17,21 +17,21 @@
   <header class="mypage-profile-header">
     <div class="profile-avatar">👤</div>
     <div class="profile-info">
-      <span class="profile-badge">일반 회원</span>
-      <h1>최주원</h1>
-      <p>U-10428 · 2026.03 가입</p>
+      <span class="profile-badge">{{ user.grade }}</span>
+      <h1>{{ user.name }}</h1>
+      <p>{{ user.user_id }} · {{ user.join_date }} 가입</p>
     </div>
     <div class="profile-stats-group">
       <div class="stat-item">
-        <span>18</span>
+        <span>{{ user.bookmark_count }}</span>
         <span>즐겨찾기</span>
       </div>
       <div class="stat-item">
-        <span>7</span>
+        <span>{{ user.review_count }}</span>
         <span>작성 후기</span>
       </div>
       <div class="stat-item">
-        <span>3</span>
+        <span>{{ user.itinerary_count }}</span>
         <span>저장 일정</span>
       </div>
     </div>
@@ -53,62 +53,49 @@
       <!-- 즐겨찾기 섹션 -->
       <section class="mypage-bookmark-section">
         <div class="bookmark-section-header">
-          <h2>즐겨찾기 18곳</h2>
+          <h2>즐겨찾기 {{ bookmarks|length }}곳</h2>
           <div class="bookmark-nav-btns">
             <button type="button">&lt;</button>
             <button type="button">&gt;</button>
           </div>
         </div>
 
-        <!-- 관광지 카드 그리드 -->
+        <!-- 관광지 카드 그리드 (API 반복문) -->
         <div class="mypage-spot-grid">
-          <!-- 카드 1 -->
+          {% if bookmarks %}
+          {% for spot in bookmarks %}
           <article class="mypage-spot-card">
-            <div class="mypage-spot-thumb">🏖️</div>
-            <h3><a href="{% url 'detail' %}">협재해수욕장</a></h3>
-            <p>제주시 한림읍</p>
+            <div class="mypage-spot-thumb"
+              style="overflow:hidden; display:flex; align-items:center; justify-content:center; background:#f0f0f0;">
+              {% if spot.firstimage %}
+              <img src="{{ spot.firstimage }}" alt="{{ spot.title }}"
+                style="width:100%; height:100%; object-fit:cover;">
+              {% else %}
+              <span>🏖️</span>
+              {% endif %}
+            </div>
+            <h3><a href="{% url 'detail' %}?contentid={{ spot.contentid }}">{{ spot.title }}</a></h3>
+            <p>{{ spot.addr1|default:"위치 정보 없음" }}</p>
           </article>
-
-          <!-- 카드 2 -->
-          <article class="mypage-spot-card">
-            <div class="mypage-spot-thumb">🌲</div>
-            <h3><a href="{% url 'detail' %}">사려니숲길</a></h3>
-            <p>제주시 조천읍</p>
-          </article>
-
-          <!-- 카드 3 -->
-          <article class="mypage-spot-card">
-            <div class="mypage-spot-thumb">⛰️</div>
-            <h3><a href="{% url 'detail' %}">새별오름</a></h3>
-            <p>제주시 애월읍</p>
-          </article>
-
-          <!-- 카드 4 -->
-          <article class="mypage-spot-card">
-            <div class="mypage-spot-thumb">🌅</div>
-            <h3><a href="{% url 'detail' %}">수월봉</a></h3>
-            <p>제주시 한경면</p>
-          </article>
-
-          <!-- 카드 5 -->
-          <article class="mypage-spot-card">
-            <div class="mypage-spot-thumb">🏝️</div>
-            <h3><a href="{% url 'detail' %}">우도</a></h3>
-            <p>제주시 우도면</p>
-          </article>
+          {% endfor %}
+          {% else %}
+          <p style="grid-column: 1 / -1; padding: 20px 0; color: #888;">즐겨찾기한 관광지가 없습니다.</p>
+          {% endif %}
 
           <!-- 추가 카드 버튼 -->
           <article class="add-spot-card">
-            <button type="button">+ 관광지 더 담기</button>
+            <a href="{% url 'explore' %}"
+              style="text-decoration:none; color:inherit; display:flex; align-items:center; justify-content:center; width:100%; height:100%;">
+              <button type="button">+ 관광지 더 담기</button>
+            </a>
           </article>
         </div>
       </section>
 
       <!-- 후기 섹션 -->
       <section class="mypage-review-section">
-        <h2>작성한 후기 7개</h2>
+        <h2>작성한 후기 {{ user.review_count }}개</h2>
         <ul class="mypage-review-list">
-          <!-- 후기 1 -->
           <li class="mypage-review-item">
             <div class="review-thumb">🌅</div>
             <div class="review-content">
@@ -117,8 +104,6 @@
             </div>
             <span class="review-date">2026.08.30</span>
           </li>
-
-          <!-- 후기 2 -->
           <li class="mypage-review-item">
             <div class="review-thumb">🌲</div>
             <div class="review-content">
@@ -135,35 +120,16 @@
     <aside class="mypage-itinerary-aside">
       <h2>저장한 여행 일정</h2>
       <div class="itinerary-list">
-        <!-- 일정 1 -->
+        {% for itin in saved_itineraries %}
         <article class="itinerary-card">
-          <h3>제주도 · 반려견 동반 1일</h3>
-          <p>2026.09.12 (토) · 4곳</p>
+          <h3>{{ itin.title }}</h3>
+          <p>{{ itin.date }} · {{ itin.spot_cnt }}곳</p>
           <div class="itinerary-actions">
             <button type="button">열기</button>
             <button type="button">삭제</button>
           </div>
         </article>
-
-        <!-- 일정 2 -->
-        <article class="itinerary-card">
-          <h3>속초 2일 코스</h3>
-          <p>2026.10.03 · 6곳</p>
-          <div class="itinerary-actions">
-            <button type="button">열기</button>
-            <button type="button">삭제</button>
-          </div>
-        </article>
-
-        <!-- 일정 3 -->
-        <article class="itinerary-card">
-          <h3>여수 야경 코스</h3>
-          <p>임시 저장 · 2곳</p>
-          <div class="itinerary-actions">
-            <button type="button">열기</button>
-            <button type="button">삭제</button>
-          </div>
-        </article>
+        {% endfor %}
       </div>
     </aside>
   </main>

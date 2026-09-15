@@ -16,79 +16,70 @@
     </header>
 
     <main class="planner-main-layout">
+        <!-- 폼 영역 -->
         <section class="planner-form-section">
-            <div class="planner-form-group">
-                <label>여행 제목</label>
-                <input type="text" placeholder="예: 반려동물 동반 1일 여행" value="반려동물 동반 1일 여행">
-            </div>
-            <div class="planner-form-group">
-                <label>여행지</label>
-                <select>
-                    <option value="jeju" selected>제주도</option>
-                    <option value="seoul">서울</option>
-                    <option value="busan">부산</option>
-                    <option value="gangwon">강원도</option>
-                    <option value="gyeongju">경주</option>
-                </select>
-            </div>
-            <div class="planner-form-group">
-                <label>날짜</label>
-                <input type="text" value="2026. 09. 12 (토)">
-            </div>
-            <div class="planner-form-group">
-                <label>동행</label>
-                <div class="companion-btn-group">
-                    <button type="button" class="companion-btn">혼자</button>
-                    <button type="button" class="companion-btn active">가족</button>
-                    <button type="button" class="companion-btn">친구</button>
+            <form method="GET" action="{% url 'planner' %}">
+                <div class="planner-form-group">
+                    <label>여행 제목</label>
+                    <input type="text" name="title" placeholder="예: 반려동물 동반 1일 여행" value="반려동물 동반 1일 여행">
                 </div>
-                <div class="companion-pet-legend">🐾 반려동물과 함께</div>
-            </div>
-            <div>
-                <button type="submit" class="btn-submit-planner">여행 만들기</button>
-            </div>
+                <div class="planner-form-group">
+                    <label>여행지</label>
+                    <select name="region">
+                        {% for r in regions %}
+                        <option value="{{ r.code }}" {% if r.is_selected %}selected{% endif %}>{{ r.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="planner-form-group">
+                    <label>날짜</label>
+                    <input type="text" name="date" value="2026. 09. 19 (토)">
+                </div>
+                <div class="planner-form-group">
+                    <label>동행</label>
+                    <div class="companion-btn-group">
+                        <button type="button" class="companion-btn">혼자</button>
+                        <button type="button" class="companion-btn active">가족</button>
+                        <button type="button" class="companion-btn">친구</button>
+                    </div>
+                    <div class="companion-pet-legend">🐾 반려동물과 함께</div>
+                </div>
+                <div>
+                    <button type="submit" class="btn-submit-planner">코스 추천받기</button>
+                </div>
+            </form>
         </section>
 
+        <!-- 타임라인 영역 -->
         <section class="planner-timeline-section">
             <div class="timeline-header">
-                <h2>제주도 · 반려동물 동반 1일 여행</h2>
+                <h2>
+                    {% if selected_region == 'seoul' %}서울
+                    {% elif selected_region == 'gangwon' %}강원도
+                    {% elif selected_region == 'busan' %}부산
+                    {% elif selected_region == 'gyeongju' %}경주
+                    {% else %}제주도{% endif %} · 반려동물 동반 1일 코스
+                </h2>
                 <div>
                     <button type="button" class="btn-save-itinerary">일정 저장</button>
                 </div>
             </div>
-            
+
             <div class="timeline-list">
+                {% if timeline_items %}
+                {% for item in timeline_items %}
                 <div class="timeline-item">
-                    <span class="timeline-time-badge">오전 09:00</span>
+                    <span class="timeline-time-badge">{{ item.time }}</span>
                     <div class="timeline-card">
-                        <h3>협재해수욕장</h3>
-                        <p>무료 · 반려동물 동반 가능</p>
+                        <h3><a href="{% url 'detail' %}?contentid={{ item.contentid }}"
+                                style="text-decoration:none; color:inherit;">{{ item.title }}</a></h3>
+                        <p>{{ item.addr }} · 반려동물 동반 가능</p>
                     </div>
                 </div>
-
-                <div class="timeline-item">
-                    <span class="timeline-time-badge">11:30</span>
-                    <div class="timeline-card">
-                        <h3>한담 해안 산책로</h3>
-                        <p>무료 · 반려동물 동반 가능</p>
-                    </div>
-                </div>
-
-                <div class="timeline-item">
-                    <span class="timeline-time-badge">오후 02:00</span>
-                    <div class="timeline-card">
-                        <h3>사려니숲길</h3>
-                        <p>무료 · 반려동물 동반 가능</p>
-                    </div>
-                </div>
-
-                <div class="timeline-item">
-                    <span class="timeline-time-badge">저녁 06:00</span>
-                    <div class="timeline-card">
-                        <h3>새별오름 일몰</h3>
-                        <p>무료 · 반려동물 동반 가능</p>
-                    </div>
-                </div>
+                {% endfor %}
+                {% else %}
+                <p style="padding: 40px 0; color: #888; text-align: center;">해당 지역에 등록된 추천 장소가 없습니다.</p>
+                {% endif %}
             </div>
 
             <div>
@@ -96,12 +87,13 @@
             </div>
         </section>
 
+        <!-- 요약 카드 영역 -->
         <section class="planner-summary-section">
             <div class="summary-card">
                 <h3>일정 요약</h3>
-                <p><span>방문 장소</span> <strong>4곳</strong></p>
-                <p><span>예상 비용</span> <strong>34,000원</strong></p>
-                <p><span>반려동물</span> <strong>4곳 모두 가능</strong></p>
+                <p><span>방문 장소</span> <strong>{{ spot_count }}곳</strong></p>
+                <p><span>예상 비용</span> <strong>무료 (입장료 기준)</strong></p>
+                <p><span>반려동물</span> <strong>{{ spot_count }}곳 모두 가능</strong></p>
             </div>
         </section>
     </main>
