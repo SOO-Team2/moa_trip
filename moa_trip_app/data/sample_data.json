@@ -23,6 +23,40 @@
     {
       "region_code": "R06",
       "region_name": "부산광역시"
+    },
+    {
+      "region_code": "R07",
+      "region_name": "대구광역시"
+    },
+    { "region_code": "R08",
+      "region_name": "인천광역시"
+    },
+    { "region_code": "R09",
+      "region_name": "광주광역시"
+    },
+    { "region_code": "R10",
+      "region_name": "대전광역시"
+    },
+    { "region_code": "R11",
+      "region_name": "울산광역시"
+    },
+    { "region_code": "R12",
+      "region_name": "세종특별자치시"
+    },
+    { "region_code": "R13",
+      "region_name": "경기도"
+    },
+    { "region_code": "R14",
+      "region_name": "충청북도"
+    },
+    { "region_code": "R15",
+      "region_name": "충청남도"
+    },
+    { "region_code": "R16",
+      "region_name": "전북특별자치도"
+    },
+    { "region_code": "R17",
+      "region_name": "경상남도"
     }
   ],
 

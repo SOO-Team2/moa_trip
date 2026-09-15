@@ -53,7 +53,7 @@ class TouristSpot(models.Model):
     operating_hours = models.CharField(db_column='OPERATING_HOURS', max_length=255, verbose_name='운영 시간')
     phone = models.CharField(db_column='PHONE', max_length=20, verbose_name='문의 전화번호')
     pet_allowed = models.BooleanField(db_column='PET_ALLOWED', verbose_name='반려동물 동반 가능 여부')
-    image = models.ImageField(db_column='IMAGE', upload_to='tourist_spots/',  max_length=500, blank=True, null=True, verbose_name='이미지') # 이미지 컬럼 추가
+    image = models.ImageField(db_column='IMAGE', upload_to='tourist_spots/', blank=True, null=True, verbose_name='이미지') # 이미지 컬럼 추가
 
     class Meta:
         managed = False

@@ -49,11 +49,13 @@
       <!-- 평점 필터 -->
       <div class="explore-filter-rating">
         <h3>평점</h3>
-        <div>
-          <button type="button" class="rating-filter-btn active">4.5 이상</button>
-          <button type="button" class="rating-filter-btn">4.0 이상</button>
-          <button type="button" class="rating-filter-btn">3.5 이상</button>
-        </div>
+        <div class="rating-filter-group">
+          <input type="radio" name="min_rating" id="rating-45" class="rating-radio" checked>
+          <label for="rating-45" class="rating-filter-btn">4.5 이상</label>
+          <input type="radio" name="min_rating" id="rating-40" class="rating-radio">
+          <label for="rating-40" class="rating-filter-btn">4.0 이상</label>
+          <input type="radio" name="min_rating" id="rating-35" class="rating-radio">
+          <label for="rating-35" class="rating-filter-btn">3.5 이상</label>
       </div>
     </div>
 

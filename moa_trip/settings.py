@@ -133,5 +133,3 @@ MAILERS = {
 
 # 공공데이터 API
 KMA_API_KEY = 'a2QRrEzCmxvn5HHIDRG8ql2FCynA0kAFDsse7JJ50NrjBn%2BTmI5iunhQoNnNeUJElublkgv8FcYckdN8hYsh8g%3D%3D'
-
-USE_DUMMY_DATA = True  # 더미 데이터
