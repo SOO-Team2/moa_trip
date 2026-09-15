@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from .models import Region
 
 def main(request):
     return render(request, 'main.html')
@@ -10,7 +11,8 @@ def detail(request):
     return render(request, 'detail.html')
 
 def planner(request):
-    return render(request, 'planner.html')
+    regions = Region.objects.all()
+    return render(request, 'planner.html', {'regions':regions})
 
 def mypage(request):
     return render(request, 'mypage.html')

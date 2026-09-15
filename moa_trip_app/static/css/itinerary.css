@@ -95,7 +95,7 @@
   color: var(--color-primary);
 }
 
-.companion-pet-legend {
+.companion-pet-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -103,7 +103,20 @@
   color: var(--color-primary);
   font-weight: 600;
   background-color: var(--color-primary-light);
-  padding: 4px 10px;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+}
+
+.companion-pet-btn:hover,
+.companion-pet-btn.active {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #ffffff;
+  font-weight: 600;
+  background-color: var(--color-primary);
+  padding: 5px 10px;
   border-radius: var(--radius-full);
 }
 
