@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from .models import TouristSpot, Region
+from django.contrib.auth.hashers import make_password, check_password
+from .models import TouristSpot, Region, Users
 from django.db.models import Avg, Count
 
 def main(request):
@@ -49,7 +50,6 @@ def mypage(request):
 def login(request):
     return render(request, 'login.html')
 
-from .models import Users
 def login_ok(request):
     user_id = request.POST.get('user_id', None)
     pw = request.POST.get('pw', None)
@@ -60,7 +60,7 @@ def login_ok(request):
         user = None
     if user != None:
         # 해당 회원 존재함
-        if user.pw == pw:
+        if check_password(pw, user.pw):
             # 로그인 정보 세션에 저장
             request.session['user_id'] = user.user_id
 
@@ -80,6 +80,43 @@ def logout(request):
     request.session.flush()
     
     return redirect('main')
+
+def signup(request):
+    if request.method != 'POST':
+        return redirect('login')
+    
+    user_id = request.POST.get('user_id', None)
+    pw = request.POST.get('pw', None)
+    nickname = request.POST.get('nickname', None)
+    email = request.POST.get('email', None)
+
+    if not user_id or not pw or not nickname or not email:
+        #입력값 누락
+        result = 2
+    elif '@' not in email:
+        #이메일 형식 오류
+        result = 3
+    else:
+
+        try:
+            user = Users.objects.get(user_id=user_id)
+        except Users.DoesNotExist:
+            user = None
+
+        if user is not None:
+            #이미 존재하는 아이디
+            result = 1
+        else:
+            #신규 회원 저장
+            Users.objects.create(
+                user_id=user_id,
+                pw=make_password(pw),
+                nickname=nickname,
+                email=email,
+            )
+            result = 0
+
+    return render(request, 'signup_ok.html', {'result':result})
 
 def admin(request):
     return render(request, 'admin.html')

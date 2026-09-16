@@ -41,23 +41,24 @@
         <button type="submit" class="auth-submit-btn">로그인</button>
       </form>
 
-      <form class="auth-form" method="post" action="#" id="signup-form" style="display: none;">
+      <form class="auth-form" method="post" action="../signup/" id="signup-form" style="display: none;">
         {% csrf_token %}
         <div class="auth-field-group">
           <label>아이디</label>
-          <input type="text" placeholder="사용할 아이디를 입력하세요" required>
+          <input type="text" name="user_id" placeholder="아이디를 입력하세요" required>
         </div>
-
+         <div class="auth-field-group">
+          <label>닉네임</label>
+          <input type="text" name="nickname" placeholder="닉네임을 입력하세요" required>
+        </div>
         <div class="auth-field-group">
           <label>비밀번호</label>
-          <input type="password" placeholder="비밀번호를 입력하세요" required>
+          <input type="password" name="pw" placeholder="비밀번호를 입력하세요" required>
         </div>
-        
         <div class="auth-field-group">
-          <label>비밀번호 확인</label>
-          <input type="password" placeholder="비밀번호를 다시 입력하세요" required>
+          <label>이메일</label>
+          <input type="email" name="email" placeholder="이메일을 입력하세요" required>
         </div>
-
         <button type="submit" class="auth-submit-btn">회원가입</button>
       </form>
     </main>
@@ -82,10 +83,10 @@
 
         if (tab.dataset.tab == 'signup') {
           loginform.style.display = 'none';  
-          signupform.style.display = 'block';
+          signupform.style.display = 'flex';
         } else {
           signupform.style.display = 'none';
-          loginform.style.display = 'block';
+          loginform.style.display = 'flex';
         }
       });
     });
