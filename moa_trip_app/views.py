@@ -66,6 +66,10 @@ def mypage(request):
 
     return render(request, 'mypage.html', context)
 
+def delete_itinerary(request, itinerary_code):
+    itinerary = Itinerary.objects.get(itinerary_code=itinerary_code)
+    itinerary.delete()
+
 def login(request):
     return render(request, 'login.html')
 
