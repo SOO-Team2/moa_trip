@@ -19,9 +19,7 @@ from django.urls import path
 from django.urls import include
 
 urlpatterns = [
-<<<<<<< HEAD
+
     # path('admin/', admin.site.urls),
-=======
->>>>>>> 008fbdcebbee300bae091c53d4c8f172f0a2cee0
     path('', include('moa_trip_app.urls')),
 ]

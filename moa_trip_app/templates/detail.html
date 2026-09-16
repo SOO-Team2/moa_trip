@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-협재해수욕장 - 상세 정보 | 모아트립
+{{ spot.title|default:"관광지 상세 정보" }} - 상세 정보 | 모아트립
 {% endblock %}
 
 {% block extra_css %}
@@ -11,73 +11,69 @@
 
 {% block content %}
 <div class="spot-wrap">
+    <!-- 상단 갤러리 그리드 -->
     <div class="spot-gallery">
-        <div class="main-photo">대표 사진</div>
-        <div>사진</div>
+        <div class="main-photo"
+            style="{% if spot.firstimage %}background: url('{{ spot.firstimage }}') center/cover no-repeat;{% endif %}">
+            {% if not spot.firstimage %}대표 사진{% endif %}
+        </div>
+        <div
+            style="{% if spot.firstimage2 %}background: url('{{ spot.firstimage2 }}') center/cover no-repeat;{% endif %}">
+            {% if not spot.firstimage2 %}사진{% endif %}
+        </div>
         <div class="more-photo">사진</div>
     </div>
 
+    <!-- 좌측 메인 영역 -->
     <div class="spot-main">
         <span class="badge-pet tag">반려동물 동반 가능</span>
 
-        <h1 class="spot-title">협재해수욕장</h1>
+        <h1 class="spot-title">{{ spot.title|default:"추천 관광지" }}</h1>
         <div class="spot-sub">
-            제주특별자치도 제주시 한림읍 협재리 2497-1 · 평점 4.6 · 후기 212
+            {{ spot.addr1|default:"주소 정보 준비 중" }} · 평점 4.6 · 후기 212
         </div>
 
+        <!-- 상세 정보 테이블 -->
         <div class="info-table">
-            <div><span class="label">입장료</span><span class="value">무료</span></div>
-            <div><span class="label">주차</span><span class="value">공영주차장 200면</span></div>
-            <div><span class="label">반려동물</span><span class="value">동반 가능 (목줄 필수)</span></div>
-            <div><span class="label">이용 시간</span><span class="value">상시 개방 (수영 09:00 - 19:00)</span></div>
-            <div><span class="label">문의</span><span class="value">064-728-3994</span></div>
+            <div>
+                <span class="label">입장료</span>
+                <span class="value">무료 (시설별 상이)</span>
+            </div>
+            <div>
+                <span class="label">주차</span>
+                <span class="value">{{ pet.parking|default:"인근 공영주차장 이용 가능" }}</span>
+            </div>
+            <div>
+                <span class="label">반려동물</span>
+                <span class="value">{{ pet.acmpyNeedMtr|default:"동반 가능 (목줄 및 배변봉투 필수 지참)" }}</span>
+            </div>
+            <div>
+                <span class="label">동반 가능 견종</span>
+                <span class="value">{{ pet.relaAcmdCode|default:"소형견 / 중형견 (방문 전 유선 확인 권장)" }}</span>
+            </div>
+            <div>
+                <span class="label">구비 시설</span>
+                <span class="value">{{ pet.relaPosesFclty|default:"반려견 휴게 공간 및 산책로 조성" }}</span>
+            </div>
+            <div>
+                <span class="label">상세 소개</span>
+                <span class="value">{{ spot.overview|safe|default:"아름다운 자연 경관을 자랑하는 대표적인 여행 코스입니다." }}</span>
+            </div>
         </div>
 
-        <div class="section-title">주간 날씨 예보</div>
+        <!-- 기상청 주간 날씨 예보 (7일 동적 반복문) -->
+        <div class="section-title">주간 날씨 예보 (기상청)</div>
         <div class="weekly-forecast">
+            {% for wf in weekly_forecast %}
             <div class="weather-item">
-                <div class="date">오늘 9/8</div>
-                <div class="weather-icon">☀️ 맑음</div>
-                <div class="temp">26°</div>
+                <div class="date">{{ wf.date }}</div>
+                <div class="weather-icon">{{ wf.icon }} {{ wf.desc }}</div>
+                <div class="temp">{{ wf.temp }}</div>
             </div>
-
-            <div class="weather-item">
-                <div class="date">화 9/9</div>
-                <div class="weather-icon">☀️ 맑음</div>
-                <div class="temp">27°</div>
-            </div>
-
-            <div class="weather-item">
-                <div class="date">수 9/10</div>
-                <div class="weather-icon">☁️ 구름</div>
-                <div class="temp">25°</div>
-            </div>
-
-            <div class="weather-item">
-                <div class="date">목 9/11</div>
-                <div class="weather-icon">🌧️ 비</div>
-                <div class="temp">23°</div>
-            </div>
-
-            <div class="weather-item">
-                <div class="date">금 9/12</div>
-                <div class="weather-icon">☁️ 흐림</div>
-                <div class="temp">24°</div>
-            </div>
-
-            <div class="weather-item">
-                <div class="date">토 9/13</div>
-                <div class="weather-icon">☀️ 맑음</div>
-                <div class="temp">26°</div>
-            </div>
-
-            <div class="weather-item">
-                <div class="date">일 9/14</div>
-                <div class="weather-icon">☀️ 맑음</div>
-                <div class="temp">27°</div>
-            </div>
+            {% endfor %}
         </div>
 
+        <!-- 후기 영역 -->
         <div class="review-header">
             <div class="section-title">후기 212개</div>
             <button class="review-write-btn">후기 작성</button>
@@ -87,27 +83,33 @@
             <div class="r-top">
                 <span class="r-writer">정명주</span>
                 <span>★ 평점 5.0 · 2026.09.02</span>
-                <div class="r-content">강아지와 함께 해변을 걸을 수 있어서 너무 좋았습니다. 바다 색깔도 에메랄드빛이고 주차장에서 해변까지 도보 3분 정도로 아주 가깝습니다.
+                <div class="r-content">
+                    강아지와 함께 해변을 걸을 수 있어서 너무 좋았습니다. 바다 색깔도 에메랄드빛이고 주차장에서 해변까지 도보 3분 정도로 아주 가깝습니다.
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- 우측 사이드바 -->
     <div class="spot-sidebar">
+        <!-- 오늘 날씨 카드 -->
         <div class="weather-today">
-            <div>실시간 제주 한림 날씨</div>
-            <div class="w-temp">26°</div>
-            <div class="w-desc">맑음 · 강수확률 10%</div>
+            <div>실시간 현지 날씨</div>
+            <div class="w-temp">{{ today_weather.temp }}</div>
+            <div class="w-desc">{{ today_weather.icon }} {{ today_weather.desc }} · 강수확률 {{ today_weather.rain_prob }}%
+            </div>
         </div>
 
-        <a href="{% url 'planner' %}" class="sidebar-btn primary">여행 일정에 추가</a>
+        <a href="{% url 'planner' %}?region={{ spot.areacode|default:'39' }}&title={{ spot.title|urlencode }}"
+            class="sidebar-btn primary" style="text-decoration: none;">여행 일정에 추가</a>
         <button class="sidebar-btn">즐겨찾기 보관</button>
 
+        <!-- 사이드바 주소 맵 -->
         <div class="sidebar-map">
             <div class="map-placeholder">
                 <div class="map-dot"></div>
             </div>
-            <div class="map-address">📍 제주시 한림읍 2497-1</div>
+            <div class="map-address">📍 {{ spot.addr1|default:"위치 정보 없음" }}</div>
         </div>
     </div>
 </div>

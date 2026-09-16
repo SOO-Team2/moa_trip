@@ -13,19 +13,28 @@
 <div class="explore-layout">
   <aside class="explore-content-left">
     <h1>관광지 탐색</h1>
-    <form method="get" class="explore-filter">
+    <div class="explore-filter">
       <h2>맞춤 필터</h2>
 
       <!-- 지역 필터 -->
       <div class="explore-filter-region">
         <h3>지역</h3>
-        {% for region in regions %}
         <div>
-          <input type="radio" name="region" id="r-{{ region.region_code }}" value="{{ region.region_code }}" {% if
-            selected_region==region.region_code %}checked{% endif %}>
-          <label for="r-{{ region.region_code }}">{{ region.region_name }}</label>
+          <input type="radio" name="region" id="r-jeju" checked>
+          <label for="r-jeju">제주도</label>
         </div>
-        {% endfor %}
+        <div>
+          <input type="radio" name="region" id="r-gangwon">
+          <label for="r-gangwon">강원도</label>
+        </div>
+        <div>
+          <input type="radio" name="region" id="r-jeonnam">
+          <label for="r-jeonnam">전라남도</label>
+        </div>
+        <div>
+          <input type="radio" name="region" id="r-gyeongbuk">
+          <label for="r-gyeongbuk">경상북도</label>
+        </div>
       </div>
       <!-- 반려동물 필터 -->
       <div class="explore-filter-pet">
@@ -91,7 +100,7 @@
           <h3><a href="{% url 'detail' %}?contentid={{ spot.contentid }}">{{ spot.title }}</a></h3>
           <p>{{ spot.addr1|default:"위치 정보 없음" }}</p>
           <div class="explore-card-footer">
-            <span class="card-rating">★ 평점 4.5 (API 연동)</span>
+            <span class="card-rating">★ 평점 4.5</span>
             <button type="button" class="btn-bookmark">즐겨찾기에 추가</button>
           </div>
         </div>
