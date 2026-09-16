@@ -193,6 +193,8 @@ button {
   border: 1px solid var(--color-primary);
   background-color: #ffffff;
   transition: var(--transition);
+  width: 135px;
+  white-space: nowrap;
 }
 
 .btn-auth:hover {
