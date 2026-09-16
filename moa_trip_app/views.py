@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import TouristSpot, Region, Users, Itinerary, Review
@@ -10,6 +11,7 @@ def main(request):
 def explore(request):
     selected_region = request.GET.get('region')
     selected_rating = request.GET.get('min_rating')
+    selected_pet = request.GET.get('pet_allowed')
     selected_sort = request.GET.get('sort', 'rating')
     spots = TouristSpot.objects.select_related('region').annotate(
         avg_rating=Avg('review__rating'),
@@ -23,6 +25,9 @@ def explore(request):
         except ValueError:
             pass
 
+    if selected_pet:
+        spots = spots.filter(pet_allowed=1)
+
     if selected_sort == 'review':
         spots = spots.order_by('-review_count')
     else:
@@ -34,7 +39,8 @@ def explore(request):
         'regions': Region.objects.all(),
         'selected_region': selected_region,
         'selected_rating': selected_rating,
-        'selected_sort': selected_sort,
+        'selected_pet': selected_pet,
+        'selected_sort': selected_sort,   
     }
     return render(request, 'explore.html', context)
 
@@ -126,6 +132,7 @@ def signup(request):
                 pw=make_password(pw),
                 nickname=nickname,
                 email=email,
+                join_date=timezone.now().date(),
             )
             result = 0
 
