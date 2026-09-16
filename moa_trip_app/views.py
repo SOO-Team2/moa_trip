@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import TouristSpot, Region, Users, Itinerary
@@ -124,6 +125,7 @@ def signup(request):
                 pw=make_password(pw),
                 nickname=nickname,
                 email=email,
+                join_date=timezone.now().date(),
             )
             result = 0
 
