@@ -11,20 +11,32 @@
 
 {% block content %}
 <div class="spot-wrap">
-    <!-- 상단 갤러리 그리드 -->
     <div class="spot-gallery">
-        <div class="main-photo"
-            style="{% if spot.firstimage %}background: url('{{ spot.firstimage }}') center/cover no-repeat;{% endif %}">
-            {% if not spot.firstimage %}대표 사진{% endif %}
+        <div class="main-photo">
+            {% if spot.firstimage %}
+            <img src="{{ spot.firstimage }}" alt="{{ spot.title }}">
+            {% else %}
+            <span>대표 사진</span>
+            {% endif %}
         </div>
-        <div
-            style="{% if spot.firstimage2 %}background: url('{{ spot.firstimage2 }}') center/cover no-repeat;{% endif %}">
-            {% if not spot.firstimage2 %}사진{% endif %}
+        <div>
+            {% if spot.firstimage2 %}
+            <img src="{{ spot.firstimage2 }}" alt="{{ spot.title }}">
+            {% elif spot.firstimage %}
+            <img src="{{ spot.firstimage }}" alt="{{ spot.title }}">
+            {% else %}
+            <span>사진</span>
+            {% endif %}
         </div>
-        <div class="more-photo">사진</div>
+        <div class="more-photo">
+            {% if spot.firstimage %}
+            <img src="{{ spot.firstimage }}" alt="{{ spot.title }}">
+            {% else %}
+            <span>사진</span>
+            {% endif %}
+        </div>
     </div>
 
-    <!-- 좌측 메인 영역 -->
     <div class="spot-main">
         <span class="badge-pet tag">반려동물 동반 가능</span>
 
@@ -33,36 +45,34 @@
             {{ spot.addr1|default:"주소 정보 준비 중" }} · 평점 4.6 · 후기 212
         </div>
 
-        <!-- 상세 정보 테이블 -->
         <div class="info-table">
             <div>
                 <span class="label">입장료</span>
-                <span class="value">무료 (시설별 상이)</span>
+                <span class="value">{{ detail_info.fee }}</span>
             </div>
             <div>
                 <span class="label">주차</span>
-                <span class="value">{{ pet.parking|default:"인근 공영주차장 이용 가능" }}</span>
+                <span class="value">{{ detail_info.parking }}</span>
             </div>
             <div>
                 <span class="label">반려동물</span>
-                <span class="value">{{ pet.acmpyNeedMtr|default:"동반 가능 (목줄 및 배변봉투 필수 지참)" }}</span>
+                <span class="value">{{ detail_info.pet_rule }}</span>
             </div>
             <div>
                 <span class="label">동반 가능 견종</span>
-                <span class="value">{{ pet.relaAcmdCode|default:"소형견 / 중형견 (방문 전 유선 확인 권장)" }}</span>
+                <span class="value">{{ detail_info.pet_size }}</span>
             </div>
             <div>
-                <span class="label">구비 시설</span>
-                <span class="value">{{ pet.relaPosesFclty|default:"반려견 휴게 공간 및 산책로 조성" }}</span>
+                <span class="label">구비 편의시설</span>
+                <span class="value">{{ detail_info.facilities }}</span>
             </div>
             <div>
                 <span class="label">상세 소개</span>
-                <span class="value">{{ spot.overview|safe|default:"아름다운 자연 경관을 자랑하는 대표적인 여행 코스입니다." }}</span>
+                <span class="value">{{ detail_info.overview|striptags }}</span>
             </div>
         </div>
 
-        <!-- 기상청 주간 날씨 예보 (7일 동적 반복문) -->
-        <div class="section-title">주간 날씨 예보 (기상청)</div>
+        <div class="section-title">주간 날씨 예보</div>
         <div class="weekly-forecast">
             {% for wf in weekly_forecast %}
             <div class="weather-item">
@@ -73,7 +83,6 @@
             {% endfor %}
         </div>
 
-        <!-- 후기 영역 -->
         <div class="review-header">
             <div class="section-title">후기 212개</div>
             <button class="review-write-btn">후기 작성</button>
@@ -90,9 +99,7 @@
         </div>
     </div>
 
-    <!-- 우측 사이드바 -->
     <div class="spot-sidebar">
-        <!-- 오늘 날씨 카드 -->
         <div class="weather-today">
             <div>실시간 현지 날씨</div>
             <div class="w-temp">{{ today_weather.temp }}</div>
@@ -101,10 +108,9 @@
         </div>
 
         <a href="{% url 'planner' %}?region={{ spot.areacode|default:'39' }}&title={{ spot.title|urlencode }}"
-            class="sidebar-btn primary" style="text-decoration: none;">여행 일정에 추가</a>
+            class="sidebar-btn primary" style="display:block; text-align:center; text-decoration:none;">여행 일정에 추가</a>
         <button class="sidebar-btn">즐겨찾기 보관</button>
 
-        <!-- 사이드바 주소 맵 -->
         <div class="sidebar-map">
             <div class="map-placeholder">
                 <div class="map-dot"></div>

@@ -29,23 +29,26 @@
         <div class="spot-grid-4">
             {% if tour_items %}
             {% for item in tour_items %}
-            <div class="card spot-card">
+            <article class="spot-card" onclick="location.href='{% url 'detail' %}?contentid={{ item.contentid }}'">
+                <!-- 1. 썸네일 영역 -->
                 <div class="spot-card-thumb">
                     {% if item.firstimage %}
                     <img src="{{ item.firstimage }}" alt="{{ item.title }}">
-                    {% else %}
-                    <img src="{% static 'images/no-image.png' %}" alt="{{ item.title }}">
                     {% endif %}
                 </div>
+
+                <!-- 2. 본문 영역 -->
                 <div class="spot-card-body">
-                    <h3><a href="{% url 'detail' %}">{{ item.title }}</a></h3>
-                    <p class="spot-card-desc">{{ item.addr1|default:"주소 정보 없음" }}</p>
+                    <h3>{{ item.title }}</h3>
+                    <p class="spot-card-desc">{{ item.addr1|default:"위치 정보 없음" }}</p>
                 </div>
+
+                <!-- 3. 하단 평점/후기 영역 -->
                 <div class="spot-card-footer">
-                    <strong class="spot-card-rating">★ 4.5</strong>
+                    <span class="spot-card-rating">★ 4.5</span>
                     <span class="spot-review-count">후기</span>
                 </div>
-            </div>
+            </article>
             {% endfor %}
             {% else %}
             <p style="grid-column: 1 / -1; text-align: center; color: #888; padding: 40px 0;">
