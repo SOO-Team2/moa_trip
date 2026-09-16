@@ -30,7 +30,7 @@
       <div class="explore-filter-pet">
         <h3>반려동물</h3>
         <label>
-          <input type="checkbox" checked>
+          <input type="checkbox">
           <span>반려동물 동반 가능</span>
         </label>
       </div>
@@ -53,7 +53,7 @@
     <div class="filter-actions">
       <button type="submit">필터 적용</button>
       <div class="filter-reset-wrapper">
-        <button type="button">초기화</button>
+        <button type="button" onclick="location.href='{% url "explore" %}'">초기화</button>
       </div>
     </div>
   </form>
@@ -67,8 +67,8 @@
       </div>
       <div>
         <span>정렬</span>
-        <button type="button" class="sort-btn active">평점순</button>
-        <button type="button" class="sort-btn">후기순</button>
+        <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}sort=rating" class="sort-btn {% if selected_sort != 'review' %}active{% endif %}">평점순</a>
+        <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}sort=review" class="sort-btn {% if selected_sort == 'review' %}active{% endif %}">후기순</a>
       </div>
     </header>
     

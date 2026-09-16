@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import TouristSpot, Region, Users, Itinerary
+from django.contrib.auth.hashers import make_password, check_password
 from django.db.models import Avg, Count
 
 def main(request):
@@ -9,6 +10,7 @@ def main(request):
 def explore(request):
     selected_region = request.GET.get('region')
     selected_rating = request.GET.get('min_rating')
+    selected_sort = request.GET.get('sort', 'rating')
     spots = TouristSpot.objects.select_related('region').annotate(
         avg_rating=Avg('review__rating'),
         review_count=Count('review'),
@@ -20,11 +22,19 @@ def explore(request):
             spots = spots.filter(avg_rating__gte=float(selected_rating))
         except ValueError:
             pass
+
+    if selected_sort == 'review':
+        spots = spots.order_by('-review_count')
+    else:
+        spots = spots.order_by('-avg_rating')
+
+
     context = {
         'spots': spots,
         'regions': Region.objects.all(),
         'selected_region': selected_region,
         'selected_rating': selected_rating,
+        'selected_sort': selected_sort,
     }
     return render(request, 'explore.html', context)
 
@@ -61,7 +71,7 @@ def login_ok(request):
         user = None
     if user != None:
         # 해당 회원 존재함
-        if user.pw == pw:
+        if check_password(pw, user.pw):
             # 로그인 정보 세션에 저장
             request.session['user_id'] = user.user_id
 
@@ -81,6 +91,43 @@ def logout(request):
     request.session.flush()
     
     return redirect('main')
+
+def signup(request):
+    if request.method != 'POST':
+        return redirect('login')
+    
+    user_id = request.POST.get('user_id', None)
+    pw = request.POST.get('pw', None)
+    nickname = request.POST.get('nickname', None)
+    email = request.POST.get('email', None)
+
+    if not user_id or not pw or not nickname or not email:
+        #입력값 누락
+        result = 2
+    elif '@' not in email:
+        #이메일 형식 오류
+        result = 3
+    else:
+
+        try:
+            user = Users.objects.get(user_id=user_id)
+        except Users.DoesNotExist:
+            user = None
+
+        if user is not None:
+            #이미 존재하는 아이디
+            result = 1
+        else:
+            #신규 회원 저장
+            Users.objects.create(
+                user_id=user_id,
+                pw=make_password(pw),
+                nickname=nickname,
+                email=email,
+            )
+            result = 0
+
+    return render(request, 'signup_ok.html', {'result':result})
 
 def admin(request):
     return render(request, 'admin.html')
