@@ -8,6 +8,7 @@ def main(request):
 def explore(request):
     selected_region = request.GET.get('region')
     selected_rating = request.GET.get('min_rating')
+    selected_sort = request.GET.get('sort', 'rating')
     spots = TouristSpot.objects.select_related('region').annotate(
         avg_rating=Avg('review__rating'),
         review_count=Count('review'),
@@ -19,11 +20,19 @@ def explore(request):
             spots = spots.filter(avg_rating__gte=float(selected_rating))
         except ValueError:
             pass
+
+    if selected_sort == 'review':
+        spots = spots.order_by('-review_count')
+    else:
+        spots = spots.order_by('-avg_rating')
+
+
     context = {
         'spots': spots,
         'regions': Region.objects.all(),
         'selected_region': selected_region,
         'selected_rating': selected_rating,
+        'selected_sort': selected_sort,
     }
     return render(request, 'explore.html', context)
 
