@@ -22,11 +22,11 @@
 
     <main class="auth-right-panel">
       <nav class="auth-tabs">
-        <a href="#" class="active">로그인</a>
-        <a href="#">회원가입</a>
+        <a href="#" class="active" data-tab="login">로그인</a>
+        <a href="#" data-tab="signup">회원가입</a>
       </nav>
 
-      <form class="auth-form" method="post" action="login_ok/">
+      <form class="auth-form" method="post" action="login_ok/" id="login-form">
         {% csrf_token %}
         <div class="auth-field-group">
           <label>아이디</label>
@@ -40,6 +40,26 @@
 
         <button type="submit" class="auth-submit-btn">로그인</button>
       </form>
+
+      <form class="auth-form" method="post" action="#" id="signup-form" style="display: none;">
+        {% csrf_token %}
+        <div class="auth-field-group">
+          <label>아이디</label>
+          <input type="text" placeholder="사용할 아이디를 입력하세요" required>
+        </div>
+
+        <div class="auth-field-group">
+          <label>비밀번호</label>
+          <input type="password" placeholder="비밀번호를 입력하세요" required>
+        </div>
+        
+        <div class="auth-field-group">
+          <label>비밀번호 확인</label>
+          <input type="password" placeholder="비밀번호를 다시 입력하세요" required>
+        </div>
+
+        <button type="submit" class="auth-submit-btn">회원가입</button>
+      </form>
     </main>
   </div>
 </div>
@@ -47,4 +67,28 @@
 
 {% block extra_js %}
 <script src="{% static 'js/trim.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.auth-tabs a');
+    const loginform = document.getElementById('login-form');
+    const signupform = document.getElementById('signup-form');
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        tabs.forEach(function (t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+
+        if (tab.dataset.tab == 'signup') {
+          loginform.style.display = 'none';  
+          signupform.style.display = 'block';
+        } else {
+          signupform.style.display = 'none';
+          loginform.style.display = 'block';
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}
