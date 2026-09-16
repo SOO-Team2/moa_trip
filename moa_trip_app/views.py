@@ -1,10 +1,6 @@
-from django.shortcuts import render
-<<<<<<< HEAD
-from .models import Region
-=======
+from django.shortcuts import render, redirect
 from .models import TouristSpot, Region
 from django.db.models import Avg, Count
->>>>>>> 008fbdcebbee300bae091c53d4c8f172f0a2cee0
 
 def main(request):
     return render(request, 'main.html')
@@ -43,6 +39,38 @@ def mypage(request):
 
 def login(request):
     return render(request, 'login.html')
+
+from .models import Users
+def login_ok(request):
+    user_id = request.POST.get('user_id', None)
+    pw = request.POST.get('pw', None)
+
+    try:
+        user = Users.objects.get(user_id=user_id)
+    except Users.DoesNotExist:
+        user = None
+    if user != None:
+        # 해당 회원 존재함
+        if user.pw == pw:
+            # 로그인 정보 세션에 저장
+            request.session['user_id'] = user.user_id
+
+            return redirect('../../')
+        else:
+            # 비밀번호 틀림
+            result = 1
+    else:
+        # 해당 회원 존재하지 않음
+        result = 0
+
+    return render(request, 'login_ok.html', { 'result':result, })
+
+def logout(request):
+    if 'user_id' in request.session:
+        del request.session['user_id']
+    request.session.flush()
+    
+    return redirect('main')
 
 def admin(request):
     return render(request, 'admin.html')

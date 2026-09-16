@@ -129,8 +129,4 @@ MAILERS = {
     'default': {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 008fbdcebbee300bae091c53d4c8f172f0a2cee0
