@@ -1,9 +1,11 @@
+
 from datetime import datetime, timedelta
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.utils import timezone
+from .models import TouristSpot, Region, Users, Itinerary, Review
 from django.contrib.auth.hashers import make_password, check_password
 from django.db.models import Avg, Count
-from .models import TouristSpot, Region, Users, Itinerary
 from .utils import fetch_public_data
 
 # ==============================================================================
@@ -35,8 +37,11 @@ def main(request):
 # 2. 관광지 탐색 (explore 에러 해결 핵심)
 # ==============================================================================
 def explore(request):
+
     selected_region = request.GET.get('region', '39')
     selected_rating = request.GET.get('min_rating', '4.5')
+    selected_pet = request.GET.get('pet_allowed')
+
     selected_sort = request.GET.get('sort', 'rating')
 
     tour_url = "http://apis.data.go.kr/B551011/KorService2/areaBasedList2"
@@ -60,6 +65,9 @@ def explore(request):
             res_items = items_box.get('item', [])
             spots = res_items if isinstance(res_items, list) else [res_items]
 
+    if selected_pet:
+        spots = spots.filter(pet_allowed=1)
+
     if selected_sort == 'review':
         spots = list(reversed(spots))
 
@@ -67,7 +75,8 @@ def explore(request):
         'spots': spots,
         'selected_region': selected_region,
         'selected_rating': selected_rating,
-        'selected_sort': selected_sort,
+        'selected_pet': selected_pet,
+        'selected_sort': selected_sort,   
     }
     return render(request, 'explore.html', context)
 
@@ -287,11 +296,20 @@ def mypage(request):
 
     try:
         user = Users.objects.get(user_id=user_id)
+
+        itineraries = Itinerary.objects.filter(user_id=user_id)
+        reviews = Review.objects.filter(user_id=user_id).select_related('spot') #models.py 필드 이름
+        context = { 'user':user, 'itineraries':itineraries, 'reviews':reviews }
+
     except Users.DoesNotExist:
         request.session.flush()
         return redirect('login')
 
+
     saved_itineraries = Itinerary.objects.filter(user_id=user_id)
+
+    return render(request, 'mypage.html', context)
+
 
     tour_url = "http://apis.data.go.kr/B551011/KorService2/areaBasedList2"
     tour_raw = fetch_public_data(tour_url, extra_params={
@@ -359,6 +377,7 @@ def signup(request):
                 pw=make_password(pw),
                 nickname=nickname,
                 email=email,
+                join_date=timezone.now().date(),
             )
             result = 0
     return render(request, 'signup_ok.html', {'result': result})

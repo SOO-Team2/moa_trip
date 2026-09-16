@@ -42,6 +42,7 @@
         <h3>반려동물</h3>
         <label>
           <input type="checkbox" name="pet" value="Y" checked>
+          <input type="checkbox" name="pet_allowed" value="1" {% if selected_pet %}checked{% endif %}>
           <span>반려동물 동반 가능</span>
         </label>
       </div>
@@ -77,10 +78,12 @@
       </div>
       <div>
         <span>정렬</span>
-        <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}sort=rating"
+
+        <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}{% if selected_pet %}pet_allowed=1&{% endif %}sort=rating"
           class="sort-btn {% if selected_sort != 'review' %}active{% endif %}">평점순</a>
-        <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}sort=review"
+        <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}{% if selected_pet %}pet_allowed=1&{% endif %}sort=review"
           class="sort-btn {% if selected_sort == 'review' %}active{% endif %}">후기순</a>
+
       </div>
     </header>
 
