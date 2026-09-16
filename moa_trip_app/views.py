@@ -130,7 +130,7 @@ def mypage(request):
 
     # 2. 사용자 프로필 및 통계 데이터 구성
     user_info = {
-        "name": "USER",
+        "name": "최주원",
         "user_id": "U-10428",
         "grade": "일반 회원",
         "join_date": "2026.03",

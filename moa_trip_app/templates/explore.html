@@ -13,30 +13,20 @@
 <div class="explore-layout">
   <aside class="explore-content-left">
     <h1>관광지 탐색</h1>
-    <div class="explore-filter">
+    <form method="get" class="explore-filter">
       <h2>맞춤 필터</h2>
 
       <!-- 지역 필터 -->
       <div class="explore-filter-region">
         <h3>지역</h3>
+        {% for region in regions %}
         <div>
-          <input type="radio" name="region" id="r-jeju" checked>
-          <label for="r-jeju">제주도</label>
+          <input type="radio" name="region" id="r-{{ region.region_code }}" value="{{ region.region_code }}" {% if
+            selected_region==region.region_code %}checked{% endif %}>
+          <label for="r-{{ region.region_code }}">{{ region.region_name }}</label>
         </div>
-        <div>
-          <input type="radio" name="region" id="r-gangwon">
-          <label for="r-gangwon">강원도</label>
-        </div>
-        <div>
-          <input type="radio" name="region" id="r-jeonnam">
-          <label for="r-jeonnam">전라남도</label>
-        </div>
-        <div>
-          <input type="radio" name="region" id="r-gyeongbuk">
-          <label for="r-gyeongbuk">경상북도</label>
-        </div>
+        {% endfor %}
       </div>
-
       <!-- 반려동물 필터 -->
       <div class="explore-filter-pet">
         <h3>반려동물</h3>
@@ -47,6 +37,7 @@
       </div>
 
       <!-- 평점 필터 -->
+
       <div class="explore-filter-rating">
         <h3>평점</h3>
         <div class="rating-filter-group">
@@ -66,13 +57,14 @@
           <button type="button">초기화</button>
         </div>
       </div>
+
   </aside>
 
   <section class="explore-content-right">
     <header class="explore-content-header">
       <div>
         <h2>선택한 지역의 관광지</h2>
-        <span>1,284곳</span>
+        <span>{{ spots|length }}곳</span>
       </div>
       <div>
         <span>정렬</span>
@@ -82,6 +74,7 @@
     </header>
 
     <!-- 관광지 카드 목록 영역 -->
+
     <section class="explore-grid-2">
       {% if spots %}
       {% for spot in spots %}
@@ -110,6 +103,7 @@
       </p>
       {% endif %}
     </section>
+
 
     <!-- 하단 페이징 영역 -->
     <nav class="explore-pagination">

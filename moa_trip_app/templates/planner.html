@@ -18,52 +18,101 @@
     <main class="planner-main-layout">
         <!-- 폼 영역 -->
         <section class="planner-form-section">
-            <form method="GET" action="{% url 'planner' %}">
-                <div class="planner-form-group">
-                    <label>여행 제목</label>
-                    <input type="text" name="title" placeholder="예: 반려동물 동반 1일 여행" value="반려동물 동반 1일 여행">
+
+            <div class="planner-form-group">
+                <label>여행 제목</label>
+                <input type="text" id="planner-title-input" placeholder="여행 제목을 입력하세요.">
+            </div>
+            <div class="planner-form-group">
+                <label>여행지</label>
+                <select id="planner-region-select">
+                    {% for region in regions %}
+                    <option value="{{ region.region_code }}">
+                        {{ region.region_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="planner-form-group">
+                <label>날짜</label>
+                <input type="date" id="planner-date">
+            </div>
+            <script>
+                // 오늘 날짜로 자동 설정
+                document.getElementById('planner-date').value = new Date().toISOString().substring(0, 10);
+            </script>
+
+            <div class="planner-form-group">
+                <label>동행</label>
+                <div class="companion-btn-group">
+                    <button type="button" class="companion-btn">혼자</button>
+                    <button type="button" class="companion-btn">가족</button>
+                    <button type="button" class="companion-btn">친구</button>
                 </div>
-                <div class="planner-form-group">
-                    <label>여행지</label>
-                    <select name="region">
-                        {% for r in regions %}
-                        <option value="{{ r.code }}" {% if r.is_selected %}selected{% endif %}>{{ r.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="planner-form-group">
-                    <label>날짜</label>
-                    <input type="text" name="date" value="2026. 09. 19 (토)">
-                </div>
-                <div class="planner-form-group">
-                    <label>동행</label>
-                    <div class="companion-btn-group">
-                        <button type="button" class="companion-btn">혼자</button>
-                        <button type="button" class="companion-btn active">가족</button>
-                        <button type="button" class="companion-btn">친구</button>
-                    </div>
-                    <div class="companion-pet-legend">🐾 반려동물과 함께</div>
-                </div>
-                <div>
-                    <button type="submit" class="btn-submit-planner">코스 추천받기</button>
-                </div>
-            </form>
+                <button type="button" class="companion-pet-btn">🐾 반려동물과 함께</button>
+            </div>
+            <script>
+                const companionBtns = document.querySelectorAll('.companion-btn');
+
+                companionBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        // 'active' 상태인지 확인
+                        const isActive = btn.classList.contains('active');
+                        // 'active' 초기화
+                        companionBtns.forEach(b => b.classList.remove('active'));
+                        // 아니라면 active
+                        if (!isActive) {
+                            btn.classList.add('active');
+                        }
+                    });
+                });
+
+                const petBtn = document.querySelector('.companion-pet-btn');
+                if (petBtn) {
+                    petBtn.addEventListener('click', () => {
+                        petBtn.classList.toggle('active');
+                    });
+                }
+            </script>
+
+            <div>
+                <button type="submit" id="btn-submit-planner" class="btn-submit-planner">여행 만들기</button>
+            </div>
+
         </section>
 
         <!-- 타임라인 영역 -->
         <section class="planner-timeline-section">
             <div class="timeline-header">
-                <h2>
-                    {% if selected_region == 'seoul' %}서울
-                    {% elif selected_region == 'gangwon' %}강원도
-                    {% elif selected_region == 'busan' %}부산
-                    {% elif selected_region == 'gyeongju' %}경주
-                    {% else %}제주도{% endif %} · 반려동물 동반 1일 코스
-                </h2>
+
+                <h2 id="planner-header-title">여행지 · 여행 제목</h2>
+
                 <div>
                     <button type="button" class="btn-save-itinerary">일정 저장</button>
                 </div>
             </div>
+
+
+            <script>
+                const submitBtn = document.getElementById('btn-submit-planner');
+                const regionSelect = document.getElementById('planner-region-select');
+                const titleInput = document.getElementById('planner-title-input');
+                const headerTitle = document.getElementById('planner-header-title');
+
+                submitBtn.addEventListener('click', (e) => {
+                    e.preventDefault(); //페이지 새로고침 방지
+                    // 선택된 요소 가져오기
+                    const selectedOption = regionSelect.options[regionSelect.selectedIndex];
+
+                    // 여행지와 제목 가져오기
+                    const regionName = selectedOption ? selectedOption.textContent.trim() : '지역';
+                    const titleText = titleInput.value.trim();
+
+                    // 헤더 타이틀 변경
+                    headerTitle.textContent = `${regionName} · ${titleText}`;
+                });
+            </script>
 
             <div class="timeline-list">
                 {% if timeline_items %}
@@ -91,11 +140,47 @@
         <section class="planner-summary-section">
             <div class="summary-card">
                 <h3>일정 요약</h3>
-                <p><span>방문 장소</span> <strong>{{ spot_count }}곳</strong></p>
-                <p><span>예상 비용</span> <strong>무료 (입장료 기준)</strong></p>
-                <p><span>반려동물</span> <strong>{{ spot_count }}곳 모두 가능</strong></p>
+
+                <p><span>방문 장소</span> <strong id="summary-spot-count">곳</strong></p>
+                <p><span>예상 비용</span> <strong>34,000원</strong></p>
+                <p><span>반려동물</span> <strong>4곳 모두 가능</strong></p>
+
             </div>
         </section>
+        <script>
+            const addSpotBtn = document.querySelector('.btn-add-timeline-spot');
+            const timelineList = document.querySelector('.timeline-list');
+            const spotCountDisplay = document.getElementById('summary-spot-count');
+
+            function updateSpotCount() {
+                const items = timelineList.querySelectorAll('.timeline-item');
+                const count = items.length;
+
+                spotCountDisplay.textContent = `${count}곳`;
+            }
+
+            updateSpotCount();
+
+            if (addSpotBtn) {
+                addSpotBtn.addEventListener('click', () => {
+                    // 새로운 타임라인 HTML 구조
+                    const newItem = document.createElement('div');
+                    newItem.classList.add('timeline-item');
+
+                    newItem.innerHTML = `
+                        <span class="timeline-time-badge">시간 미정</span>
+                        <div class="timeline-card">
+                            <h3>새로운 장소</h3>
+                            <p>정보를 입력해주세요</p>
+                        </div>
+                    `;
+
+                    // 실제 화면에 배치
+                    timelineList.appendChild(newItem);
+                    updateSpotCount();
+                });
+            }
+        </script>
     </main>
 </div>
 {% endblock %}

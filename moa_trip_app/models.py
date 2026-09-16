@@ -9,8 +9,8 @@ class Users(models.Model):
     nickname = models.CharField(db_column='NICKNAME', max_length=20, verbose_name='닉네임')
     email = models.CharField(db_column='EMAIL', max_length=255, verbose_name='이메일')
     pw = models.CharField(db_column='PW', max_length=20, verbose_name='비밀번호')
-    status = models.CharField(db_column='STATUS', max_length=20, default='정상', verbose_name='회원 상태') # 상태 컬럼 추가
     join_date = models.DateField(db_column='JOIN_DATE', blank=True, null=True, verbose_name='가입일자')
+    status = models.CharField(db_column='STATUS', max_length=20, default='정상', verbose_name='회원 상태') # 상태 컬럼 추가
 
     class Meta:
         managed = False
@@ -47,12 +47,11 @@ class TouristSpot(models.Model):
     region = models.ForeignKey(Region, on_delete=models.DO_NOTHING, db_column='REGION_CODE', verbose_name='지역')
     t_name = models.CharField(db_column='T_NAME', max_length=255, verbose_name='관광지명')
     address = models.CharField(db_column='ADDRESS', max_length=255, verbose_name='주소')
-    category = models.CharField(db_column='CATEGORY', max_length=20, blank=True, null=True, verbose_name='카테고리')
     entry_fee = models.IntegerField(db_column='ENTRY_FEE', verbose_name='입장료')
     parking_info = models.CharField(db_column='PARKING_INFO', max_length=20, blank=True, null=True, verbose_name='주차 정보')
     operating_hours = models.CharField(db_column='OPERATING_HOURS', max_length=255, verbose_name='운영 시간')
     phone = models.CharField(db_column='PHONE', max_length=20, verbose_name='문의 전화번호')
-    pet_allowed = models.BooleanField(db_column='PET_ALLOWED', verbose_name='반려동물 동반 가능 여부')
+    pet_allowed = models.IntegerField(db_column='PET_ALLOWED', verbose_name='반려동물 동반 가능 여부')
     image = models.ImageField(db_column='IMAGE', upload_to='tourist_spots/', blank=True, null=True, verbose_name='이미지') # 이미지 컬럼 추가
 
     class Meta:
@@ -66,32 +65,11 @@ class TouristSpot(models.Model):
 
 
 # ==============================================================================
-# 4. 축제 (FESTIVAL)
-# ==============================================================================
-class Festival(models.Model):
-    festival_id = models.CharField(db_column='FESTIVAL_ID', primary_key=True, max_length=20, verbose_name='축제 ID')
-    region = models.ForeignKey(Region, on_delete=models.DO_NOTHING, db_column='REGION_CODE', verbose_name='지역')
-    festival_name = models.CharField(db_column='FESTIVAL_NAME', max_length=255, verbose_name='축제명')
-    start_date = models.DateField(db_column='START_DATE', verbose_name='시작일자')
-    end_date = models.DateField(db_column='END_DATE', verbose_name='종료일자')
-    festival_location = models.CharField(db_column='FESTIVAL_LOCATION', max_length=255, blank=True, null=True, verbose_name='축제 장소')
-
-    class Meta:
-        managed = False
-        db_table = 'FESTIVAL'
-        verbose_name = '축제'
-        verbose_name_plural = '축제 목록'
-
-    def __str__(self):
-        return self.festival_name
-
-
-# ==============================================================================
 # 5. 날씨 캐시 (WEATHERCACHE)
 # * 실제 DB 복합 PK (WEATHER_CONDITION, REGION_CODE) -> Django 단일 PK + unique_together 처리
 # ==============================================================================
 class WeatherCache(models.Model):
-    weather_condition = models.CharField(db_column='WEATHER_CONDITION', primary_key=True, max_length=20, verbose_name='기상 상태')
+    weather_condition = models.CharField(db_column='WEATHER_CONDITION', max_length=20, verbose_name='기상 상태')
     region = models.ForeignKey(Region, on_delete=models.DO_NOTHING, db_column='REGION_CODE', verbose_name='지역')
     forecast_date = models.DateField(db_column='FORECAST_DATE', verbose_name='예보 날짜')
     temp_high = models.IntegerField(db_column='TEMP_HIGH', blank=True, null=True, verbose_name='최고 기온')
@@ -100,7 +78,7 @@ class WeatherCache(models.Model):
     class Meta:
         managed = False
         db_table = 'WEATHERCACHE'
-        unique_together = (('weather_condition', 'region'),)
+        unique_together = (('region', 'forecast_date'),)
         verbose_name = '날씨 캐시'
         verbose_name_plural = '날씨 캐시 목록'
 
