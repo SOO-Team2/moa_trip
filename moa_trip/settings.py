@@ -134,6 +134,7 @@ MAILERS = {
     'default': {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
+
 }
 
 
@@ -147,4 +148,5 @@ KMA_API_KEY = unquote(os.environ.get("KMA_API_KEY", ""))
 # ========================================================
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 

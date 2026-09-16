@@ -8,7 +8,7 @@ class Users(models.Model):
     user_id = models.CharField(db_column='USER_ID', primary_key=True, max_length=20, verbose_name='회원 ID')
     nickname = models.CharField(db_column='NICKNAME', max_length=20, verbose_name='닉네임')
     email = models.CharField(db_column='EMAIL', max_length=255, verbose_name='이메일')
-    pw = models.CharField(db_column='PW', max_length=20, verbose_name='비밀번호')
+    pw = models.CharField(db_column='PW', max_length=255, verbose_name='비밀번호')
     join_date = models.DateField(db_column='JOIN_DATE', blank=True, null=True, verbose_name='가입일자')
     status = models.CharField(db_column='STATUS', max_length=20, default='정상', verbose_name='회원 상태') # 상태 컬럼 추가
 

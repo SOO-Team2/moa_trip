@@ -17,9 +17,9 @@
   <header class="mypage-profile-header">
     <div class="profile-avatar">👤</div>
     <div class="profile-info">
-      <span class="profile-badge">{{ user.grade }}</span>
-      <h1>{{ user.name }}</h1>
-      <p>{{ user.user_id }} · {{ user.join_date }} 가입</p>
+      <span class="profile-badge">{{ user.grade|default:"일반 회원" }}</span>
+      <h1>{{ user.nickname|default:user.name }}</h1>
+      <p>{{ user.user_id }} · {{ user.join_date|default:"2026.03" }} 가입</p>
     </div>
     <div class="profile-stats-group">
       <div class="stat-item">
@@ -120,16 +120,35 @@
     <aside class="mypage-itinerary-aside">
       <h2>저장한 여행 일정</h2>
       <div class="itinerary-list">
+        {% if saved_itineraries %}
         {% for itin in saved_itineraries %}
         <article class="itinerary-card">
-          <h3>{{ itin.title }}</h3>
-          <p>{{ itin.date }} · {{ itin.spot_cnt }}곳</p>
+          <h3>{{ itin.title|default:itin.itinerary_title }}</h3>
+          <p>{{ itin.date|default:itin.itinerary_date }} · {{ itin.spot_cnt|default:"3" }}곳</p>
           <div class="itinerary-actions">
             <button type="button">열기</button>
             <button type="button">삭제</button>
           </div>
         </article>
         {% endfor %}
+        {% else %}
+        <article class="itinerary-card">
+          <h3>속초 2일 코스</h3>
+          <p>2026.10.03 · 6곳</p>
+          <div class="itinerary-actions">
+            <button type="button">열기</button>
+            <button type="button">삭제</button>
+          </div>
+        </article>
+        <article class="itinerary-card">
+          <h3>여수 야경 코스</h3>
+          <p>임시 저장 · 2곳</p>
+          <div class="itinerary-actions">
+            <button type="button">열기</button>
+            <button type="button">삭제</button>
+          </div>
+        </article>
+        {% endif %}
       </div>
     </aside>
   </main>

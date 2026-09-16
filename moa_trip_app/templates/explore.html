@@ -13,60 +13,60 @@
 <div class="explore-layout">
   <aside class="explore-content-left">
     <h1>관광지 탐색</h1>
-    <div class="explore-filter">
+    <form method="get" action="{% url 'explore' %}" class="explore-filter">
       <h2>맞춤 필터</h2>
 
       <!-- 지역 필터 -->
       <div class="explore-filter-region">
         <h3>지역</h3>
         <div>
-          <input type="radio" name="region" id="r-jeju" checked>
+          <input type="radio" name="region" id="r-jeju" value="39" checked>
           <label for="r-jeju">제주도</label>
         </div>
         <div>
-          <input type="radio" name="region" id="r-gangwon">
+          <input type="radio" name="region" id="r-gangwon" value="51">
           <label for="r-gangwon">강원도</label>
         </div>
         <div>
-          <input type="radio" name="region" id="r-jeonnam">
+          <input type="radio" name="region" id="r-jeonnam" value="38">
           <label for="r-jeonnam">전라남도</label>
         </div>
         <div>
-          <input type="radio" name="region" id="r-gyeongbuk">
+          <input type="radio" name="region" id="r-gyeongbuk" value="35">
           <label for="r-gyeongbuk">경상북도</label>
         </div>
       </div>
+
       <!-- 반려동물 필터 -->
       <div class="explore-filter-pet">
         <h3>반려동물</h3>
         <label>
-          <input type="checkbox" checked>
+          <input type="checkbox" name="pet" value="Y" checked>
           <span>반려동물 동반 가능</span>
         </label>
       </div>
 
       <!-- 평점 필터 -->
-
       <div class="explore-filter-rating">
         <h3>평점</h3>
         <div class="rating-filter-group">
-          <input type="radio" name="min_rating" id="rating-45" class="rating-radio" checked>
+          <input type="radio" name="min_rating" id="rating-45" value="4.5" class="rating-radio" checked>
           <label for="rating-45" class="rating-filter-btn">4.5 이상</label>
-          <input type="radio" name="min_rating" id="rating-40" class="rating-radio">
+          <input type="radio" name="min_rating" id="rating-40" value="4.0" class="rating-radio">
           <label for="rating-40" class="rating-filter-btn">4.0 이상</label>
-          <input type="radio" name="min_rating" id="rating-35" class="rating-radio">
+          <input type="radio" name="min_rating" id="rating-35" value="3.5" class="rating-radio">
           <label for="rating-35" class="rating-filter-btn">3.5 이상</label>
         </div>
       </div>
 
       <!-- 하단 버튼 영역 -->
       <div class="filter-actions">
-        <button type="button">필터 적용</button>
+        <button type="submit">필터 적용</button>
         <div class="filter-reset-wrapper">
-          <button type="button">초기화</button>
+          <button type="button" onclick="location.href='{% url 'explore' %}'">초기화</button>
         </div>
       </div>
-
+    </form>
   </aside>
 
   <section class="explore-content-right">
@@ -77,13 +77,14 @@
       </div>
       <div>
         <span>정렬</span>
-        <button type="button" class="sort-btn active">평점순</button>
-        <button type="button" class="sort-btn">후기순</button>
+        <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}sort=rating"
+          class="sort-btn {% if selected_sort != 'review' %}active{% endif %}">평점순</a>
+        <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}sort=review"
+          class="sort-btn {% if selected_sort == 'review' %}active{% endif %}">후기순</a>
       </div>
     </header>
 
     <!-- 관광지 카드 목록 영역 -->
-
     <section class="explore-grid-2">
       {% if spots %}
       {% for spot in spots %}
@@ -112,7 +113,6 @@
       </p>
       {% endif %}
     </section>
-
 
     <!-- 하단 페이징 영역 -->
     <nav class="explore-pagination">
