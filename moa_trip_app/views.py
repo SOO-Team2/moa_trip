@@ -1,7 +1,9 @@
+import json
+import uuid
 from django.utils import timezone
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from .models import TouristSpot, Region, Users, Itinerary
+from django.http import HttpResponse, JsonResponse
+from .models import TouristSpot, Region, Users, Itinerary, ItineraryTime
 from django.contrib.auth.hashers import make_password, check_password
 from django.db.models import Avg, Count
 
@@ -48,8 +50,94 @@ def detail(request):
     return render(request, 'detail.html')
 
 def planner(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return HttpResponse('<script>alert("로그인이 필요한 페이지입니다."); location.href="../login/";</script>')
+
     regions = Region.objects.all()
-    return render(request, 'planner.html', {'regions':regions})
+    spots = TouristSpot.objects.select_related('region').all()
+    spots_data = [
+        {
+            'spot_code': spot.spot_code,
+            't_name': spot.t_name,
+            'address': spot.address,
+            'entry_fee': spot.entry_fee,
+            'pet_allowed': spot.pet_allowed,
+            'region_name': spot.region.region_name,
+        }
+        for spot in spots
+    ]
+    return render(request, 'planner.html', {'regions':regions, 'spots_data': spots_data})
+
+def planner_add_spot(request):
+    if request.method != 'POST':
+        return JsonResponse({'result': 'fail', 'message': '잘못된 요청입니다.'}, status=405)
+
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return JsonResponse({'result': 'fail', 'message': '로그인이 필요합니다.'}, status=401)
+
+    spot_code = request.POST.get('spot_code')
+    itinerary_title = request.POST.get('itinerary_title') or None
+    itinerary_date = request.POST.get('itinerary_date')
+    companion = request.POST.get('companion') or None
+    pet_accompanied = request.POST.get('pet_accompanied') == 'true'
+    visit_time = request.POST.get('visit_time') or None
+
+    if not spot_code or not itinerary_date:
+        return JsonResponse({'result': 'fail', 'message': '장소와 날짜는 필수입니다.'}, status=400)
+
+    try:
+        spot = TouristSpot.objects.get(spot_code=spot_code)
+    except TouristSpot.DoesNotExist:
+        return JsonResponse({'result': 'fail', 'message': '존재하지 않는 관광지입니다.'}, status=404)
+
+    itinerary_code = 'IT' + uuid.uuid4().hex[:18].upper()
+
+    itinerary = Itinerary.objects.create(
+        itinerary_code=itinerary_code,
+        user_id=user_id,
+        spot=spot,
+        itinerary_title=itinerary_title,
+        itinerary_date=itinerary_date,
+        companion=companion,
+        pet_accompanied=pet_accompanied,
+    )
+    if visit_time:
+        ItineraryTime.objects.create(
+            itinerary=itinerary,
+            visit_time=visit_time,
+        )
+
+
+    return JsonResponse({
+        'result': 'ok',
+        'itinerary_code': itinerary.itinerary_code,
+        't_name': spot.t_name,
+        'entry_fee': spot.entry_fee,
+        'pet_allowed': spot.pet_allowed,
+        'visit_time': visit_time,
+    })
+
+
+def planner_delete_spot(request):
+    if request.method != 'POST':
+        return JsonResponse({'result': 'fail', 'message':'잘못된 요청입니다.'}, status=405)
+
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return JsonResponse({'result': 'fail', 'message':'로그인이 필요합니다.'}, status=401)
+
+    itinerary_code = request.POST.get('itinerary_code')
+
+    try:
+        itinerary = Itinerary.objects.get(itinerary_code=itinerary_code, user_id=user_id)
+    except Itinerary.DoesNotExist:
+        return JsonResponse({'result': 'fail', 'message':'삭제할 일정을 찾을 수 없습니다.'}, status=404)
+
+    itinerary.delete()
+
+    return JsonResponse({'result': 'ok'})
 
 def mypage(request):
     user_id = request.session.get('user_id', None)

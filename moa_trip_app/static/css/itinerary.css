@@ -310,3 +310,96 @@
   color: var(--color-primary);
   font-weight: 700;
 }
+
+/* ==========================================================================
+   TIMELINE ITEM DELETE BUTTON (Hover to show)
+   ========================================================================== */
+.timeline-delete-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background-color: #ffffff;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+  z-index: 3;
+}
+
+.timeline-item:hover .timeline-delete-btn {
+  opacity: 1;
+  visibility: visible;
+}
+
+.timeline-delete-btn:hover {
+  background-color: #EF4444;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   SPOT SEARCH (Add place)
+   ========================================================================== */
+.spot-search-wrap {
+  position: relative;
+  margin-top: 12px;
+}
+
+.spot-search-input {
+  width: 100%;
+  padding: 14px;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--color-text);
+  outline: none;
+  transition: var(--transition);
+}
+
+.spot-search-input:focus {
+  border-style: solid;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.spot-search-results {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  z-index: 10;
+  list-style: none;
+  padding: 4px;
+}
+
+.spot-search-results:empty {
+  display: none;
+}
+
+.spot-search-results li {
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--color-text);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.spot-search-results li:hover {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}

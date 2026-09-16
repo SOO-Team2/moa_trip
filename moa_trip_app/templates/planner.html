@@ -11,6 +11,9 @@
 
 {% block content %}
 <div class="planner-container">
+    {% csrf_token %}
+    {{ spots_data|json_script:"spots-data" }}
+
     <header class="planner-header">
         <h1>즐겨찾기로 여행 만들기</h1>
     </header>
@@ -114,6 +117,7 @@
                         <h3>협재해수욕장</h3>
                         <p>무료 · 반려동물 동반 가능</p>
                     </div>
+                    <button type="button" class="timeline-delete-btn" aria-label="삭제">✕</button>
                 </div>
 
                 <div class="timeline-item">
@@ -122,6 +126,7 @@
                         <h3>한담 해안 산책로</h3>
                         <p>무료 · 반려동물 동반 가능</p>
                     </div>
+                    <button type="button" class="timeline-delete-btn" aria-label="삭제">✕</button>
                 </div>
 
                 <div class="timeline-item">
@@ -130,6 +135,7 @@
                         <h3>사려니숲길</h3>
                         <p>무료 · 반려동물 동반 가능</p>
                     </div>
+                    <button type="button" class="timeline-delete-btn" aria-label="삭제">✕</button>
                 </div>
 
                 <div class="timeline-item">
@@ -138,11 +144,13 @@
                         <h3>새별오름 일몰</h3>
                         <p>무료 · 반려동물 동반 가능</p>
                     </div>
+                    <button type="button" class="timeline-delete-btn" aria-label="삭제">✕</button>
                 </div>
             </div>
 
-            <div>
-                <button type="button" class="btn-add-timeline-spot">+ 장소 직접 추가</button>
+            <div class="spot-search-wrap">
+                <input type="text" id="spot-search-input" class="spot-search-input" placeholder="추가할 관광지 이름을 검색하세요.">
+                <ul id="spot-search-results" class="spot-search-results"></ul>
             </div>
         </section>
 
@@ -155,38 +163,131 @@
             </div>
         </section>
         <script>
-            const addSpotBtn = document.querySelector('.btn-add-timeline-spot');
             const timelineList = document.querySelector('.timeline-list');
             const spotCountDisplay = document.getElementById('summary-spot-count');
-
+            
             function updateSpotCount() {
                 const items = timelineList.querySelectorAll('.timeline-item');
                 const count = items.length;
-                
+
                 spotCountDisplay.textContent = `${count}곳`;
             }
 
             updateSpotCount();
 
-            if (addSpotBtn) {
-                addSpotBtn.addEventListener('click', () => {
-                    // 새로운 타임라인 HTML 구조
+            //삭제 버튼 클릭 처리(기존 예시 카드 + 새로 추가된 카드 공통)
+            timelineList.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('timeline-delete-btn')) return;
+
+                const item = e.target.closest('.timeline-item');
+                const itineraryCode = item.dataset.itineraryCode;
+
+                //DB에 저장된 적 없는(예시) 카드는 화면에서만 삭제
+                if (!itineraryCode) {
+                    item.remove();
+                    updateSpotCount();
+                    return;
+                }
+                
+                fetch("{% url 'planner_delete_spot' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({ itinerary_code: itineraryCode}).toString(),
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.result !== 'ok') {
+                        alert(data.message || '삭제에 실패했습니다.');
+                        return;
+                    }
+                    item.remove();
+                    updateSpotCount();
+                })
+                .catch(() => alert('삭제 중 오류가 발생했습니다.'));
+            })
+        </script>
+
+        <script>
+           //관광지 검색 + DB 저장
+           const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+           const spotData = JSON.parse(document.getElementById('spots-data').textContent);
+           const searchInput = document.getElementById('spot-search-input');
+           const searchResults = document.getElementById('spot-search-results');
+
+           function formatFee(fee) {
+            return fee === 0 ? '무료' : `${fee.toLocaleString()}원`;
+           }
+
+           function formatPet(petAllowed) {
+            return petAllowed ? '반려동물 동반 가능' : '반려동물 동반 불가';
+           }
+
+           searchInput.addEventListener('input', () => {
+            const keyword = searchInput.value.trim();
+            searchResults.innerHTML = '';
+
+            if (!keyword) return;
+
+            const matched = spotData
+                .filter(spot => spot.t_name.includes(keyword))
+                .slice(0,8);
+
+            matched.forEach(spot => {
+                const li = document.createElement('li');
+                li.textContent = `${spot.t_name} (${spot.region_name})`;
+                li.addEventListener('click', () => addSpotToTimeline(spot));
+                searchResults.appendChild(li);
+            });
+           });
+
+           function addSpotToTimeline(spot) {
+                const activeCompanionBtn = document.querySelector('.companion-btn.active');
+
+                const formData = new URLSearchParams();
+                formData.append('spot_code', spot.spot_code);
+                formData.append('itinerary_title', titleInput.value.trim());
+                formData.append('itinerary_date', document.getElementById('planner-date').value);
+                formData.append('companion', activeCompanionBtn ? activeCompanionBtn.textContent : '');
+                formData.append('pet_accompanied', petBtn.classList.contains('active') ? 'true' : 'false');
+
+                fetch("{% url 'planner_add_spot' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData.toString(),
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.result !== 'ok') {
+                        alert(data.message || '저장에 실패했습니다.');
+                        return;
+                    }
+
                     const newItem = document.createElement('div');
                     newItem.classList.add('timeline-item');
-                    
+                    newItem.dataset.itineraryCode = data.itinerary_code;
                     newItem.innerHTML = `
                         <span class="timeline-time-badge">시간 미정</span>
                         <div class="timeline-card">
-                            <h3>새로운 장소</h3>
-                            <p>정보를 입력해주세요</p>
+                            <h3>${data.t_name}</h3>
+                            <p>${formatFee(data.entry_fee)} · ${formatPet(data.pet_allowed)}</p>
                         </div>
+                        <button type="button" class="timeline-delete-btn" aria-label="삭제">✕</button>
                     `;
 
-                    // 실제 화면에 배치
                     timelineList.appendChild(newItem);
                     updateSpotCount();
-                });
-            }
+
+                    searchInput.value = '';
+                    searchResults.innerHTML = '';
+                })
+                .catch(() => alert('저장 중 오류가 발생했습니다.'));
+           }
         </script>
     </main>
 </div>

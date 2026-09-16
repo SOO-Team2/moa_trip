@@ -146,3 +146,20 @@ class Itinerary(models.Model):
 
     def __str__(self):
         return f"{self.itinerary_title or self.itinerary_code} ({self.user.nickname})"
+
+    
+# ==============================================================================
+# 9. 일정 방문 시간 (ITINERARY_TIME) - ITINERARY의 자식 테이블
+# ==============================================================================
+class ItineraryTime(models.Model):
+    itinerary = models.OneToOneField(Itinerary, on_delete=models.DO_NOTHING, db_column='ITINERARY_CODE', primary_key=True, verbose_name='일정')
+    visit_time = models.CharField(db_column='VISIT_TIME', max_length=5, verbose_name='방문 시간')
+
+    class Meta:
+        managed = False
+        db_table = 'ITINERARY_TIME'
+        verbose_name = '방문 시간'
+        verbose_name_plural = '방문 시간 목록'
+
+    def __str__(self):
+        return f"{self.itinerary.itinerary_code} - {self.visit_time}"
