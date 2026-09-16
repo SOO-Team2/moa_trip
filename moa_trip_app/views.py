@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from .models import TouristSpot, Region
+from django.http import HttpResponse
+from .models import TouristSpot, Region, Users, Itinerary
 from django.db.models import Avg, Count
 
 def main(request):
@@ -35,12 +36,21 @@ def planner(request):
     return render(request, 'planner.html', {'regions':regions})
 
 def mypage(request):
-    return render(request, 'mypage.html')
+    user_id = request.session.get('user_id', None)
+    if not user_id:
+        return HttpResponse('<script>alert("로그인이 필요한 페이지입니다."); location.href="../login/";</script>')
+    try:
+        user = Users.objects.get(user_id=user_id)
+        itinerary = Itinerary.objects.get(user_id=user_id)
+    except Users.DoesNotExist:
+        # 세션은 남아있는데 데이터 없으면 초기화
+        request.session.flush()
+
+    return render(request, 'mypage.html', { 'user':user, 'itinerary':itinerary })
 
 def login(request):
     return render(request, 'login.html')
 
-from .models import Users
 def login_ok(request):
     user_id = request.POST.get('user_id', None)
     pw = request.POST.get('pw', None)

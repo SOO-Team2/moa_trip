@@ -18,8 +18,8 @@
     <div class="profile-avatar">👤</div>
     <div class="profile-info">
       <span class="profile-badge">일반 회원</span>
-      <h1>최주원</h1>
-      <p>U-10428 · 2026.03 가입</p>
+      <h1>{{ user.nickname }}</h1>
+      <p>{{ user.user_id }} · {{ user.join_date|date:"Y년 m월" }} 가입</p>
     </div>
     <div class="profile-stats-group">
       <div class="stat-item">
@@ -137,8 +137,8 @@
       <div class="itinerary-list">
         <!-- 일정 1 -->
         <article class="itinerary-card">
-          <h3>제주도 · 반려견 동반 1일</h3>
-          <p>2026.09.12 (토) · 4곳</p>
+          <h3>{{ itinerary.itinerary_title }}</h3>
+          <p>{{ itinerary.itinerary_date|date:"Y.m.d" }} · 4곳</p>
           <div class="itinerary-actions">
             <button type="button">열기</button>
             <button type="button">삭제</button>

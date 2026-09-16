@@ -22,8 +22,8 @@
 
     <main class="auth-right-panel">
       <nav class="auth-tabs">
-        <a href="#" class="active" data-tab="login">로그인</a>
-        <a href="#" data-tab="signup">회원가입</a>
+        <a class="active" data-tab="login">로그인</a>
+        <a data-tab="signup">회원가입</a>
       </nav>
 
       <form class="auth-form" method="post" action="login_ok/" id="login-form">
@@ -45,7 +45,7 @@
         {% csrf_token %}
         <div class="auth-field-group">
           <label>아이디</label>
-          <input type="text" placeholder="사용할 아이디를 입력하세요" required>
+          <input type="text" placeholder="아이디를 입력하세요" required>
         </div>
 
         <div class="auth-field-group">
@@ -82,10 +82,10 @@
 
         if (tab.dataset.tab == 'signup') {
           loginform.style.display = 'none';  
-          signupform.style.display = 'block';
+          signupform.style.display = 'flex';
         } else {
           signupform.style.display = 'none';
-          loginform.style.display = 'block';
+          loginform.style.display = 'flex';
         }
       });
     });
