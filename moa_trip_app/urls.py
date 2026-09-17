@@ -10,7 +10,6 @@ urlpatterns = [
     path('planner/add/', views.planner_add_spot, name='planner_add_spot'),
     path('planner/delete/', views.planner_delete_spot, name='planner_delete_spot'),
     path('mypage/', views.mypage, name='mypage'),
-    path('mypage/delete/<str:itinerary_code>/', views.delete_itinerary, name='delete_itinerary'),
     path('login/', views.login, name='login'),
     path('login/login_ok/', views.login_ok, name='login_ok'),
     path('logout/', views.logout, name='logout'),

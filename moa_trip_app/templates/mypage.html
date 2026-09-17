@@ -118,15 +118,20 @@
     <script>
       function deleteItinerary(button, itineraryCode) {
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        fetch(`/mypage/delete/${itineraryCode}/`, {
+        fetch("{% url 'planner_delete_spot' %}", {
           method: 'POST',
           headers: {
             'X-CSRFToken': csrftoken,
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({itinerary_code: itineraryCode}).toString()
         })
-    
-        .then(response => {
+        .then(response => response.json())
+        .then(data => {
+          if (data.result !== 'ok') {
+            alert(data.message || '삭제에 실패했습니다.');
+            return;
+          }
           const card = button.closest('.itinerary-card');
           const list = card.closest('.itinerary-list');
 

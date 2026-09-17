@@ -82,6 +82,7 @@ def planner_add_spot(request):
     companion = request.POST.get('companion') or None
     pet_accompanied = request.POST.get('pet_accompanied') == 'true'
     visit_time = request.POST.get('visit_time') or None
+    existing_itinerary_code = request.POST.get('itinerary_code') or None
 
     if not spot_code or not itinerary_date:
         return JsonResponse({'result': 'fail', 'message': '장소와 날짜는 필수입니다.'}, status=400)
@@ -91,18 +92,25 @@ def planner_add_spot(request):
     except TouristSpot.DoesNotExist:
         return JsonResponse({'result': 'fail', 'message': '존재하지 않는 관광지입니다.'}, status=404)
 
-    itinerary_title = request.POST.get('itinerary_title') or spot.region.region_name
+    if existing_itinerary_code:
+        # 같은 여행에서 이미 만든 일정이 있으면 그걸 재사용(새로 만들지 않음)
+        try:
+            itinerary = Itinerary.objects.get(itinerary_code=existing_itinerary_code, user_id=user_id)
+        except Itinerary.DoesNotExist:
+            return JsonResponse({'result': 'fail', 'message': '해당 여행 일정을 찾을 수 없습니다.'}, status=404)
 
-    itinerary_code = 'IT' + uuid.uuid4().hex[:18].upper()
+    else:
+        itinerary_title = request.POST.get('itinerary_title') or spot.region.region_name
+        itinerary_code = 'IT' + uuid.uuid4().hex[:18].upper()
 
-    itinerary = Itinerary.objects.create(
-        itinerary_code=itinerary_code,
-        user_id=user_id,
-        itinerary_title=itinerary_title,
-        itinerary_date=itinerary_date,
-        companion=companion,
-        pet_accompanied=pet_accompanied,
-    )
+        itinerary = Itinerary.objects.create(
+            itinerary_code=itinerary_code,
+            user_id=user_id,
+            itinerary_title=itinerary_title,
+            itinerary_date=itinerary_date,
+            companion=companion,
+            pet_accompanied=pet_accompanied,
+        )
     ItineraryTime.objects.create(
         itinerary=itinerary,
         spot=spot,
@@ -153,10 +161,6 @@ def mypage(request):
         request.session.flush()
 
     return render(request, 'mypage.html', context)
-
-def delete_itinerary(request, itinerary_code):
-    itinerary = Itinerary.objects.get(itinerary_code=itinerary_code)
-    itinerary.delete()
 
 def login(request):
     return render(request, 'login.html')

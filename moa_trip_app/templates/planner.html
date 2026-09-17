@@ -289,7 +289,7 @@
 
             // 일정 저장 버튼 클릭 처리
             const saveBtn = document.querySelector('.btn-save-itinerary');
-            saveBtn.addEventListener('click', () => {
+            saveBtn.addEventListener('click', async () => {
                 const newItems = Array.from(timelineList.querySelectorAll('.timeline-item'))
                     .filter(item => item.dataset.spotCode && !item.dataset.itineraryCode);
 
@@ -305,7 +305,12 @@
                 const companion = activeCompanionBtn ? activeCompanionBtn.textContent : '';
                 const petAccompanied = petBtn.classList.contains('active') ? 'true' : 'false';
 
-                const savePromises = newItems.map(item => {
+                // 같은 여행(일정)에 속한 장소들이 공유할 itinerary_code
+                let sharedItineraryCode = null;
+                let hasFailed = false;
+
+                // 장소를 하나씩 순서대로 저장 (동시에 보내지 않음)
+                for (const item of newItems) {
                     const formData = new URLSearchParams();
                     formData.append('spot_code', item.dataset.spotCode);
                     formData.append('itinerary_title', itineraryTitle);
@@ -314,33 +319,35 @@
                     formData.append('pet_accompanied', petAccompanied);
                     formData.append('visit_time', buildVisitTime(item));
 
-                    return fetch("{% url 'planner_add_spot' %}", {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': csrfToken,
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: formData.toString(),
-                    })
-                    .then(res => res.json())
-                    .then(data => ({ item, data }));
-                });
+                    // 이미 만들어진 일정이 있으면 그 코드를 같이 보냄
+                    if (sharedItineraryCode) {
+                        formData.append('itinerary_code', sharedItineraryCode);
+                    }
 
-                Promise.all(savePromises)
-                    .then(results => {
-                        results.forEach(({ item, data }) => {
-                            if (data.result !== 'ok') return;
-                            item.dataset.itineraryCode = data.itinerary_code;
+                    try {
+                        const res = await fetch("{% url 'planner_add_spot' %}", {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': csrfToken,
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: formData.toString(),
                         });
+                        const data = await res.json();
 
-                        const failed = results.filter(r => r.data.result !== 'ok');
-                        if (failed.length > 0) {
-                            alert('일부 장소 저장에 실패했습니다.');
-                        } else {
-                            alert('일정이 저장되었습니다.');
+                        if (data.result !== 'ok') {
+                            hasFailed = true;
+                            continue;
                         }
-                    })
-                    .catch(() => alert('저장 중 오류가 발생했습니다.'));
+
+                        sharedItineraryCode = data.itinerary_code;
+                        item.dataset.itineraryCode = data.itinerary_code;
+                    } catch (e) {
+                        hasFailed = true;
+                    }
+                }
+
+                alert(hasFailed ? '일부 장소 저장에 실패했습니다.' : '일정이 저장되었습니다.');
             });
         </script>
     </main>
