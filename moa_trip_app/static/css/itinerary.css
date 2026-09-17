@@ -225,6 +225,51 @@
   margin-bottom: 8px;
 }
 
+.timeline-time-badge select {
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-primary);
+    outline: none;
+    padding: 0;
+    margin: 0;
+    padding: 2px;
+}
+
+/* 드롭다운 화살표 숨기기 */
+.timeline-time-badge select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+.timeline-time-badge input[type="number"] {
+    width: 15px;
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-align: center;
+    outline: none;
+    padding: 2px 0;
+}
+
+/* placeholder 색상 맞추기 */
+.timeline-time-badge input[type="number"]::placeholder {
+    color: var(--color-primary);
+    opacity: 0.7;
+}
+
+/* 숫자 입력창 화살표 숨기기 */
+.timeline-time-badge input[type="number"]::-webkit-outer-spin-button,
+.timeline-time-badge input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 .timeline-card {
   background-color: #FAFAFA;
   border: 1px solid var(--color-border);

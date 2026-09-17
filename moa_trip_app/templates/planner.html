@@ -119,7 +119,7 @@
             <!-- 즐겨찾기 목록팝업 -->
             <div id="spot-modal" class="spot-modal" style="display: none;">
                 <div class="spot-modal-content">
-                    <h2>즐겨찾기 목록</h2>
+                    <h2>즐겨찾기 목록</h2></br>
                     <div class="mypage-spot-grid">
                         {% for favorite in favorites %}
                             <article class="mypage-spot-card" data-spot-name="{{ favorite.spot.t_name }}">
@@ -219,7 +219,15 @@
                     newItem.classList.add('timeline-item');
                     
                     newItem.innerHTML = `
-                        <span class="timeline-time-badge">시간 미정</span>
+                        <div class="timeline-time-badge">
+                            <select class="time-period-select">
+                                <option value="오전">오전</option>
+                                <option value="오후">오후</option>
+                            </select>
+                            <input type="number" class="time-hour-input" placeholder="00" min="1" max="12" maxlength="2">
+                            <span>:</span>
+                            <input type="number" class="time-minute-input" placeholder="00" min="0" max="59" maxlength="2">
+                        </div>
                         <div class="timeline-card">
                             <h3>${spotName}</h3>
                             <p>무료 · 반려동물 동반 가능</p>
