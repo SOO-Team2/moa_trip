@@ -3,7 +3,7 @@ import uuid
 from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from .models import TouristSpot, Region, Users, Itinerary, ItineraryTime, Review
+from .models import TouristSpot, Region, Users, Itinerary, ItineraryTime, Review, Favorite
 from django.contrib.auth.hashers import make_password, check_password
 from django.db.models import Avg, Count
 
@@ -147,7 +147,8 @@ def mypage(request):
         user = Users.objects.get(user_id=user_id)
         itineraries = Itinerary.objects.filter(user_id=user_id)
         reviews = Review.objects.filter(user_id=user_id).select_related('spot') #models.py 필드 이름
-        context = { 'user':user, 'itineraries':itineraries, 'reviews':reviews }
+        favorites = Favorite.objects.filter(user_id=user_id).select_related('spot')
+        context = { 'user':user, 'itineraries':itineraries, 'reviews':reviews, 'favorites':favorites }
     except Users.DoesNotExist:
         # 세션은 남아있는데 데이터 없으면 초기화
         request.session.flush()

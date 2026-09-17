@@ -23,7 +23,7 @@
     </div>
     <div class="profile-stats-group">
       <div class="stat-item">
-        <span>18</span>
+        <span>{{ favorites.count }}</span>
         <span>즐겨찾기</span>
       </div>
       <div class="stat-item">
@@ -53,7 +53,7 @@
       <!-- 즐겨찾기 섹션 -->
       <section class="mypage-bookmark-section">
         <div class="bookmark-section-header">
-          <h2>즐겨찾기 18곳</h2>
+          <h2>즐겨찾기 {{ favorites.count }}곳</h2>
           <div class="bookmark-nav-btns">
             <button type="button">&lt;</button>
             <button type="button">&gt;</button>
@@ -62,44 +62,17 @@
 
         <!-- 관광지 카드 그리드 -->
         <div class="mypage-spot-grid">
-          <!-- 카드 1 -->
-          <article class="mypage-spot-card">
-            <div class="mypage-spot-thumb">🏖️</div>
-            <h3><a href="{% url 'detail' %}">협재해수욕장</a></h3>
-            <p>제주시 한림읍</p>
-          </article>
-
-          <!-- 카드 2 -->
-          <article class="mypage-spot-card">
-            <div class="mypage-spot-thumb">🌲</div>
-            <h3><a href="{% url 'detail' %}">사려니숲길</a></h3>
-            <p>제주시 조천읍</p>
-          </article>
-
-          <!-- 카드 3 -->
-          <article class="mypage-spot-card">
-            <div class="mypage-spot-thumb">⛰️</div>
-            <h3><a href="{% url 'detail' %}">새별오름</a></h3>
-            <p>제주시 애월읍</p>
-          </article>
-
-          <!-- 카드 4 -->
-          <article class="mypage-spot-card">
-            <div class="mypage-spot-thumb">🌅</div>
-            <h3><a href="{% url 'detail' %}">수월봉</a></h3>
-            <p>제주시 한경면</p>
-          </article>
-
-          <!-- 카드 5 -->
-          <article class="mypage-spot-card">
-            <div class="mypage-spot-thumb">🏝️</div>
-            <h3><a href="{% url 'detail' %}">우도</a></h3>
-            <p>제주시 우도면</p>
-          </article>
+          {% for favorite in favorites %}
+            <article class="mypage-spot-card">
+              <div class="mypage-spot-thumb">🏖️</div>
+              <h3><a href="{% url 'detail' %}">{{ favorite.spot.t_name }}</a></h3>
+              <p>{{ favorite.spot.address }}</p>
+            </article>
+          {% endfor %}
 
           <!-- 추가 카드 버튼 -->
           <article class="add-spot-card">
-            <button type="button">+ 관광지 더 담기</button>
+            <button type="button" onclick="location.href='../explore'">+ 관광지 더 담기</button>
           </article>
         </div>
       </section>
