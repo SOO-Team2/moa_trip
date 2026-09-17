@@ -152,7 +152,8 @@ class Itinerary(models.Model):
 # ==============================================================================
 class ItineraryTime(models.Model):
     itinerary = models.OneToOneField(Itinerary, on_delete=models.DO_NOTHING, db_column='ITINERARY_CODE', primary_key=True, verbose_name='일정')
-    visit_time = models.CharField(db_column='VISIT_TIME', max_length=5, verbose_name='방문 시간')
+    spot = models.ForeignKey(TouristSpot, on_delete=models.DO_NOTHING, db_column='SPOT_CODE', verbose_name='관광지')
+    visit_time = models.CharField(db_column='VISIT_TIME', max_length=5, blank=True, null=True, verbose_name='방문 시간')
 
     class Meta:
         managed = False
