@@ -67,7 +67,7 @@ def planner(request):
         }
         for fav in favorites
     ]
-    return render(request, 'planner.html', {'regions':regions, 'spots_data': spots_data})
+    return render(request, 'planner.html', {'regions':regions, 'spots_data': spots_data, 'favorites':favorites})
 
 def planner_add_spot(request):
     if request.method != 'POST':

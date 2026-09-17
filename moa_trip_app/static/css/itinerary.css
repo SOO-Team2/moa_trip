@@ -271,6 +271,32 @@
   background-color: var(--color-primary-subtle);
 }
 
+/* 즐겨찾기 목록 팝업 */
+.spot-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.15); /* 반투명 검은색 배경 */
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* 다른 콘텐츠들보다 위에 오도록 설정 */
+}
+
+/* 팝업 실제 박스 컨텐츠 */
+.spot-modal-content {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 850px;
+    max-height: 80vh;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
 /* ==========================================================================
    RIGHT: SUMMARY & STATS PANEL (280px)
    ========================================================================== */
