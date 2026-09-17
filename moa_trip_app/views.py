@@ -35,6 +35,11 @@ def explore(request):
     else:
         spots = spots.order_by('-avg_rating')
 
+    user_id = request.session.get('user_id')
+    favorited_spot_codes = set(
+        Favorite.objects.filter(user_id=user_id).values_list('spot_id', flat=True)
+    ) if user_id else set()
+
 
     context = {
         'spots': spots,
@@ -43,6 +48,8 @@ def explore(request):
         'selected_rating': selected_rating,
         'selected_pet': selected_pet,
         'selected_sort': selected_sort,   
+        'favorited_spot_codes': favorited_spot_codes,
+
     }
     return render(request, 'explore.html', context)
 
@@ -145,6 +152,31 @@ def planner_delete_spot(request):
     itinerary.delete()
 
     return JsonResponse({'result': 'ok'})
+
+def favorite_toggle(request):
+    if request.method != 'POST':
+        return JsonResponse({'result': 'fail', 'message': '잘못된 요청입니다.'}, status=405)
+
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return JsonResponse({'result': 'fail', 'message': '로그인이 필요합니다.'}, status=401)
+
+    spot_code = request.POST.get('spot_code')
+    if not spot_code:
+        return JsonResponse({'result': 'fail', 'message': '관광지 정보가 없습니다.'}, status=400)
+
+    existing = Favorite.objects.filter(user_id=user_id, spot_id=spot_code).first()
+
+    if existing:
+        existing.delete()
+        return JsonResponse({'result': 'ok', 'is_favorited': False})
+    else:
+        Favorite.objects.create(
+            fav_code=uuid.uuid4().hex[:20],
+            user_id=user_id,
+            spot_id=spot_code,
+        )
+        return JsonResponse({'result': 'ok', 'is_favorited': True})
 
 def mypage(request):
     user_id = request.session.get('user_id', None)

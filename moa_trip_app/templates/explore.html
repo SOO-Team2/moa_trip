@@ -75,7 +75,7 @@
     <!-- 관광지 카드 목록 영역 -->
 <section class="explore-grid-2">
   {% for spot in spots %}
-  <article class="explore-card">
+  <article class="explore-card" data-spot-code="{{ spot.spot_code }}">
     <div class="explore-card-image">
       <span>사진</span>
     </div>
@@ -94,7 +94,9 @@
         {% else %}
         <span class="card-rating">아직 후기 없음</span>
         {% endif %}
-        <button type="button" class="btn-bookmark">즐겨찾기에 추가</button>
+        <button type="button" class="btn-bookmark {% if spot.spot_code in favorited_spot_codes %}is-favorited{% endif %}" data-spot-code="{{ spot.spot_code }}">
+          {% if spot.spot_code in favorited_spot_codes %}즐겨찾기 완료{% else %}즐겨찾기에 추가{% endif %}
+        </button>
       </div>
     </div>
   </article>
@@ -113,4 +115,51 @@
     </nav>
   </section>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const buttons = document.querySelectorAll('.btn-bookmark');
+
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const spotCode = btn.dataset.spotCode;
+
+      fetch('{% url "favorite_toggle" %}', {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': '{{ csrf_token }}',
+        },
+        body: new URLSearchParams({ spot_code: spotCode }),
+      })
+        .then(function (res) {
+          if (res.status === 401) {
+            alert('로그인이 필요합니다.');
+            window.location.href = '{% url "login" %}';
+            return null;
+          }
+          return res.json();
+        })
+        .then(function (data) {
+          if (!data) return;
+          if (data.result !== 'ok') {
+            alert(data.message || '즐겨찾기 처리에 실패했습니다.');
+            return;
+          }
+          if (data.is_favorited) {
+            btn.classList.add('is-favorited');
+            btn.textContent = '추가됨';
+          } else {
+            btn.classList.remove('is-favorited');
+            btn.textContent = '즐겨찾기에 추가';
+          }
+        })
+        .catch(function () {
+          alert('네트워크 오류가 발생했습니다.');
+        });
+    });
+  });
+});
+</script>
+
 {% endblock %}
