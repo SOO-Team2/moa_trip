@@ -78,7 +78,6 @@ def planner_add_spot(request):
         return JsonResponse({'result': 'fail', 'message': '로그인이 필요합니다.'}, status=401)
 
     spot_code = request.POST.get('spot_code')
-    itinerary_title = request.POST.get('itinerary_title') or None
     itinerary_date = request.POST.get('itinerary_date')
     companion = request.POST.get('companion') or None
     pet_accompanied = request.POST.get('pet_accompanied') == 'true'
@@ -91,6 +90,8 @@ def planner_add_spot(request):
         spot = TouristSpot.objects.get(spot_code=spot_code)
     except TouristSpot.DoesNotExist:
         return JsonResponse({'result': 'fail', 'message': '존재하지 않는 관광지입니다.'}, status=404)
+
+    itinerary_title = request.POST.get('itinerary_title') or spot.region.region_name
 
     itinerary_code = 'IT' + uuid.uuid4().hex[:18].upper()
 

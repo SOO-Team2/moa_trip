@@ -151,7 +151,8 @@ class Itinerary(models.Model):
 # 9. 일정 방문 시간 (ITINERARY_TIME) - ITINERARY의 자식 테이블
 # ==============================================================================
 class ItineraryTime(models.Model):
-    itinerary = models.OneToOneField(Itinerary, on_delete=models.DO_NOTHING, db_column='ITINERARY_CODE', primary_key=True, verbose_name='일정')
+    itinerary_time_id = models.AutoField(db_column='ITINERARY_TIME_ID', primary_key=True, verbose_name='방문 시간 ID')
+    itinerary = models.ForeignKey(Itinerary, on_delete=models.DO_NOTHING, db_column='ITINERARY_CODE', verbose_name='일정')
     spot = models.ForeignKey(TouristSpot, on_delete=models.DO_NOTHING, db_column='SPOT_CODE', verbose_name='관광지')
     visit_time = models.CharField(db_column='VISIT_TIME', max_length=5, blank=True, null=True, verbose_name='방문 시간')
 
