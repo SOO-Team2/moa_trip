@@ -392,7 +392,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  border: none;
+  border: 1.5px solid #ffffff;
   background-color: #ffffff;
   color: var(--color-text-muted);
   font-size: 12px;
@@ -407,14 +407,14 @@
   z-index: 3;
 }
 
-.timeline-item:hover .timeline-delete-btn {
+.timeline-card:hover .timeline-delete-btn {
   opacity: 1;
   visibility: visible;
 }
 
-.timeline-delete-btn:hover {
-  background-color: #EF4444;
-  color: #ffffff;
+.timeline-delete-btn:hover { 
+  border-color: #EF4444;
+  color: #EF4444;
 }
 
 /* ==========================================================================
