@@ -131,7 +131,6 @@ class Review(models.Model):
 class Itinerary(models.Model):
     itinerary_code = models.CharField(db_column='ITINERARY_CODE', primary_key=True, max_length=20, verbose_name='일정 코드')
     user = models.ForeignKey(Users, on_delete=models.DO_NOTHING, db_column='USER_ID', verbose_name='회원')
-    spot = models.ForeignKey(TouristSpot, on_delete=models.DO_NOTHING, db_column='SPOT_CODE', verbose_name='관광지')
     itinerary_title = models.CharField(db_column='ITINERARY_TITLE', max_length=255, blank=True, null=True, verbose_name='일정 제목')
     itinerary_date = models.DateField(db_column='ITINERARY_DATE', verbose_name='일정 일자')
     companion = models.CharField(db_column='COMPANION', max_length=20, blank=True, null=True, verbose_name='동행') # 동행 컬럼 추가
@@ -153,7 +152,8 @@ class Itinerary(models.Model):
 # ==============================================================================
 class ItineraryTime(models.Model):
     itinerary = models.OneToOneField(Itinerary, on_delete=models.DO_NOTHING, db_column='ITINERARY_CODE', primary_key=True, verbose_name='일정')
-    visit_time = models.CharField(db_column='VISIT_TIME', max_length=5, verbose_name='방문 시간')
+    spot = models.ForeignKey(TouristSpot, on_delete=models.DO_NOTHING, db_column='SPOT_CODE', verbose_name='관광지')
+    visit_time = models.CharField(db_column='VISIT_TIME', max_length=5, blank=True, null=True, verbose_name='방문 시간')
 
     class Meta:
         managed = False

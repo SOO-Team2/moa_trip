@@ -149,7 +149,8 @@
             </div>
 
             <div class="spot-search-wrap">
-                <input type="text" id="spot-search-input" class="spot-search-input" placeholder="추가할 관광지 이름을 검색하세요.">
+                <input type="time" id="spot-visit-time-input" class="spot-search-input" style="margin-bottom: 8px;">
+                <input type="text" id="spot-search-input" class="spot-search-input" placeholder="즐겨찾기한 관광지 이름을 검색하세요.">
                 <ul id="spot-search-results" class="spot-search-results"></ul>
             </div>
         </section>
@@ -225,6 +226,16 @@
             return petAllowed ? '반려동물 동반 가능' : '반려동물 동반 불가';
            }
 
+           function formatVisitTime(time) {
+            if (!time) return '시간 미정';
+            const [hourStr, minuteStr] = time.split(':');
+            const hour = parseInt(hourStr, 10);
+            const period = hour < 12 ? '오전' : '오후';
+            const hour12 = hour % 12 === 0 ? 12 : hour % 12;
+            return `${period} ${String(hour12).padStart(2, '0')}:${minuteStr}`;
+           }
+
+
            searchInput.addEventListener('input', () => {
             const keyword = searchInput.value.trim();
             searchResults.innerHTML = '';
@@ -245,6 +256,7 @@
 
            function addSpotToTimeline(spot) {
                 const activeCompanionBtn = document.querySelector('.companion-btn.active');
+                const visitTimeInput = document.getElementById('spot-visit-time-input');
 
                 const formData = new URLSearchParams();
                 formData.append('spot_code', spot.spot_code);
@@ -252,6 +264,9 @@
                 formData.append('itinerary_date', document.getElementById('planner-date').value);
                 formData.append('companion', activeCompanionBtn ? activeCompanionBtn.textContent : '');
                 formData.append('pet_accompanied', petBtn.classList.contains('active') ? 'true' : 'false');
+                formData.append('visit_time', visitTimeInput.value);
+
+
 
                 fetch("{% url 'planner_add_spot' %}", {
                     method: 'POST',
@@ -272,7 +287,8 @@
                     newItem.classList.add('timeline-item');
                     newItem.dataset.itineraryCode = data.itinerary_code;
                     newItem.innerHTML = `
-                        <span class="timeline-time-badge">시간 미정</span>
+                        <span class="timeline-time-badge">${formatVisitTime(data.visit_time)}</span>
+
                         <div class="timeline-card">
                             <h3>${data.t_name}</h3>
                             <p>${formatFee(data.entry_fee)} · ${formatPet(data.pet_allowed)}</p>
@@ -285,6 +301,7 @@
 
                     searchInput.value = '';
                     searchResults.innerHTML = '';
+                    visitTimeInput.value = '';
                 })
                 .catch(() => alert('저장 중 오류가 발생했습니다.'));
            }

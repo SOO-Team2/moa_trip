@@ -3,7 +3,7 @@ import uuid
 from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from .models import TouristSpot, Region, Users, Itinerary, ItineraryTime, Review
+from .models import TouristSpot, Region, Users, Itinerary, ItineraryTime, Review, Favorite
 from django.contrib.auth.hashers import make_password, check_password
 from django.db.models import Avg, Count
 
@@ -55,17 +55,17 @@ def planner(request):
         return HttpResponse('<script>alert("로그인이 필요한 페이지입니다."); location.href="../login/";</script>')
 
     regions = Region.objects.all()
-    spots = TouristSpot.objects.select_related('region').all()
+    favorites = Favorite.objects.filter(user_id=user_id).select_related('spot', 'spot__region')
     spots_data = [
         {
-            'spot_code': spot.spot_code,
-            't_name': spot.t_name,
-            'address': spot.address,
-            'entry_fee': spot.entry_fee,
-            'pet_allowed': spot.pet_allowed,
-            'region_name': spot.region.region_name,
+            'spot_code': fav.spot.spot_code,
+            't_name': fav.spot.t_name,
+            'address': fav.spot.address,
+            'entry_fee': fav.spot.entry_fee,
+            'pet_allowed': fav.spot.pet_allowed,
+            'region_name': fav.spot.region.region_name,
         }
-        for spot in spots
+        for fav in favorites
     ]
     return render(request, 'planner.html', {'regions':regions, 'spots_data': spots_data})
 
@@ -97,18 +97,16 @@ def planner_add_spot(request):
     itinerary = Itinerary.objects.create(
         itinerary_code=itinerary_code,
         user_id=user_id,
-        spot=spot,
         itinerary_title=itinerary_title,
         itinerary_date=itinerary_date,
         companion=companion,
         pet_accompanied=pet_accompanied,
     )
-    if visit_time:
-        ItineraryTime.objects.create(
-            itinerary=itinerary,
-            visit_time=visit_time,
-        )
-
+    ItineraryTime.objects.create(
+        itinerary=itinerary,
+        spot=spot,
+        visit_time=visit_time,
+    )
 
     return JsonResponse({
         'result': 'ok',
