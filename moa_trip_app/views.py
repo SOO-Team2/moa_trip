@@ -267,4 +267,22 @@ def signup(request):
     return render(request, 'signup_ok.html', {'result':result})
 
 def admin(request):
-    return render(request, 'admin.html')
+    section = request.GET.get('section', 'members')
+    selected_status = request.GET.get('status', '전체')
+
+    users = Users.objects.annotate(review_count=Count('review')).order_by('-join_date')
+    if selected_status != '전체':
+        users = users.filter(status=selected_status)
+
+    total_count = Users.objects.count()
+    this_month_start = timezone.now().date().replace(day=1)
+    new_count = Users.objects.filter(join_date__gte=this_month_start).count()
+
+    context = {
+        'section': section,
+        'users': users,
+        'total_count': total_count,
+        'new_count': new_count,
+        'selected_status': selected_status,
+    }
+    return render(request, 'admin.html', context)
