@@ -1,5 +1,6 @@
 import math
 import re
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from django.shortcuts import render
 from ..models import Favorite
@@ -44,7 +45,6 @@ def convert_to_grid(lat, lon):
     return nx, ny
 
 
-
 # ==============================================================================
 # 1. 메인 (추천 관광지 8개)
 # ==============================================================================
@@ -68,6 +68,7 @@ def main(request):
             tour_items = res_items if isinstance(res_items, list) else [res_items]
 
     return render(request, 'main.html', {"tour_items": tour_items})
+
 
 # ==============================================================================
 # 2. 관광지 (explore)
@@ -96,7 +97,7 @@ TOUR_REGIONS = [
 
 def explore(request):
     selected_region = request.GET.get('region', 'all')
-    selected_rating = request.GET.get('min_rating', '4.5')
+    selected_rating = request.GET.get('min_rating')
     selected_pet = request.GET.get('pet_allowed')
     selected_sort = request.GET.get('sort', 'rating')
     try:
@@ -106,28 +107,19 @@ def explore(request):
 
     num_of_rows = 10
 
-    if selected_pet:
-        tour_url = "http://apis.data.go.kr/B551011/KorPetTourService2/areaBasedList2"
-        extra_params = {
-            "_type": "json",
-            "MobileOS": "ETC",
-            "MobileApp": "MoaTrip",
-            "contentTypeId": "12",
-            "numOfRows": num_of_rows,
-            "pageNo": cur_page,
-            "arrange": "O",
-        }
-    else:
-        tour_url = "http://apis.data.go.kr/B551011/KorService2/areaBasedList2"
-        extra_params = {
-            "_type": "json",
-            "MobileOS": "ETC",
-            "MobileApp": "MoaTrip",
-            "contentTypeId": "12",
-            "numOfRows": num_of_rows,
-            "pageNo": cur_page,
-            "arrange": "O",
-        }
+    #API 호출 기본 정보
+    service_name = "KorPetTourService2" if selected_pet else "KorService2"
+    tour_url = f"http://apis.data.go.kr/B551011/{service_name}/areaBasedList2"
+
+    extra_params = {
+        "_type": "json",
+        "MobileOS": "ETC",
+        "MobileApp": "MoaTrip",
+        "contentTypeId": "12",
+        "numOfRows": num_of_rows,
+        "pageNo": cur_page,
+        "arrange": "O",
+    }
 
     if selected_region and selected_region != 'all':
         extra_params["areaCode"] = selected_region
@@ -135,6 +127,7 @@ def explore(request):
     tour_raw = fetch_public_data(tour_url, extra_params=extra_params)
     spots = []
     total_count = 0
+
     if tour_raw and isinstance(tour_raw, dict):
         body = tour_raw.get('response', {}).get('body', {})
         if isinstance(body, dict):
@@ -146,6 +139,31 @@ def explore(request):
 
     if selected_sort == 'review':
         spots = list(reversed(spots))
+
+    # 반려동물 동반 가능 필터
+    if selected_pet: #필터 켰을 때
+        for spot in spots:
+            spot['is_pet_allowed'] = True
+    elif spots: #필터 껐을 때
+        def check_spot_pet(spot_item):
+            cid = spot_item.get('contentid')
+            if not cid:
+                spot_item['is_pet_allowed'] = False
+                return
+            pet_url = "http://apis.data.go.kr/B551011/KorPetTourService2/detailPetTour2"
+            raw = fetch_public_data(pet_url, extra_params={
+                "_type": "json", "MobileOS": "ETC", "MobileApp": "MoaTrip", "contentId": str(cid)
+            })
+            is_ok = False
+            if raw and isinstance(raw, dict):
+                body = raw.get('response', {}).get('body', {})
+                items_box = body.get('items') if isinstance(body, dict) else None
+                if isinstance(items_box, dict) and items_box.get('item'):
+                    is_ok = True
+            spot_item['is_pet_allowed'] = is_ok
+
+        with ThreadPoolExecutor(max_workers=min(len(spots), 10)) as executor: #병렬로 조회
+            list(executor.map(check_spot_pet, spots))
 
     user_id = request.session.get('user_id')
     favorited_spot_codes = set(
@@ -337,7 +355,7 @@ def detail(request):
         spot.get('parking')
     )
     if not parking_info:
-        parking_info = f"{region_name} 인근 공영주차장 이용 가능"
+        parking_info = "인근 공영주차장 이용 가능"
 
     # 5-3) 반려동물 규정 판별
     pet_need = (pet.get('acmpyNeedMtr') or '').strip()
@@ -347,28 +365,34 @@ def detail(request):
     chk_pet = (intro.get('chkpet') or '').strip()
 
     is_pet_allowed = False
+    pet_status = "unknown"
     pet_rule = ""
 
     if pet_need or pet_etc or pet_type or pet_cpam:
-        # detailPetTour2 에 등록된 반려동물 동반 관광지
+        # detailPetTour2에 등록된 반려동물 동반 관광지
         is_pet_allowed = True
+        pet_status = "allowed"
         pet_rule_parts = [p for p in [pet_need, pet_etc, pet_cpam] if p]
         pet_rule = " · ".join(pet_rule_parts) if pet_rule_parts else (pet_type or "동반 가능 (목줄 착용 필수)")
     elif chk_pet:
         clean_chk = re.sub(r'<[^>]+>', '', chk_pet).strip()
         if any(keyword in clean_chk for keyword in ["불가", "금지", "안됨", "제한"]):
             is_pet_allowed = False
+            pet_status = "disallowed"
             pet_rule = clean_chk if len(clean_chk) <= 40 else "반려동물 동반 불가"
         elif any(keyword in clean_chk for keyword in ["가능", "허용", "목줄", "케이지"]):
             is_pet_allowed = True
+            pet_status = "allowed"
             pet_rule = clean_chk if len(clean_chk) <= 40 else "동반 가능 (목줄/케이지 필수)"
         else:
             pet_rule = clean_chk
             is_pet_allowed = "가능" in clean_chk
+            pet_status = "allowed" if is_pet_allowed else "disallowed"
     else:
-        # 두 API 모두 정보가 없거나 미등록된 경우 (사적지, 박물관 등 미허용 가능성)
+        # 두 API 모두 정보가 없거나 미등록된 경우
         is_pet_allowed = False
-        pet_rule = "동반 불가 (방문 전 사전 문의 필요)"
+        pet_status = "unknown"
+        pet_rule = "방문 전 문의 필요"
 
     # 5-4) 이용 시간
     raw_time = (
@@ -413,6 +437,7 @@ def detail(request):
         "pet": pet_rule,
         "pet_rule": pet_rule,
         "is_pet_allowed": is_pet_allowed,
+        "pet_status": pet_status,
         "use_time": use_time,
         "contact": contact_tel,
     }

@@ -41,7 +41,7 @@
       <div class="explore-filter-rating">
         <h3>평점</h3>
         <div class="rating-filter-group">
-          <input type="radio" name="min_rating" id="rating-45" value="4.5" class="rating-radio" checked>
+          <input type="radio" name="min_rating" id="rating-45" value="4.5" class="rating-radio">
           <label for="rating-45" class="rating-filter-btn">4.5 이상</label>
           <input type="radio" name="min_rating" id="rating-40" value="4.0" class="rating-radio">
           <label for="rating-40" class="rating-filter-btn">4.0 이상</label>
@@ -95,15 +95,16 @@
 
         <!-- 2. 본문 영역 (badge-pet explore-card-tag 적용) -->
         <div class="explore-card-body">
+          {% if spot.is_pet_allowed %}
           <span class="badge-pet explore-card-tag">반려동물 OK</span>
+          {% endif %}
           <h3>{{ spot.title }}</h3>
           <p>{{ spot.addr1|default:"위치 정보 없음" }}</p>
-
           <div class="explore-card-footer">
-            <span class="card-rating">★ 평점 4.5 (API 연동)</span>
+            <span class="card-rating">★ 평점 4.5 (1)</span>
             <button type="button" class="btn-bookmark {% if spot.contentid in favorited_spot_codes %}is-favorited{% endif %}"
               data-spot-code="{{ spot.contentid }}" onclick="event.stopPropagation();">
-              {% if spot.contentid in favorited_spot_codes %}즐겨찾기 완료{% else %}즐겨찾기에 추가{% endif %}
+              {% if spot.contentid in favorited_spot_codes %}✓ 추가됨{% else %}즐겨찾기에 추가{% endif %}
             </button>
           </div>
         </div>
@@ -126,7 +127,7 @@
       {% for p in page_range %}
       <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}{% if selected_pet %}pet_allowed=1&{% endif %}{% if selected_sort %}sort={{ selected_sort }}&{% endif %}page={{ p }}"
          class="explore-page-button {% if p == cur_page %}active{% endif %}"
-         style="text-decoration: none; {% if p != cur_page %}background-color: #ffffff; color: var(--color-text); border-color: var(--color-border);{% endif %}">
+         style="text-decoration: none;">
         {{ p }}
       </a>
       {% endfor %}
@@ -171,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }
           if (data.is_favorited) {
             btn.classList.add('is-favorited');
-            btn.textContent = '추가됨';
+            btn.textContent = '✓ 추가됨';
           } else {
             btn.classList.remove('is-favorited');
             btn.textContent = '즐겨찾기에 추가';

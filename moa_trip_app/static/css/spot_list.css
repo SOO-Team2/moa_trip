@@ -406,8 +406,7 @@
 }
 
 .explore-page-button:hover,
-.explore-page-button.active,
-.explore-page-button:first-child {
+.explore-page-button.active {
   background-color: var(--color-primary);
   border-color: var(--color-primary);
   color: #ffffff;
