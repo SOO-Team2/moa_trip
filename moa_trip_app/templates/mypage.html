@@ -23,24 +23,16 @@
     </div>
     <div class="profile-stats-group">
       <div class="stat-item">
-        <span>{{ user.bookmark_count }}</span>
+        <span>{{ favorites.count }}</span>
         <span>즐겨찾기</span>
       </div>
       <div class="stat-item">
-        <<<<<<< HEAD <span>{{ user.review_count }}</span>
-          <span>작성 후기</span>
-      </div>
-      <div class="stat-item">
-        <span>{{ user.itinerary_count }}</span>
-        <span>저장 일정</span>
-        =======
         <span>{{ reviews.count }}</span>
         <span>작성 후기</span>
       </div>
       <div class="stat-item">
         <span id="itinerary-count">{{ itineraries.count }}</span>
         <span>여행 일정</span>
-        >>>>>>> abfcfd755c37a137580d369ba08cdb66093b4420
       </div>
     </div>
   </header>
@@ -61,7 +53,7 @@
       <!-- 즐겨찾기 섹션 -->
       <section class="mypage-bookmark-section">
         <div class="bookmark-section-header">
-          <h2>즐겨찾기 {{ bookmarks|length }}곳</h2>
+          <h2>즐겨찾기 {{ favorites.count }}곳</h2>
           <div class="bookmark-nav-btns">
             <button type="button">&lt;</button>
             <button type="button">&gt;</button>
@@ -70,25 +62,15 @@
 
         <!-- 관광지 카드 그리드 (API 반복문) -->
         <div class="mypage-spot-grid">
-          {% if bookmarks %}
-          {% for spot in bookmarks %}
+          {% for favorite in favorites %}
           <article class="mypage-spot-card">
-            <div class="mypage-spot-thumb"
-              style="overflow:hidden; display:flex; align-items:center; justify-content:center; background:#f0f0f0;">
-              {% if spot.firstimage %}
-              <img src="{{ spot.firstimage }}" alt="{{ spot.title }}"
-                style="width:100%; height:100%; object-fit:cover;">
-              {% else %}
-              <span>🏖️</span>
-              {% endif %}
-            </div>
-            <h3><a href="{% url 'detail' %}?contentid={{ spot.contentid }}">{{ spot.title }}</a></h3>
-            <p>{{ spot.addr1|default:"위치 정보 없음" }}</p>
+            <div class="mypage-spot-thumb">🏖️</div>
+            <h3><a href="{% url 'detail' %}?contentid={{ favorite.spot.spot_code }}">{{ favorite.spot.t_name }}</a></h3>
+            <p>{{ favorite.spot.address }}</p>
           </article>
-          {% endfor %}
-          {% else %}
+          {% empty %}
           <p style="grid-column: 1 / -1; padding: 20px 0; color: #888;">즐겨찾기한 관광지가 없습니다.</p>
-          {% endif %}
+          {% endfor %}
 
           <!-- 추가 카드 버튼 -->
           <article class="add-spot-card">
@@ -125,14 +107,15 @@
       <div class="itinerary-list">
 
         {% for itinerary in itineraries %}
-        <article class="itinerary-card">
-          <h3>{{ itinerary.itinerary_title }}</h3>
-          <p>{{ itinerary.itinerary_date|date:"Y.m.d" }} · 4곳</p>
-          <div class="itinerary-actions">
-            <button type="button">열기</button>
-            <button type="button" onclick="deleteItinerary(this)">삭제</button>
-          </div>
-        </article>
+          <article class="itinerary-card">
+            <h3>{{ itinerary.itinerary_title }}</h3>
+            <p>{{ itinerary.itinerary_date|date:"Y.m.d" }} · 4곳</p>
+            <div class="itinerary-actions">
+              <button type="button">열기</button>
+              {% csrf_token %}
+              <button type="button" onclick="deleteItinerary(this, '{{ itinerary.itinerary_code }}')">삭제</button>
+            </div>
+          </article>
         {% empty %}
         <p>아직 일정이 없습니다.</p>
         {% endfor %}
@@ -141,23 +124,39 @@
     </aside>
 
     <script>
-      function deleteItinerary(button) {
-        const card = button.closest('.itinerary-card');
-        const list = card.closest('.itinerary-list');
+      function deleteItinerary(button, itineraryCode) {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        fetch("{% url 'planner_delete_spot' %}", {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({itinerary_code: itineraryCode}).toString()
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.result !== 'ok') {
+            alert(data.message || '삭제에 실패했습니다.');
+            return;
+          }
+          const card = button.closest('.itinerary-card');
+          const list = card.closest('.itinerary-list');
 
-        card.remove();
+          card.remove();
 
-        const count = list.querySelectorAll('.itinerary-card').length;
-        // 여행 일정 숫자 변경
-        document.getElementById('itinerary-count').textContent = count;
+          const count = list.querySelectorAll('.itinerary-card').length;
+          // 여행 일정 숫자 변경
+          document.getElementById('itinerary-count').textContent = count;
 
-        // 일정 없으면 메시지 표시
-        if (count === 0) {
-          const emptyMessage = document.createElement('p');
-          emptyMessage.textContent = '아직 일정이 없습니다.';
+          // 일정 없으면 메시지 표시
+          if (count === 0) {
+            const emptyMessage = document.createElement('p');
+            emptyMessage.textContent = '아직 일정이 없습니다.';
 
-          list.appendChild(emptyMessage);
-        }
+            list.appendChild(emptyMessage);
+          }
+        })
       }
     </script>
   </main>

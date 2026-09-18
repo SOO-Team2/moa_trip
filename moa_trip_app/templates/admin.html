@@ -15,25 +15,26 @@
         <aside class="admin-sidebar">
             <h3>관리</h3>
             <ul>
-                <li class="active"><a href="#">회원 관리</a></li>
-                <li><a href="#">관광지 관리</a></li>
-                <li><a href="#">후기 관리</a></li>
+                <li class="{% if section == 'members' %}active{% endif %}"><a href="{% url 'admin' %}?section=members">회원 관리</a></li>
+                <li class="{% if section == 'spots' %}active{% endif %}"><a href="{% url 'admin' %}?section=spots">관광지 관리</a></li>
+                <li class="{% if section == 'reviews' %}active{% endif %}"><a href="{% url 'admin' %}?section=reviews">후기 관리</a></li>
             </ul>
             <h3>시스템</h3>
             <ul>
-                <li><a href="#">API 연동</a></li>
-                <li><a href="#">데이터 동기화</a></li>
+                <li class="{% if section == 'api' %}active{% endif %}"><a href="{% url 'admin' %}?section=api">API 연동</a></li>
+                <li class="{% if section == 'sync' %}active{% endif %}"><a href="{% url 'admin' %}?section=sync">데이터 동기화</a></li>
             </ul>
         </aside>
 
         <main class="admin-main">
+            {% if section == 'members' %}
             <section class="admin-stats-grid">
                 <div class="admin-stat-card">
-                    <h3>8,412</h3>
+                    <h3>{{ total_count }}</h3>
                     <p>전체 회원</p>
                 </div>
                 <div class="admin-stat-card">
-                    <h3>142</h3>
+                    <h3>{{ new_count }}</h3>
                     <p>신규 가입</p>
                 </div>
                 <div class="admin-stat-card">
@@ -44,21 +45,21 @@
 
             <section class="admin-content-box">
                 <h2>회원 관리</h2>
-                
+
                 <div class="admin-toolbar">
                     <div class="admin-search-wrap">
                         <input type="text" placeholder="이메일 또는 닉네임 검색">
                     </div>
                     <div class="admin-filter-tabs">
-                        <button type="button" class="active">전체</button>
-                        <button type="button">탈퇴</button>
+                        <button type="button" class="{% if selected_status == '전체' %}active{% endif %}" onclick="location.href='{% url 'admin' %}?section=members&status=전체'">전체</button>
+                        <button type="button" class="{% if selected_status == '탈퇴' %}active{% endif %}" onclick="location.href='{% url 'admin' %}?section=members&status=탈퇴'">탈퇴</button>
                     </div>
                 </div>
 
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th scope="col"><input type="checkbox"></th>
+                            <th scope="col"><input type="checkbox" id="select-all-checkbox"></th>
                             <th scope="col">회원 ID</th>
                             <th scope="col">닉네임</th>
                             <th scope="col">이메일</th>
@@ -69,74 +70,75 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for user in users %}
                         <tr>
-                            <td><input type="checkbox"></td>
-                            <td>U-10428</td>
-                            <td>주원</td>
-                            <td>jw.choi@example.com</td>
-                            <td>2026.03.14</td>
-                            <td>7</td>
-                            <td><span class="admin-badge active">정상</span></td>
+                            <td><input type="checkbox" class="row-checkbox"></td>
+                            <td>{{ user.user_id }}</td>
+                            <td>{{ user.nickname }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.join_date|date:"Y.m.d" }}</td>
+                            <td>{{ user.review_count }}</td>
+                            <td>
+                                {% if user.status == '정상' %}
+                                <span class="admin-badge active">정상</span>
+                                {% else %}
+                                <span class="admin-badge danger">{{ user.status }}</span>
+                                {% endif %}
+                            </td>
                             <td><a href="#">상세</a></td>
                         </tr>
+                        {% empty %}
                         <tr>
-                            <td><input type="checkbox"></td>
-                            <td>U-10427</td>
-                            <td>병진</td>
-                            <td>bj.park@example.com</td>
-                            <td>2026.03.14</td>
-                            <td>12</td>
-                            <td><span class="admin-badge active">정상</span></td>
-                            <td><a href="#">상세</a></td>
+                            <td colspan="8">표시할 회원이 없습니다.</td>
                         </tr>
-                        <tr>
-                            <td><input type="checkbox"></td>
-                            <td>U-10391</td>
-                            <td>여행러</td>
-                            <td>trip.kim@example.com</td>
-                            <td>2026.02.28</td>
-                            <td>41</td>
-                            <td><span class="admin-badge warn">탈퇴</span></td>
-                            <td><a href="#">상세</a></td>
-                        </tr>
-                        <tr>
-                            <td><input type="checkbox"></td>
-                            <td>U-10388</td>
-                            <td>명주</td>
-                            <td>mj.jung@example.com</td>
-                            <td>2026.02.21</td>
-                            <td>5</td>
-                            <td><span class="admin-badge active">정상</span></td>
-                            <td><a href="#">상세</a></td>
-                        </tr>
-                        <tr>
-                            <td><input type="checkbox"></td>
-                            <td>U-10375</td>
-                            <td>보리아빠</td>
-                            <td>bori@example.com</td>
-                            <td>2026.02.09</td>
-                            <td>18</td>
-                            <td><span class="admin-badge active">정상</span></td>
-                            <td><a href="#">상세</a></td>
-                        </tr>
-                        <tr>
-                            <td><input type="checkbox"></td>
-                            <td>U-10344</td>
-                            <td>jongseop</td>
-                            <td>js.lee@example.com</td>
-                            <td>2026.01.30</td>
-                            <td>2</td>
-                            <td><span class="admin-badge danger">탈퇴</span></td>
-                            <td><a href="#">상세</a></td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
-
-                <div class="admin-table-bottom">
-                    <p>1건 선택됨</p>
-                </div>
             </section>
+
+            {% elif section == 'spots' %}
+            <section class="admin-content-box">
+                <h2>관광지 관리</h2>
+                <p>준비 중인 페이지입니다.</p>
+            </section>
+
+            {% elif section == 'reviews' %}
+            <section class="admin-content-box">
+                <h2>후기 관리</h2>
+                <p>준비 중인 페이지입니다.</p>
+            </section>
+
+            {% elif section == 'api' %}
+            <section class="admin-content-box">
+                <h2>API 연동</h2>
+                <p>준비 중인 페이지입니다.</p>
+            </section>
+
+            {% elif section == 'sync' %}
+            <section class="admin-content-box">
+                <h2>데이터 동기화</h2>
+                <p>준비 중인 페이지입니다.</p>
+            </section>
+            {% endif %}
+
         </main>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var selectAll = document.getElementById('select-all-checkbox');
+    var rowCheckboxes = document.querySelectorAll('.row-checkbox');
+
+    if (selectAll) {
+        selectAll.addEventListener('change', function () {
+            rowCheckboxes.forEach(function (checkbox) {
+                checkbox.checked = selectAll.checked;
+            });
+        });
+    }
+});
+</script>
 {% endblock %}

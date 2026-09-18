@@ -374,6 +374,12 @@
   color: #ffffff;
 }
 
+.btn-bookmark.is-favorited {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+}
+
 /* Pagination */
 .explore-pagination,
 .explore-content-right > nav {
