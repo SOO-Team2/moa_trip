@@ -7,30 +7,43 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/spot_detail.css' %}">
+<style>
+  .spot-gallery > div {
+    overflow: hidden;
+    border-radius: 8px;
+  }
+  .spot-gallery img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    position: relative;
+    z-index: 2;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="spot-wrap">
     <div class="spot-gallery">
         <div class="main-photo">
-            {% if spot.firstimage %}
-            <img src="{{ spot.firstimage }}" alt="{{ spot.title }}">
+            {% if gallery.photo1 %}
+            <img src="{{ gallery.photo1 }}" alt="{{ spot.title }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
             {% else %}
             <span>대표 사진</span>
             {% endif %}
         </div>
         <div>
-            {% if spot.firstimage2 %}
-            <img src="{{ spot.firstimage2 }}" alt="{{ spot.title }}">
-            {% elif spot.firstimage %}
-            <img src="{{ spot.firstimage }}" alt="{{ spot.title }}">
+            {% if gallery.photo2 %}
+            <img src="{{ gallery.photo2 }}" alt="{{ spot.title }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
             {% else %}
             <span>사진</span>
             {% endif %}
         </div>
         <div class="more-photo">
-            {% if spot.firstimage %}
-            <img src="{{ spot.firstimage }}" alt="{{ spot.title }}">
+            {% if gallery.photo3 %}
+            <img src="{{ gallery.photo3 }}" alt="{{ spot.title }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
             {% else %}
             <span>사진</span>
             {% endif %}
@@ -38,7 +51,11 @@
     </div>
 
     <div class="spot-main">
+        {% if detail_info.is_pet_allowed %}
         <span class="badge-pet tag">반려동물 동반 가능</span>
+        {% else %}
+        <span class="badge-pet tag" style="background-color: #F3F4F6; color: #6B7280; box-shadow: none;">반려동물 동반 불가</span>
+        {% endif %}
 
         <h1 class="spot-title">{{ spot.title|default:"추천 관광지" }}</h1>
         <div class="spot-sub">

@@ -105,16 +105,30 @@ def explore(request):
         cur_page = 1
 
     num_of_rows = 10
-    tour_url = "http://apis.data.go.kr/B551011/KorService2/areaBasedList2"
-    extra_params = {
-        "_type": "json",
-        "MobileOS": "ETC",
-        "MobileApp": "MoaTrip",
-        "contentTypeId": "12",
-        "numOfRows": num_of_rows,
-        "pageNo": cur_page,
-        "arrange": "O",
-    }
+
+    if selected_pet:
+        tour_url = "http://apis.data.go.kr/B551011/KorPetTourService2/areaBasedList2"
+        extra_params = {
+            "_type": "json",
+            "MobileOS": "ETC",
+            "MobileApp": "MoaTrip",
+            "contentTypeId": "12",
+            "numOfRows": num_of_rows,
+            "pageNo": cur_page,
+            "arrange": "O",
+        }
+    else:
+        tour_url = "http://apis.data.go.kr/B551011/KorService2/areaBasedList2"
+        extra_params = {
+            "_type": "json",
+            "MobileOS": "ETC",
+            "MobileApp": "MoaTrip",
+            "contentTypeId": "12",
+            "numOfRows": num_of_rows,
+            "pageNo": cur_page,
+            "arrange": "O",
+        }
+
     if selected_region and selected_region != 'all':
         extra_params["areaCode"] = selected_region
 
@@ -128,10 +142,16 @@ def explore(request):
             items_box = body.get('items')
             if isinstance(items_box, dict):
                 res_items = items_box.get('item', [])
-                spots = res_items if isinstance(res_items, list) else [res_items]
+                spots = res_items if isinstance(res_items, list) else [res_items] #결과가 1개일 경우
 
-    if selected_pet:
-        spots = [s for s in spots if str(s.get('pet_allowed', '')) in ['1', 'Y', 'true']]
+    # 카드 주소는 최대 3어절까지만 표기 
+    for spot in spots:
+        if isinstance(spot, dict):
+            addr = spot.get('addr1')
+            if addr and isinstance(addr, str):
+                words = addr.strip().split()
+                if words:
+                    spot['addr1'] = ' '.join(words[:3])
 
     if selected_sort == 'review':
         spots = list(reversed(spots))
@@ -277,34 +297,47 @@ def detail(request):
                 if not any(u_name == exist.split('/')[-1] for exist in images):
                     images.append(u)
 
-    # 3장이 안 채워지거나 같은 구도일 경우 대비한 Fallback 이미지 풀
+    # 3장의 사진이 반드시 서로 다르게 나오도록 보장하는 로직
     backup_pool = [
         "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", # 푸른 바다/하늘
         "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=800&q=80", # 잔디/자연
         "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80", # 풍경/산
+        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80", # 호수/여행
+        "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80", # 로드트립
     ]
 
-    p1 = images[0] if len(images) > 0 else backup_pool[0]
-    p2 = images[1] if len(images) > 1 else backup_pool[0]
-    p3 = images[2] if len(images) > 2 else backup_pool[1]
+    selected_photos = []
+    # 1. API에서 가져온 실제 관광지 사진 중 중복 없이 순차 수집
+    for img in images:
+        if img and img not in selected_photos and len(selected_photos) < 3:
+            selected_photos.append(img)
 
-    # 혹시라도 3장 중 같은 사진이 있다면 백업 이미지로 대체
-    if p2 == p1:
-        p2 = backup_pool[0]
-    if p3 in [p1, p2]:
-        p3 = backup_pool[1] if p2 != backup_pool[1] else backup_pool[2]
+    # 2. 3장이 부족한 경우 백업 이미지 풀에서 중복 없이 보충
+    for b_img in backup_pool:
+        if len(selected_photos) >= 3:
+            break
+        if b_img not in selected_photos:
+            selected_photos.append(b_img)
 
     gallery_photos = {
-        "photo1": p1,
-        "photo2": p2,
-        "photo3": p3,
+        "photo1": selected_photos[0],
+        "photo2": selected_photos[1],
+        "photo3": selected_photos[2],
     }
 
     # 5. 상세 안내 테이블 정보 조립
-    # 5-1) 입장료
-    use_fee = intro.get('usefee') or intro.get('usetime') or spot.get('usefee') or "무료"
-    if "무료" not in use_fee and len(use_fee) > 30:
-        use_fee = "무료 (체험 프로그램 별도)"
+    # 5-1) 입장료 (요금 필드만 참조, 이용시간usetime 혼입 방지)
+    raw_fee = (
+        intro.get('usefee') or 
+        intro.get('usefeeleports') or 
+        intro.get('spendtimefestival') or 
+        spot.get('usefee')
+    )
+    if raw_fee:
+        clean_fee = re.sub(r'<[^>]+>', ' ', str(raw_fee)).strip()
+        use_fee = clean_fee if len(clean_fee) <= 50 else (clean_fee[:47] + '...')
+    else:
+        use_fee = "무료"
 
     # 5-2) 주차
     parking_info = (
@@ -315,17 +348,53 @@ def detail(request):
     if not parking_info:
         parking_info = f"{region_name} 인근 공영주차장 이용 가능"
 
-    # 5-3) 반려동물 규정
-    pet_rule = pet.get('acmpyNeedMtr') or pet.get('etcAcmpyInfo')
-    if not pet_rule:
-        pet_rule = "동반 가능 (목줄 필수)"
+    # 5-3) 반려동물 규정 판별
+    pet_need = (pet.get('acmpyNeedMtr') or '').strip()
+    pet_etc = (pet.get('etcAcmpyInfo') or '').strip()
+    pet_type = (pet.get('acmpyTypeCd') or '').strip()
+    pet_cpam = (pet.get('acmpyPsblCpam') or '').strip()
+    chk_pet = (intro.get('chkpet') or '').strip()
+
+    is_pet_allowed = False
+    pet_rule = ""
+
+    if pet_need or pet_etc or pet_type or pet_cpam:
+        # detailPetTour2 에 등록된 반려동물 동반 관광지
+        is_pet_allowed = True
+        pet_rule_parts = [p for p in [pet_need, pet_etc, pet_cpam] if p]
+        pet_rule = " · ".join(pet_rule_parts) if pet_rule_parts else (pet_type or "동반 가능 (목줄 착용 필수)")
+    elif chk_pet:
+        clean_chk = re.sub(r'<[^>]+>', '', chk_pet).strip()
+        if any(keyword in clean_chk for keyword in ["불가", "금지", "안됨", "제한"]):
+            is_pet_allowed = False
+            pet_rule = clean_chk if len(clean_chk) <= 40 else "반려동물 동반 불가"
+        elif any(keyword in clean_chk for keyword in ["가능", "허용", "목줄", "케이지"]):
+            is_pet_allowed = True
+            pet_rule = clean_chk if len(clean_chk) <= 40 else "동반 가능 (목줄/케이지 필수)"
+        else:
+            pet_rule = clean_chk
+            is_pet_allowed = "가능" in clean_chk
+    else:
+        # 두 API 모두 정보가 없거나 미등록된 경우 (사적지, 박물관 등 미허용 가능성)
+        is_pet_allowed = False
+        pet_rule = "동반 불가 (방문 전 사전 문의 필요)"
 
     # 5-4) 이용 시간
-    use_time = (
-        intro.get('usetime') or intro.get('opentime') or 
-        spot.get('usetime') or spot.get('opentime') or 
-        "상시 개방 (연중무휴)"
+    raw_time = (
+        intro.get('usetime') or 
+        intro.get('usetimefestival') or 
+        intro.get('usetimeleports') or 
+        intro.get('opentime') or 
+        intro.get('opentimefood') or 
+        intro.get('playtime') or 
+        spot.get('usetime') or 
+        spot.get('opentime')
     )
+    if raw_time:
+        clean_time = re.sub(r'<[^>]+>', ' ', str(raw_time)).strip()
+        use_time = clean_time if len(clean_time) <= 80 else (clean_time[:77] + '...')
+    else:
+        use_time = "상시 개방 (연중무휴)"
 
     # 5) 문의 전화 (전수 조사)
     raw_contact = (
@@ -339,7 +408,6 @@ def detail(request):
     )
 
     if raw_contact:
-        import re
         contact_tel = re.sub(r'<[^>]+>', '', str(raw_contact)).strip()
     else:
         tel_map = {
@@ -353,6 +421,7 @@ def detail(request):
         "parking": parking_info,
         "pet": pet_rule,
         "pet_rule": pet_rule,
+        "is_pet_allowed": is_pet_allowed,
         "use_time": use_time,
         "contact": contact_tel,
     }
