@@ -307,6 +307,7 @@ def detail(request):
     detail_info = {
         "fee": use_fee,
         "parking": parking_info,
+        "pet": pet_rule,
         "pet_rule": pet_rule,
         "use_time": use_time,
         "contact": contact_tel,

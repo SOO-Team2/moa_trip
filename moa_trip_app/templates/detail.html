@@ -48,27 +48,23 @@
         <div class="info-table">
             <div>
                 <span class="label">입장료</span>
-                <span class="value">{{ detail_info.fee }}</span>
+                <span class="value">{{ detail_info.fee|safe|default:"무료" }}</span>
             </div>
             <div>
                 <span class="label">주차</span>
-                <span class="value">{{ detail_info.parking }}</span>
+                <span class="value">{{ detail_info.parking|safe|default:"주차 정보 없음" }}</span>
             </div>
             <div>
                 <span class="label">반려동물</span>
-                <span class="value">{{ detail_info.pet_rule }}</span>
+                <span class="value">{{ detail_info.pet|safe|default:"반려동물 정보 없음" }}</span>
             </div>
             <div>
-                <span class="label">동반 가능 견종</span>
-                <span class="value">{{ detail_info.pet_size }}</span>
+                <span class="label">이용시간</span>
+                <span class="value">{{ detail_info.use_time|safe|default:"이용 시간 정보 없음" }}</span>
             </div>
             <div>
-                <span class="label">구비 편의시설</span>
-                <span class="value">{{ detail_info.facilities }}</span>
-            </div>
-            <div>
-                <span class="label">상세 소개</span>
-                <span class="value">{{ detail_info.overview|striptags }}</span>
+                <span class="label">문의</span>
+                <span class="value">{{ detail_info.contact|safe|default:"문의처 정보 없음" }}</span>
             </div>
         </div>
 
