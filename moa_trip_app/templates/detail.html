@@ -51,7 +51,11 @@
     </div>
 
     <div class="spot-main">
+        {% if detail_info.is_pet_allowed %}
         <span class="badge-pet tag">반려동물 동반 가능</span>
+        {% else %}
+        <span class="badge-pet tag" style="background-color: #F3F4F6; color: #6B7280; box-shadow: none;">반려동물 동반 불가</span>
+        {% endif %}
 
         <h1 class="spot-title">{{ spot.title|default:"추천 관광지" }}</h1>
         <div class="spot-sub">
