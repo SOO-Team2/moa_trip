@@ -31,8 +31,8 @@
       <!-- 반려동물 필터 -->
       <div class="explore-filter-pet">
         <h3>반려동물</h3>
-        <label>
-          <input type="checkbox" name="pet_allowed" value="1" {% if selected_pet %}checked{% endif %}>
+        <label for="cb-pet-allowed" style="cursor: pointer; display: flex; align-items: center; gap: 10px;">
+          <input type="checkbox" name="pet_allowed" id="cb-pet-allowed" value="1" {% if selected_pet %}checked{% endif %}>
           <span>반려동물 동반 가능</span>
         </label>
       </div>
