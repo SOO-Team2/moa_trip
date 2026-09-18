@@ -31,7 +31,6 @@
       <div class="explore-filter-pet">
         <h3>반려동물</h3>
         <label>
-          <input type="checkbox" name="pet" value="Y" checked>
           <input type="checkbox" name="pet_allowed" value="1" {% if selected_pet %}checked{% endif %}>
           <span>반려동물 동반 가능</span>
         </label>
@@ -184,5 +183,4 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 </script>
-
 {% endblock %}

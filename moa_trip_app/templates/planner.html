@@ -157,7 +157,7 @@
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
             
             function formatFee(fee) {
-                return fee === 0 ? '무료' : `${fee.toLocaleString()}원`;
+                return `${fee.toLocaleString()}원`;
             }
             function formatPet(petAllowed) {
                 return petAllowed ? '반려동물 동반 가능' : '반려동물 동반 불가';
