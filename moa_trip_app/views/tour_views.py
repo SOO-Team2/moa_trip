@@ -99,14 +99,20 @@ def explore(request):
     selected_rating = request.GET.get('min_rating', '4.5')
     selected_pet = request.GET.get('pet_allowed')
     selected_sort = request.GET.get('sort', 'rating')
+    try:
+        cur_page = max(1, int(request.GET.get('page', 1)))
+    except (ValueError, TypeError):
+        cur_page = 1
 
+    num_of_rows = 10
     tour_url = "http://apis.data.go.kr/B551011/KorService2/areaBasedList2"
     extra_params = {
         "_type": "json",
         "MobileOS": "ETC",
         "MobileApp": "MoaTrip",
         "contentTypeId": "12",
-        "numOfRows": 12,
+        "numOfRows": num_of_rows,
+        "pageNo": cur_page,
         "arrange": "O",
     }
     if selected_region and selected_region != 'all':
@@ -114,12 +120,15 @@ def explore(request):
 
     tour_raw = fetch_public_data(tour_url, extra_params=extra_params)
     spots = []
+    total_count = 0
     if tour_raw and isinstance(tour_raw, dict):
         body = tour_raw.get('response', {}).get('body', {})
-        items_box = body.get('items') if isinstance(body, dict) else None
-        if isinstance(items_box, dict):
-            res_items = items_box.get('item', [])
-            spots = res_items if isinstance(res_items, list) else [res_items]
+        if isinstance(body, dict):
+            total_count = int(body.get('totalCount', 0) or 0)
+            items_box = body.get('items')
+            if isinstance(items_box, dict):
+                res_items = items_box.get('item', [])
+                spots = res_items if isinstance(res_items, list) else [res_items]
 
     if selected_pet:
         spots = [s for s in spots if str(s.get('pet_allowed', '')) in ['1', 'Y', 'true']]
@@ -132,6 +141,17 @@ def explore(request):
         Favorite.objects.filter(user_id=user_id).values_list('spot_id', flat=True)
     ) if user_id else set()
 
+    # 페이징 계산 (5개 페이지 블록 단위)
+    total_pages = math.ceil(total_count / num_of_rows) if total_count > 0 else 1
+    page_block = 5
+    start_page = ((cur_page - 1) // page_block) * page_block + 1
+    end_page = min(total_pages, start_page + page_block - 1)
+    has_prev = start_page > 1
+    has_next = end_page < total_pages
+    prev_page = start_page - 1
+    next_page = end_page + 1
+    page_range = range(start_page, end_page + 1)
+
     context = {
         'spots': spots,
         'tour_regions': TOUR_REGIONS,
@@ -140,6 +160,14 @@ def explore(request):
         'selected_pet': selected_pet,
         'selected_sort': selected_sort,
         'favorited_spot_codes': favorited_spot_codes,
+        'cur_page': cur_page,
+        'total_count': total_count,
+        'total_pages': total_pages,
+        'page_range': page_range,
+        'has_prev': has_prev,
+        'has_next': has_next,
+        'prev_page': prev_page,
+        'next_page': next_page,
     }
     return render(request, 'explore.html', context)
 

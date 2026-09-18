@@ -118,10 +118,23 @@
 
     <!-- 하단 페이징 영역 -->
     <nav class="explore-pagination">
-      <button type="button" class="explore-page-button active">1</button>
-      <button type="button" class="explore-page-button">2</button>
-      <button type="button" class="explore-page-button">3</button>
-      <button type="button" class="explore-page-button">4</button>
+      {% if has_prev %}
+      <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}{% if selected_pet %}pet_allowed=1&{% endif %}{% if selected_sort %}sort={{ selected_sort }}&{% endif %}page={{ prev_page }}"
+         class="explore-page-button" style="text-decoration: none;">&lt;</a>
+      {% endif %}
+
+      {% for p in page_range %}
+      <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}{% if selected_pet %}pet_allowed=1&{% endif %}{% if selected_sort %}sort={{ selected_sort }}&{% endif %}page={{ p }}"
+         class="explore-page-button {% if p == cur_page %}active{% endif %}"
+         style="text-decoration: none; {% if p != cur_page %}background-color: #ffffff; color: var(--color-text); border-color: var(--color-border);{% endif %}">
+        {{ p }}
+      </a>
+      {% endfor %}
+
+      {% if has_next %}
+      <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}{% if selected_pet %}pet_allowed=1&{% endif %}{% if selected_sort %}sort={{ selected_sort }}&{% endif %}page={{ next_page }}"
+         class="explore-page-button" style="text-decoration: none;">&gt;</a>
+      {% endif %}
     </nav>
   </section>
 </div>
