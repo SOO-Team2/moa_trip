@@ -17,8 +17,8 @@
   <header class="mypage-profile-header">
     <div class="profile-avatar">👤</div>
     <div class="profile-info">
-      <span class="profile-badge">{{ user.grade|default:"일반 회원" }}</span>
-      <h1>{{ user.nickname|default:user.name }}</h1>
+      <span class="profile-badge">일반 회원</span>
+      <h1>{{ user.nickname|default:user.user_id }}</h1>
       <p>{{ user.user_id }} · {{ user.join_date|default:"2026.03" }} 가입</p>
     </div>
     <div class="profile-stats-group">
