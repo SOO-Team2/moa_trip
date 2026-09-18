@@ -128,7 +128,7 @@ def explore(request):
             items_box = body.get('items')
             if isinstance(items_box, dict):
                 res_items = items_box.get('item', [])
-                spots = res_items if isinstance(res_items, list) else [res_items]
+                spots = res_items if isinstance(res_items, list) else [res_items] #결과가 1개일 경우
 
     if selected_pet:
         spots = [s for s in spots if str(s.get('pet_allowed', '')) in ['1', 'Y', 'true']]

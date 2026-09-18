@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block title %}
 관광지 탐색 - 모아트립
@@ -63,7 +64,7 @@
     <header class="explore-content-header">
       <div>
         <h2>선택한 지역의 관광지</h2>
-        <span>{{ spots|length }}곳</span>
+        <span>{{ total_count|default:0|intcomma }}곳</span>
       </div>
       <div>
         <span>정렬</span>
