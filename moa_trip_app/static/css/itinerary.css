@@ -179,6 +179,25 @@
   background-color: var(--color-primary-hover);
 }
 
+.btn-delete-itinerary {
+  padding: 8px 18px;
+  margin-right: 8px;
+  background-color: transparent;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.btn-delete-itinerary:hover,
+.btn-delete-itinerary:active {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
 /* Timeline Items with connecting line */
 .timeline-list {
   position: relative;

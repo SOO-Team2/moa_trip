@@ -67,6 +67,15 @@ def main(request):
             res_items = items_box.get('item', [])
             tour_items = res_items if isinstance(res_items, list) else [res_items]
 
+    # 카드 주소는 최대 3어절까지만 표기
+    for item in tour_items:
+        if isinstance(item, dict):
+            addr = item.get('addr1')
+            if addr and isinstance(addr, str):
+                words = addr.strip().split()
+                if words:
+                    item['addr1'] = ' '.join(words[:3])
+
     return render(request, 'main.html', {"tour_items": tour_items})
 
 
@@ -136,6 +145,15 @@ def explore(request):
             if isinstance(items_box, dict):
                 res_items = items_box.get('item', [])
                 spots = res_items if isinstance(res_items, list) else [res_items] #결과가 1개일 경우
+
+    # 카드 주소는 최대 3어절까지만 표기 
+    for spot in spots:
+        if isinstance(spot, dict):
+            addr = spot.get('addr1')
+            if addr and isinstance(addr, str):
+                words = addr.strip().split()
+                if words:
+                    spot['addr1'] = ' '.join(words[:3])
 
     if selected_sort == 'review':
         spots = list(reversed(spots))
@@ -263,8 +281,9 @@ def detail(request):
         if pet_items:
             pet = pet_items[0]
 
-    # 4-2. 관광지 상세 소개정보 조회 (detailIntro2 -> 실패 시 detailIntro1)
+    # 4-2. 관광지 상세 소개정보 및 반복정보 조회 (detailIntro2 & detailInfo2)
     intro = {}
+    repeat_info_items = []
     if content_id:
         c_type = spot.get('contenttypeid') or spot.get('contentTypeId') or "12"
         raw_intro = fetch_public_data(
@@ -278,10 +297,21 @@ def detail(request):
             }
         )
         intro_items = extract_items(raw_intro)
-
-
         if intro_items:
             intro = intro_items[0]
+
+        # detailInfo2 (입장료, 주차요금 등 세부 반복 정보 전수 조회)
+        raw_repeat_info = fetch_public_data(
+            "http://apis.data.go.kr/B551011/KorService2/detailInfo2",
+            extra_params={
+                "_type": "json",
+                "MobileOS": "ETC",
+                "MobileApp": "MoaTrip",
+                "contentId": str(content_id),
+                "contentTypeId": str(c_type),
+            }
+        )
+        repeat_info_items = extract_items(raw_repeat_info)
 
     # 4-3. 관광지 추가 이미지 목록 조회 (detailImage1/detailImage2)
     images = []
@@ -334,27 +364,72 @@ def detail(request):
         "photo3": selected_photos[2],
     }
 
+    def clean_multiline_text(raw_text, max_lines=6, max_len=400):
+        if not raw_text:
+            return ""
+        s = str(raw_text)
+        s = re.sub(r'<br\s*/?>', '\n', s, flags=re.I)
+        s = re.sub(r'</?(?:p|div|li)[^>]*>', '\n', s, flags=re.I)
+        s = re.sub(r'<[^>]+>', '', s)
+        # 붙어있는 대괄호 구분 [3월~5월]... 앞에 줄바꿈
+        s = re.sub(r'([^\n\s])(\[[^\]]+\])', r'\1\n\2', s)
+        # 붙어있는 대시 구분 - 주말... 앞에 줄바꿈
+        s = re.sub(r'([^\n\s])(-\s*[^\n]+)', r'\1\n\2', s)
+        lines = [line.strip() for line in s.split('\n') if line.strip()]
+        if max_lines and len(lines) > max_lines:
+            lines = lines[:max_lines]
+        res = '<br>'.join(lines)
+        if len(res) > max_len:
+            res = res[:max_len-3] + '...'
+        return res
+
     # 5. 상세 안내 테이블 정보 조립
-    # 5-1) 입장료 (요금 필드만 참조, 이용시간usetime 혼입 방지)
-    raw_fee = (
-        intro.get('usefee') or 
-        intro.get('usefeeleports') or 
-        intro.get('spendtimefestival') or 
-        spot.get('usefee')
-    )
+    # 5-1) 입장료 (detailInfo2 반복 정보 우선 -> intro -> spot)
+    raw_fee = ""
+    for r_item in repeat_info_items:
+        iname = (r_item.get('infoname') or '').replace(' ', '')
+        itext = (r_item.get('infotext') or '').strip()
+        if any(w in iname for w in ['입장료', '관람료', '이용요금', '이용료', '체험료', '요금']):
+            if itext:
+                raw_fee = itext
+                break
+
+    if not raw_fee:
+        raw_fee = (
+            intro.get('usefee') or 
+            intro.get('usefeeleports') or 
+            intro.get('spendtimefestival') or 
+            spot.get('usefee')
+        )
+
     if raw_fee:
-        clean_fee = re.sub(r'<[^>]+>', ' ', str(raw_fee)).strip()
-        use_fee = clean_fee if len(clean_fee) <= 50 else (clean_fee[:47] + '...')
+        clean_check = re.sub(r'<[^>]+>', '', str(raw_fee)).strip()
+        if clean_check in ['무료', '무료입장', '무료 관람', '무료관람', '없음']:
+            use_fee = "무료"
+        else:
+            use_fee = clean_multiline_text(raw_fee, max_lines=6, max_len=350)
     else:
         use_fee = "무료"
 
-    # 5-2) 주차
-    parking_info = (
+    # 5-2) 주차 (detailInfo2 주차요금 정보 보강)
+    info_parking = ""
+    for r_item in repeat_info_items:
+        iname = (r_item.get('infoname') or '').replace(' ', '')
+        itext = (r_item.get('infotext') or '').strip()
+        if '주차' in iname and itext:
+            info_parking = clean_multiline_text(itext, max_lines=4, max_len=250)
+            break
+
+    raw_parking = (
+        info_parking or
         pet.get('parking') or pet.get('parkinfo') or 
         intro.get('parking') or intro.get('parkinfo') or 
         spot.get('parking')
     )
-    if not parking_info:
+
+    if raw_parking:
+        parking_info = clean_multiline_text(raw_parking, max_lines=4, max_len=250)
+    else:
         parking_info = "인근 공영주차장 이용 가능"
 
     # 5-3) 반려동물 규정 판별
@@ -373,19 +448,22 @@ def detail(request):
         is_pet_allowed = True
         pet_status = "allowed"
         pet_rule_parts = [p for p in [pet_need, pet_etc, pet_cpam] if p]
-        pet_rule = " · ".join(pet_rule_parts) if pet_rule_parts else (pet_type or "동반 가능 (목줄 착용 필수)")
+        if pet_rule_parts:
+            pet_rule = clean_multiline_text('<br>'.join(pet_rule_parts), max_lines=4, max_len=250)
+        else:
+            pet_rule = pet_type or "동반 가능 (목줄 착용 필수)"
     elif chk_pet:
         clean_chk = re.sub(r'<[^>]+>', '', chk_pet).strip()
         if any(keyword in clean_chk for keyword in ["불가", "금지", "안됨", "제한"]):
             is_pet_allowed = False
             pet_status = "disallowed"
-            pet_rule = clean_chk if len(clean_chk) <= 40 else "반려동물 동반 불가"
+            pet_rule = clean_multiline_text(clean_chk, max_lines=3, max_len=200) or "반려동물 동반 불가"
         elif any(keyword in clean_chk for keyword in ["가능", "허용", "목줄", "케이지"]):
             is_pet_allowed = True
             pet_status = "allowed"
-            pet_rule = clean_chk if len(clean_chk) <= 40 else "동반 가능 (목줄/케이지 필수)"
+            pet_rule = clean_multiline_text(clean_chk, max_lines=3, max_len=200) or "동반 가능 (목줄/케이지 필수)"
         else:
-            pet_rule = clean_chk
+            pet_rule = clean_multiline_text(clean_chk, max_lines=3, max_len=200)
             is_pet_allowed = "가능" in clean_chk
             pet_status = "allowed" if is_pet_allowed else "disallowed"
     else:
@@ -406,8 +484,7 @@ def detail(request):
         spot.get('opentime')
     )
     if raw_time:
-        clean_time = re.sub(r'<[^>]+>', ' ', str(raw_time)).strip()
-        use_time = clean_time if len(clean_time) <= 80 else (clean_time[:77] + '...')
+        use_time = clean_multiline_text(raw_time, max_lines=6, max_len=350)
     else:
         use_time = "상시 개방 (연중무휴)"
 

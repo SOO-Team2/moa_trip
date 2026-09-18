@@ -113,19 +113,25 @@
 
 .info-table > div {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   font-size: 14px;
 }
 
 .info-table .label {
-  width: 120px;
+  width: 110px;
+  flex-shrink: 0;
   font-weight: 600;
   color: var(--color-text-muted);
+  padding-top: 1px;
 }
 
 .info-table .value {
   color: var(--color-text);
   font-weight: 500;
+  flex: 1;
+  line-height: 1.6;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 /* 7-Day Weekly Weather Forecast */

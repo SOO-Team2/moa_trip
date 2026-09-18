@@ -14,6 +14,7 @@
 <div class="planner-container">
     {% csrf_token %}
     {{ spots_data|json_script:"spots-data" }}
+    {{ itinerary_items_data|json_script:"itinerary-items-data" }}
 
     <header class="planner-header">
         <h1>즐겨찾기로 여행 만들기</h1>
@@ -25,7 +26,8 @@
 
             <div class="planner-form-group">
                 <label>여행 제목</label>
-                <input type="text" id="planner-title-input" placeholder="여행 제목을 입력하세요.">
+                <input type="text" id="planner-title-input" placeholder="여행 제목을 입력하세요." value="{{ itinerary.itinerary_title|default:'' }}">
+
             </div>
             <div class="planner-form-group">
                 <label>여행지</label>
@@ -43,8 +45,10 @@
                 <input type="date" id="planner-date">
             </div>
             <script>
-                // 오늘 날짜로 자동 설정
+                // 저장된 일정을 불러온 게 아니면 오늘 날짜로 자동 설정
+                {% if not itinerary %}
                 document.getElementById('planner-date').value = new Date().toISOString().substring(0, 10);
+                {% endif %}
             </script>
 
             <div class="planner-form-group">
@@ -93,10 +97,12 @@
                 <h2 id="planner-header-title">여행지 · 여행 제목</h2>
 
                 <div>
+                    {% if itinerary %}
+                    <button type="button" class="btn-delete-itinerary">일정 삭제</button>
+                    {% endif %}
                     <button type="button" class="btn-save-itinerary">일정 저장</button>
                 </div>
             </div>
-
 
             <script>
                 const submitBtn = document.getElementById('btn-submit-planner');
@@ -129,11 +135,25 @@
                     <div class="mypage-spot-grid">
                         {% for favorite in favorites %}
                             <article class="mypage-spot-card" data-spot-code="{{ favorite.spot.spot_code }}" data-spot-name="{{ favorite.spot.t_name }}" data-entry-fee="{{ favorite.spot.entry_fee }}" data-pet-allowed="{{ favorite.spot.pet_allowed }}">
-                                <div class="mypage-spot-thumb">🏖️</div>
+                                <div class="mypage-spot-thumb">
+                                    {% if favorite.spot.image.name and 'http' in favorite.spot.image.name %}
+                                    <img src="{{ favorite.spot.image.name }}" alt="{{ favorite.spot.t_name }}" style="width:100%; height:100%; object-fit:cover; position:absolute; inset:0;">
+                                    {% else %}
+                                    🏖️
+                                    {% endif %}
+                                </div>
                                 <h3><a href="{% url 'detail' %}">{{ favorite.spot.t_name }}</a></h3>
                                 <p>{{ favorite.spot.address }}</p>
                             </article>
                         {% endfor %}
+
+                        <!-- 즐겨찾기가 부족할 때 탐색 페이지로 이동해서 더 담기 -->
+                        <article class="add-spot-card">
+                            <a href="{% url 'explore' %}"
+                                style="text-decoration:none; color:inherit; display:flex; align-items:center; justify-content:center; width:100%; height:100%;">
+                                <button type="button">+ 관광지 더 담기</button>
+                            </a>
+                        </article>
                     </div>
                 </div>
             </div>
@@ -155,7 +175,7 @@
             const totalFeeDisplay = document.getElementById('summary-total-fee');
             const petInfoDisplay = document.getElementById('summary-pet-info');
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            
+
             function formatFee(fee) {
                 return `${fee.toLocaleString()}원`;
             }
@@ -181,7 +201,50 @@
                 }
             }
 
-            updateSummary();
+            // 타임라인 카드 하나 만들기 (즐겨찾기에서 새로 담을 때 / 저장된 일정 불러올 때 공통 사용)
+            function createTimelineItem({ spotCode, spotName, entryFee, petAllowed, itineraryCode, visitTime }) {
+                const newItem = document.createElement('div');
+                newItem.classList.add('timeline-item');
+                newItem.dataset.spotCode = spotCode;
+                newItem.dataset.entryFee = entryFee;
+                newItem.dataset.petAllowed = petAllowed ? '1' : '0';
+                if (itineraryCode) {
+                    newItem.dataset.itineraryCode = itineraryCode;
+                }
+
+                // 저장된 방문 시간("HH:MM" 24시간제)을 오전/오후 + 시:분 입력값으로 되돌리기
+                let period = '오전';
+                let hour = '';
+                let minute = '';
+                if (visitTime) {
+                    const [hStr, mStr] = visitTime.split(':');
+                    let h = parseInt(hStr, 10);
+                    period = h >= 12 ? '오후' : '오전';
+                    h = h % 12;
+                    hour = h === 0 ? 12 : h;
+                    minute = mStr;
+                }
+
+                newItem.innerHTML = `
+                    <div class="timeline-time-badge">
+                        <select class="time-period-select">
+                            <option value="오전" ${period === '오전' ? 'selected' : ''}>오전</option>
+                            <option value="오후" ${period === '오후' ? 'selected' : ''}>오후</option>
+                        </select>
+                        <input type="number" class="time-hour-input" placeholder="00" min="1" max="12" maxlength="2" value="${hour}">
+                        <span>:</span>
+                        <input type="number" class="time-minute-input" placeholder="00" min="0" max="59" maxlength="2" value="${minute}">
+                    </div>
+                    <div class="timeline-card">
+                        <h3>${spotName}</h3>
+                        <p>${formatFee(entryFee)} · ${formatPet(petAllowed)}</p>
+                        <button type="button" class="timeline-delete-btn" aria-label="삭제">✕</button>
+                    </div>
+                `;
+
+                timelineList.appendChild(newItem);
+                return newItem;
+            }
 
             //삭제 버튼 클릭 처리(저장 전 카드 + 저장된 카드 공통)
             timelineList.addEventListener('click', (e) => {
@@ -196,14 +259,14 @@
                     updateSummary();
                     return;
                 }
-                
+
                 fetch("{% url 'planner_delete_spot' %}", {
                     method: 'POST',
                     headers: {
                         'X-CSRFToken': csrfToken,
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: new URLSearchParams({ itinerary_code: itineraryCode}).toString(),
+                    body: new URLSearchParams({ itinerary_code: itineraryCode, spot_code: item.dataset.spotCode }).toString()
                 })
                 .then(res => res.json())
                 .then(data => {
@@ -216,7 +279,7 @@
                 })
                 .catch(() => alert('삭제 중 오류가 발생했습니다.'));
             })
-            
+
             // 즐겨찾기 팝업 제어
             const modal = document.getElementById('spot-modal');
             const openModalBtn = document.querySelector('.btn-add-timeline-spot');
@@ -245,37 +308,9 @@
                     const entryFee = parseInt(card.getAttribute('data-entry-fee'), 10) || 0;
                     const petAllowed = card.getAttribute('data-pet-allowed') === '1';
 
-                    // 새로운 타임라인 HTML 생성
-                    const newItem = document.createElement('div');
-                    newItem.classList.add('timeline-item');
-                    newItem.dataset.spotCode = spotCode;
-                    newItem.dataset.entryFee = entryFee;
-                    newItem.dataset.petAllowed = petAllowed ? '1' : '0';
+                    createTimelineItem({ spotCode, spotName, entryFee, petAllowed });
 
-                    newItem.innerHTML = `
-                        <div class="timeline-time-badge">
-                            <select class="time-period-select">
-                                <option value="오전">오전</option>
-                                <option value="오후">오후</option>
-                            </select>
-                            <input type="number" class="time-hour-input" placeholder="00" min="1" max="12" maxlength="2">
-                            <span>:</span>
-                            <input type="number" class="time-minute-input" placeholder="00" min="0" max="59" maxlength="2">
-                        </div>
-                        <div class="timeline-card">
-                            <h3>${spotName}</h3>
-                            <p>${formatFee(entryFee)} · ${formatPet(petAllowed)}</p>
-                            <button type="button" class="timeline-delete-btn" aria-label="삭제">✕</button>
-                        </div>
-                    `;
-
-                    // 타임라인 리스트에 추가
-                    timelineList.appendChild(newItem);
-
-                    // 요약 정보 갱신
                     updateSummary();
-
-                    // 팝업 닫기
                     modal.style.display = 'none';
                 });
             });
@@ -295,13 +330,59 @@
                 return `${String(hour).padStart(2, '0')}:${minute}`;
             }
 
+            // 마이페이지에서 '열기'로 들어온 경우, 저장된 일정 데이터 불러오기
+            const itineraryItemsDataEl = document.getElementById('itinerary-items-data');
+            const itineraryItemsData = itineraryItemsDataEl ? JSON.parse(itineraryItemsDataEl.textContent) : [];
+
+            // 새 장소를 추가할 때 붙일 일정 코드 (기존 일정을 열었다면 그 코드, 아니면 없음)
+            let sharedItineraryCode = itineraryItemsData.length > 0
+                ? itineraryItemsData[0].itinerary_code
+                : {% if itinerary %}"{{ itinerary.itinerary_code }}"{% else %}null{% endif %};
+
+            {% if itinerary %}
+            // 여행지 선택 값 맞추기 (저장된 첫 장소의 지역 기준)
+            if (itineraryItemsData.length > 0) {
+                regionSelect.value = itineraryItemsData[0].region_code;
+            }
+
+            titleInput.value = "{{ itinerary.itinerary_title|default:''|escapejs }}";
+            document.getElementById('planner-date').value = "{{ itinerary.itinerary_date|date:'Y-m-d' }}";
+
+            companionBtns.forEach(btn => {
+                if (btn.textContent.trim() === "{{ itinerary.companion|default:''|escapejs }}") {
+                    btn.classList.add('active');
+                }
+            });
+
+            {% if itinerary.pet_accompanied %}
+            petBtn.classList.add('active');
+            {% endif %}
+
+            const loadedRegionOption = regionSelect.options[regionSelect.selectedIndex];
+            headerTitle.textContent = `${loadedRegionOption ? loadedRegionOption.textContent.trim() : ''} · {{ itinerary.itinerary_title|default:''|escapejs }}`;
+            {% endif %}
+
+            // 저장된 장소들로 타임라인 미리 채우기
+            itineraryItemsData.forEach(item => {
+                createTimelineItem({
+                    spotCode: item.spot_code,
+                    spotName: item.t_name,
+                    entryFee: item.entry_fee,
+                    petAllowed: item.pet_allowed === 1 || item.pet_allowed === true,
+                    itineraryCode: item.itinerary_code,
+                    visitTime: item.visit_time,
+                });
+            });
+
+            updateSummary();
+
             // 일정 저장 버튼 클릭 처리
             const saveBtn = document.querySelector('.btn-save-itinerary');
             saveBtn.addEventListener('click', async () => {
                 const newItems = Array.from(timelineList.querySelectorAll('.timeline-item'))
                     .filter(item => item.dataset.spotCode && !item.dataset.itineraryCode);
 
-                if (newItems.length === 0) {
+                if (newItems.length === 0 && !sharedItineraryCode) {
                     alert('즐겨찾기에서 장소를 먼저 담아주세요.');
                     return;
                 }
@@ -313,9 +394,31 @@
                 const companion = activeCompanionBtn ? activeCompanionBtn.textContent : '';
                 const petAccompanied = petBtn.classList.contains('active') ? 'true' : 'false';
 
-                // 같은 여행(일정)에 속한 장소들이 공유할 itinerary_code
-                let sharedItineraryCode = null;
                 let hasFailed = false;
+
+                // 기존에 열어둔 일정이면, 새 장소 유무와 상관없이 제목/날짜/동행/반려동물 정보부터 갱신
+                if (sharedItineraryCode) {
+                    try {
+                        const res = await fetch("{% url 'planner_update_itinerary' %}", {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': csrfToken,
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams({
+                                itinerary_code: sharedItineraryCode,
+                                itinerary_title: itineraryTitle,
+                                itinerary_date: itineraryDate,
+                                companion: companion,
+                                pet_accompanied: petAccompanied,
+                            }).toString(),
+                        });
+                        const data = await res.json();
+                        if (data.result !== 'ok') hasFailed = true;
+                    } catch (e) {
+                        hasFailed = true;
+                    }
+                }
 
                 // 장소를 하나씩 순서대로 저장 (동시에 보내지 않음)
                 for (const item of newItems) {
@@ -357,7 +460,35 @@
 
                 alert(hasFailed ? '일부 장소 저장에 실패했습니다.' : '일정이 저장되었습니다.');
             });
+            // 일정 삭제 버튼 클릭 처리 (일정 전체 삭제)
+            const deleteItineraryBtn = document.querySelector('.btn-delete-itinerary');
+            if (deleteItineraryBtn) {
+                deleteItineraryBtn.addEventListener('click', () => {
+                    if (!confirm('이 여행 일정을 전체 삭제하시겠습니까?')) return;
+
+                    fetch("{% url 'planner_delete_spot' %}", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({ itinerary_code: sharedItineraryCode }).toString(),
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.result !== 'ok') {
+                            alert(data.message || '삭제에 실패했습니다.');
+                            return;
+                        }
+                        alert('일정이 삭제되었습니다.');
+                        window.location.href = "{% url 'mypage' %}";
+                    })
+                    .catch(() => alert('삭제 중 오류가 발생했습니다.'));
+                });
+            }
+
         </script>
+
     </main>
 </div>
 {% endblock %}
