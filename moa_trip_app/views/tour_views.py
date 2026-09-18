@@ -69,10 +69,31 @@ def main(request):
 
     return render(request, 'main.html', {"tour_items": tour_items})
 
-
 # ==============================================================================
 # 2. 관광지 (explore)
 # ==============================================================================
+TOUR_REGIONS = [
+    {"code": "all", "name": "전체"},
+    {"code": "1", "name": "서울"},
+    {"code": "2", "name": "인천"},
+    {"code": "31", "name": "경기"},
+    {"code": "32", "name": "강원"},
+    {"code": "33", "name": "충북"},
+    {"code": "34", "name": "충남"},
+    {"code": "3", "name": "대전"},
+    {"code": "8", "name": "세종"},
+    {"code": "35", "name": "경북"},
+    {"code": "36", "name": "경남"},
+    {"code": "4", "name": "대구"},
+    {"code": "7", "name": "울산"},
+    {"code": "6", "name": "부산"},
+    {"code": "37", "name": "전북"},
+    {"code": "38", "name": "전남"},
+    {"code": "5", "name": "광주"},
+    {"code": "39", "name": "제주"},
+]
+
+
 def explore(request):
     selected_region = request.GET.get('region', 'all')
     selected_rating = request.GET.get('min_rating', '4.5')
@@ -113,6 +134,7 @@ def explore(request):
 
     context = {
         'spots': spots,
+        'tour_regions': TOUR_REGIONS,
         'selected_region': selected_region,
         'selected_rating': selected_rating,
         'selected_pet': selected_pet,
@@ -142,7 +164,7 @@ def detail(request):
         return item if isinstance(item, list) else ([item] if item else [])
 
     spot = {}
-    area_code = req_areacode if req_areacode else "39"
+    area_code = req_areacode if req_areacode and req_areacode != 'all' else "39"
 
     # 1. 한국관광공사 공통 상세조회 (detailCommon2 단독 호출: 타입 불문 100% 응답)
     if content_id:

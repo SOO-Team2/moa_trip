@@ -19,22 +19,12 @@
       <!-- 지역 필터 -->
       <div class="explore-filter-region">
         <h3>지역</h3>
+        {% for r in tour_regions %}
         <div>
-          <input type="radio" name="region" id="r-jeju" value="39" checked>
-          <label for="r-jeju">제주도</label>
+          <input type="radio" name="region" id="r-{{ r.code }}" value="{{ r.code }}" {% if selected_region == r.code or not selected_region and r.code == 'all' %}checked{% endif %}>
+          <label for="r-{{ r.code }}">{{ r.name }}</label>
         </div>
-        <div>
-          <input type="radio" name="region" id="r-gangwon" value="32">
-          <label for="r-gangwon">강원도</label>
-        </div>
-        <div>
-          <input type="radio" name="region" id="r-jeonnam" value="38">
-          <label for="r-jeonnam">전라남도</label>
-        </div>
-        <div>
-          <input type="radio" name="region" id="r-gyeongbuk" value="35">
-          <label for="r-gyeongbuk">경상북도</label>
-        </div>
+        {% endfor %}
       </div>
 
       <!-- 반려동물 필터 -->
