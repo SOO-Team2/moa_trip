@@ -144,6 +144,15 @@ def explore(request):
                 res_items = items_box.get('item', [])
                 spots = res_items if isinstance(res_items, list) else [res_items] #결과가 1개일 경우
 
+    # 카드 주소는 최대 3어절까지만 표기 
+    for spot in spots:
+        if isinstance(spot, dict):
+            addr = spot.get('addr1')
+            if addr and isinstance(addr, str):
+                words = addr.strip().split()
+                if words:
+                    spot['addr1'] = ' '.join(words[:3])
+
     if selected_sort == 'review':
         spots = list(reversed(spots))
 
