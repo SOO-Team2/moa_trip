@@ -277,27 +277,32 @@ def detail(request):
                 if not any(u_name == exist.split('/')[-1] for exist in images):
                     images.append(u)
 
-    # 3장이 안 채워지거나 같은 구도일 경우 대비한 Fallback 이미지 풀
+    # 3장의 사진이 반드시 서로 다르게 나오도록 보장하는 로직
     backup_pool = [
         "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", # 푸른 바다/하늘
         "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=800&q=80", # 잔디/자연
         "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80", # 풍경/산
+        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80", # 호수/여행
+        "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80", # 로드트립
     ]
 
-    p1 = images[0] if len(images) > 0 else backup_pool[0]
-    p2 = images[1] if len(images) > 1 else backup_pool[0]
-    p3 = images[2] if len(images) > 2 else backup_pool[1]
+    selected_photos = []
+    # 1. API에서 가져온 실제 관광지 사진 중 중복 없이 순차 수집
+    for img in images:
+        if img and img not in selected_photos and len(selected_photos) < 3:
+            selected_photos.append(img)
 
-    # 혹시라도 3장 중 같은 사진이 있다면 백업 이미지로 대체
-    if p2 == p1:
-        p2 = backup_pool[0]
-    if p3 in [p1, p2]:
-        p3 = backup_pool[1] if p2 != backup_pool[1] else backup_pool[2]
+    # 2. 3장이 부족한 경우 백업 이미지 풀에서 중복 없이 보충
+    for b_img in backup_pool:
+        if len(selected_photos) >= 3:
+            break
+        if b_img not in selected_photos:
+            selected_photos.append(b_img)
 
     gallery_photos = {
-        "photo1": p1,
-        "photo2": p2,
-        "photo3": p3,
+        "photo1": selected_photos[0],
+        "photo2": selected_photos[1],
+        "photo3": selected_photos[2],
     }
 
     # 5. 상세 안내 테이블 정보 조립
