@@ -21,26 +21,29 @@
     position: static;
   }
 
-  /* 즐겨찾기 카드 삭제(✕) 버튼 - 평소엔 숨겨져 있다가 카드에 마우스를 올리면 보이게 */
+  /* 즐겨찾기 카드 삭제(✕) 버튼 (planner의 timeline-delete-btn과 동일한 스타일) */
   .mypage-spot-delete-btn {
     position: absolute;
     top: 8px;
     right: 8px;
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
+    padding: 0 0 0 1px; /* 👈 왼쪽 치우침 보정 (오른쪽으로 1px 이동) */
     border-radius: 50%;
     border: 1.5px solid #ffffff;
     background-color: #ffffff;
     color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
     box-shadow: var(--shadow-sm);
-    z-index: 2;
     opacity: 0;
     visibility: hidden;
     transition: var(--transition);
+    z-index: 2;
+    cursor: pointer;
   }
 
   .mypage-spot-card:hover .mypage-spot-delete-btn {
@@ -67,7 +70,7 @@
     <div class="profile-info">
       <span class="profile-badge">일반 회원</span>
       <h1>{{ user.nickname|default:user.user_id }}</h1>
-      <p>{{ user.user_id }} · {{ user.join_date|default:"2026.03" }} 가입</p>
+      <p>{{ user.user_id }} · {{ user.join_date|date:"Y.m" }} 가입</p>
     </div>
     <div class="profile-stats-group">
       <div class="stat-item">
@@ -76,7 +79,7 @@
       </div>
       <div class="stat-item">
         <span>{{ reviews.count }}</span>
-        <span>작성 후기</span>
+        <span>후기</span>
       </div>
       <div class="stat-item">
         <span id="itinerary-count">{{ itineraries.count }}</span>
@@ -90,8 +93,8 @@
     <ul>
       <li class="active"><a href="#" data-tab= "dashboard">대시보드</a></li>
       <li><a href="#" data-tab="bookmark">즐겨찾기</a></li>
-      <li><a href="#" data-tab="review">작성한 후기</a></li>
-      <li><a href="#" data-tab="itinerary">저장한 여행 일정</a></li>
+      <li><a href="#" data-tab="review">후기</a></li>
+      <li><a href="#" data-tab="itinerary">여행 일정</a></li>
     </ul>
   </nav>
 
@@ -118,20 +121,20 @@
               {% else %}
               🏖️
               {% endif %}
-              <button type="button" class="mypage-spot-delete-btn" onclick="event.stopPropagation(); deleteFavorite(this, '{{ favorite.spot.spot_code }}')">✕</button>
+              <button type="button" class="mypage-spot-delete-btn" onclick="event.stopPropagation(); deleteFavorite(this, '{{ favorite.spot.spot_code }}')" aria-label="삭제">✕</button>
             </div>
             <h3>{{ favorite.spot.t_name }}</h3>
-            <p>{{ favorite.spot.address }}</p>
+            <p>{{ favorite.spot.short_address }}</p>
           </article>
-          {% empty %}
-          <p style="grid-column: 1 / -1; padding: 20px 0; color: #888;">즐겨찾기한 관광지가 없습니다.</p>
           {% endfor %}
 
           <!-- 추가 카드 버튼 -->
           <article class="add-spot-card">
             <a href="{% url 'explore' %}"
               style="text-decoration:none; color:inherit; display:flex; align-items:center; justify-content:center; width:100%; height:100%;">
-              <button type="button">+ 관광지 더 담기</button>
+              <button type="button" id="btn-add-favorite">
+                {% if favorites %}+ 관광지 더 담기{% else %}+ 관광지 담기{% endif %}
+              </button>
             </a>
           </article>
         </div>
@@ -151,6 +154,8 @@
             </div>
             <span class="review-date">{{ review.create_date|date:"Y.m.d" }}</span>
           </li>
+          {% empty %}
+          <p style="padding: 30px 0; color: #888; text-align: center;">아직 후기가 없습니다.</p>
           {% endfor %}
         </ul>
       </section>
@@ -205,11 +210,20 @@
           // 즐겨찾기 숫자 변경
           document.getElementById('bookmark-stat-count').textContent = count;
           document.getElementById('bookmark-section-count').textContent = count;
+
+          // 0개가 되면 버튼 문구를 '+ 관광지 담기'로 변경
+          if (count === 0) {
+            const addBtn = document.getElementById('btn-add-favorite');
+            if (addBtn) addBtn.textContent = '+ 관광지 담기';
+          }
         })
         .catch(() => alert('삭제 중 오류가 발생했습니다.'));
       }
 
       function deleteItinerary(button, itineraryCode) {
+        if (!confirm('여행 일정을 삭제하시겠습니까?')) {
+          return;
+        }
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         fetch("{% url 'planner_delete_spot' %}", {
           method: 'POST',

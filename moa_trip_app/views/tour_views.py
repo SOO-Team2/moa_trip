@@ -199,10 +199,22 @@ def explore(request):
     next_page = end_page + 1
     page_range = range(start_page, end_page + 1)
 
+    # 선택된 지역 이름 및 헤더 타이틀 작성
+    selected_region_name = next(
+        (r['name'] for r in TOUR_REGIONS if r['code'] == selected_region),
+        '전체'
+    )
+    if selected_region == 'all' or not selected_region:
+        region_title = "전체 관광지"
+    else:
+        region_title = f"{selected_region_name} 지역 관광지"
+
     context = {
         'spots': spots,
         'tour_regions': TOUR_REGIONS,
         'selected_region': selected_region,
+        'selected_region_name': selected_region_name,
+        'region_title': region_title,
         'selected_rating': selected_rating,
         'selected_pet': selected_pet,
         'selected_sort': selected_sort,

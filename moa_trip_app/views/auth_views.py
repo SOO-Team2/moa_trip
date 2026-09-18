@@ -21,7 +21,7 @@ def login_ok(request):
     if user and check_password(pw, user.pw):
         request.session['user_id'] = user.user_id
         return redirect('../../')
-    return render(request, 'login_ok.html', {'result': 1 if user else 0})
+    return render(request, 'login_ok.html')
 
 def logout(request):
     if 'user_id' in request.session:

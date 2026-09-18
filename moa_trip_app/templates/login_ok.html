@@ -1,9 +1,4 @@
 <script language="javascript">
-    {% if result == 0 %}
-        alert('아이디를 확인해주세요.');
-    {% elif result == 1 %}
-        alert('비밀번호를 확인해주세요.');
-    {% endif %}
-    
-    location.href='../';
+    alert('아이디 또는 비밀번호가 일치하지 않습니다.');
+    history.back();
 </script>

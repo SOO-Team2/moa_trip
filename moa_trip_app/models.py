@@ -60,6 +60,14 @@ class TouristSpot(models.Model):
     def __str__(self):
         return self.t_name
 
+    @property #함수를 변수처럼 사용
+    def short_address(self):
+        if self.address:
+            words = self.address.strip().split()
+            if words:
+                return ' '.join(words[:3])
+        return self.address or '주소 정보 준비 중'
+
 
 # ==============================================================================
 # 5. 날씨 캐시 (WEATHERCACHE)

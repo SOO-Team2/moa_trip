@@ -112,12 +112,30 @@ def planner(request):
                 for it in itinerary_times
             ]
 
+    # detail 페이지 '여행 일정 만들기' 버튼
+    initial_spot_data = None
+    spot_code = request.GET.get('spot_code')
+    if spot_code:
+        spot = TouristSpot.objects.filter(spot_code=spot_code).select_related('region').first()
+        if not spot:
+            spot = create_touristspot_from_api(spot_code) #공공데이터 API에서 가져와 저장
+        if spot:
+            initial_spot_data = {
+                'spot_code': spot.spot_code,
+                't_name': spot.t_name,
+                'entry_fee': spot.entry_fee,
+                'pet_allowed': spot.pet_allowed == 1,
+                'region_code': spot.region.region_code if spot.region else None,
+                'region_name': spot.region.region_name if spot.region else '',
+            }
+
     return render(request, 'planner.html', {
         'regions': regions,
         'spots_data': spots_data,
         'favorites': favorites,
         'itinerary': itinerary,
         'itinerary_items_data': itinerary_items_data,
+        'initial_spot_data': initial_spot_data,
     })
 
 def planner_update_itinerary(request):

@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-{{ spot.title|default:"관광지 상세 정보" }} - 상세 정보 | 모아트립
+{{ spot.title|default:"관광지 상세 정보" }} | 모아트립
 {% endblock %}
 
 {% block extra_css %}
@@ -86,7 +86,7 @@
             </div>
         </div>
 
-        <div class="section-title">주간 날씨 예보</div>
+        <div class="section-title">주간 날씨</div>
         <div class="weekly-forecast">
             {% for wf in weekly_forecast %}
             <div class="weather-item">
@@ -115,21 +115,21 @@
 
     <div class="spot-sidebar">
         <div class="weather-today">
-            <div>실시간 현지 날씨</div>
+            <div>현재 날씨</div>
             <div class="w-temp">{{ today_weather.temp }}</div>
             <div class="w-desc">{{ today_weather.icon }} {{ today_weather.desc }} · 강수확률 {{ today_weather.rain_prob }}%
             </div>
         </div>
 
-        <a href="{% url 'planner' %}?region={{ spot.areacode|default:'39' }}&title={{ spot.title|urlencode }}"
-            class="sidebar-btn primary" style="display:block; text-align:center; text-decoration:none;">여행 일정에 추가</a>
-        <button class="sidebar-btn">즐겨찾기 보관</button>
+        <a href="{% url 'planner' %}?spot_code={{ spot.contentid }}&region={{ spot.areacode }}&title={{ spot.title|urlencode }}"
+            class="sidebar-btn primary" style="display:block; text-align:center; text-decoration:none;">여행 일정 만들기</a>
+        <button class="sidebar-btn">즐겨찾기에 추가</button>
 
         <div class="sidebar-map">
             <div class="map-placeholder">
                 <div class="map-dot"></div>
             </div>
-            <div class="map-address">📍 {{ spot.addr1|default:"위치 정보 없음" }}</div>
+            <div class="map-address">📍 {{ spot.addr1|default:"주소 정보 준비 중" }}</div>
         </div>
     </div>
 </div>

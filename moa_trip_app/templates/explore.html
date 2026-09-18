@@ -63,7 +63,7 @@
   <section class="explore-content-right">
     <header class="explore-content-header">
       <div>
-        <h2>선택한 지역의 관광지</h2>
+        <h2>{{ region_title }}</h2>
         <span>{{ total_count|default:0|intcomma }}곳</span>
       </div>
       <div>
@@ -112,7 +112,9 @@
       {% endfor %}
       {% else %}
       <div style="grid-column: span 2; text-align: center; padding: 60px 0; color: #9ca3af;">
-        선택한 지역의 관광지가 없습니다.
+        {% if selected_region == 'all' or not selected_region %}
+          조건에 맞는 관광지가 없습니다.
+        {% endif %}
       </div>
       {% endif %}
     </section>

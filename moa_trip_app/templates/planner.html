@@ -15,9 +15,10 @@
     {% csrf_token %}
     {{ spots_data|json_script:"spots-data" }}
     {{ itinerary_items_data|json_script:"itinerary-items-data" }}
+    {{ initial_spot_data|json_script:"initial-spot-data" }}
 
     <header class="planner-header">
-        <h1>즐겨찾기로 여행 만들기</h1>
+        <h1>나만의 여행 만들기</h1>
     </header>
 
     <main class="planner-main-layout">
@@ -85,7 +86,7 @@
             </script>
 
             <div>
-                <button type="submit" id="btn-submit-planner" class="btn-submit-planner">여행 만들기</button>
+                <button type="submit" id="btn-submit-planner" class="btn-submit-planner">여행 제목 적용</button>
             </div>
 
         </section>
@@ -94,7 +95,7 @@
         <section class="planner-timeline-section">
             <div class="timeline-header">
 
-                <h2 id="planner-header-title">여행지 · 여행 제목</h2>
+                <h2 id="planner-header-title">새로운 여행 일정</h2>
 
                 <div>
                     {% if itinerary %}
@@ -126,12 +127,12 @@
             <div class="timeline-list"></div>
 
             <div>
-                <button type="button" class="btn-add-timeline-spot">+ 장소 직접 추가</button>
+                <button type="button" class="btn-add-timeline-spot">+ 즐겨찾기에서 장소 추가</button>
             </div>
             <!-- 즐겨찾기 목록팝업 -->
             <div id="spot-modal" class="spot-modal" style="display: none;">
                 <div class="spot-modal-content">
-                    <h2>즐겨찾기 목록</h2></br>
+                    <h2>내 즐겨찾기 목록</h2></br>
                     <div class="mypage-spot-grid">
                         {% for favorite in favorites %}
                             <article class="mypage-spot-card" data-spot-code="{{ favorite.spot.spot_code }}" data-spot-name="{{ favorite.spot.t_name }}" data-entry-fee="{{ favorite.spot.entry_fee }}" data-pet-allowed="{{ favorite.spot.pet_allowed }}">
@@ -143,7 +144,7 @@
                                     {% endif %}
                                 </div>
                                 <h3><a href="{% url 'detail' %}">{{ favorite.spot.t_name }}</a></h3>
-                                <p>{{ favorite.spot.address }}</p>
+                                <p>{{ favorite.spot.short_address }}</p>
                             </article>
                         {% endfor %}
 
@@ -151,7 +152,7 @@
                         <article class="add-spot-card">
                             <a href="{% url 'explore' %}"
                                 style="text-decoration:none; color:inherit; display:flex; align-items:center; justify-content:center; width:100%; height:100%;">
-                                <button type="button">+ 관광지 더 담기</button>
+                                <button type="button">{% if favorites %}+ 관광지 더 담기{% else %}+ 관광지 담기{% endif %}</button>
                             </a>
                         </article>
                     </div>
@@ -197,7 +198,7 @@
                     petInfoDisplay.textContent = '-';
                 } else {
                     const petCount = items.filter(item => item.dataset.petAllowed === '1').length;
-                    petInfoDisplay.textContent = petCount === count ? `${count}곳 모두 가능` : `${count}곳 중 ${petCount}곳 가능`;
+                    petInfoDisplay.textContent = petCount === count ? `${count}곳 모두 가능` : `${petCount}곳 가능`;
                 }
             }
 
@@ -362,6 +363,26 @@
             headerTitle.textContent = `${loadedRegionOption ? loadedRegionOption.textContent.trim() : ''} · {{ itinerary.itinerary_title|default:''|escapejs }}`;
             {% endif %}
 
+            // detail 페이지 '여행 일정 만들기' 장소 자동 추가
+            const initialSpotDataEl = document.getElementById('initial-spot-data');
+            const initialSpotData = initialSpotDataEl ? JSON.parse(initialSpotDataEl.textContent) : null;
+
+            if (initialSpotData && itineraryItemsData.length === 0) { //저장된 일정이 아닐 때
+                // 지역 자동 선택
+                if (initialSpotData.region_code) {
+                    regionSelect.value = initialSpotData.region_code;
+                }
+                headerTitle.textContent = '새로운 여행 일정';
+
+                // 타임라인 카드  생성
+                createTimelineItem({
+                    spotCode: initialSpotData.spot_code,
+                    spotName: initialSpotData.t_name,
+                    entryFee: initialSpotData.entry_fee,
+                    petAllowed: initialSpotData.pet_allowed,
+                });
+            }
+
             // 저장된 장소들로 타임라인 미리 채우기
             itineraryItemsData.forEach(item => {
                 createTimelineItem({
@@ -383,7 +404,7 @@
                     .filter(item => item.dataset.spotCode && !item.dataset.itineraryCode);
 
                 if (newItems.length === 0 && !sharedItineraryCode) {
-                    alert('즐겨찾기에서 장소를 먼저 담아주세요.');
+                    alert('일정에 추가된 장소가 없습니다.');
                     return;
                 }
 
@@ -460,11 +481,11 @@
 
                 alert(hasFailed ? '일부 장소 저장에 실패했습니다.' : '일정이 저장되었습니다.');
             });
-            // 일정 삭제 버튼 클릭 처리 (일정 전체 삭제)
+            // 일정 삭제 버튼 클릭 처리
             const deleteItineraryBtn = document.querySelector('.btn-delete-itinerary');
             if (deleteItineraryBtn) {
                 deleteItineraryBtn.addEventListener('click', () => {
-                    if (!confirm('이 여행 일정을 전체 삭제하시겠습니까?')) return;
+                    if (!confirm('이 여행 일정을 삭제하시겠습니까?')) return;
 
                     fetch("{% url 'planner_delete_spot' %}", {
                         method: 'POST',

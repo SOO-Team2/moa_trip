@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-모아트립 - 나만의 감성 여행
+모아트립 - 나만의 여행 만들기
 {% endblock %}
 
 {% block extra_css %}
@@ -12,7 +12,7 @@
 {% block content %}
 <section class="hero-section">
     <h1 class="hero-title">어디로 떠날까요?</h1>
-    <p class="hero-subtitle">취향과 일정에 꼭 맞는 국내 여행지를 한눈에 발견해보세요</p>
+    <p class="hero-subtitle">내 일정과 조건에 맞는 국내 여행지를 한눈에 발견해보세요</p>
     <div class="hero-actions">
         <a href="{% url 'explore' %}" class="btn-primary">관광지 둘러보기</a>
         <a href="{% url 'planner' %}" class="btn-outline hero-btn-outline">여행 일정 만들기</a>
@@ -52,7 +52,7 @@
             {% endfor %}
             {% else %}
             <p style="grid-column: 1 / -1; text-align: center; color: #888; padding: 40px 0;">
-                불러온 관광지 데이터가 없습니다.
+                관광지 정보를 준비 중입니다.
             </p>
             {% endif %}
         </div>
@@ -60,7 +60,7 @@
 
     <div class="section-wrapper">
         <div class="section-header">
-            <h2 class="section-title">진행 중인 축제</h2>
+            <h2 class="section-title">반려동물과 함께 떠나요</h2>
             <a href="{% url 'explore' %}" class="link-more">전체 보기 &gt;</a>
         </div>
 
