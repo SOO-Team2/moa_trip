@@ -126,14 +126,14 @@
 }
 
 .mypage-nav li a:hover,
-.mypage-nav li.active a,
-.mypage-nav li:first-child a {
+.mypage-nav li.active a
+{
   color: var(--color-primary);
   font-weight: 700;
 }
 
-.mypage-nav li.active a::after,
-.mypage-nav li:first-child a::after {
+.mypage-nav li.active a::after
+{
   content: '';
   position: absolute;
   bottom: -1px;
