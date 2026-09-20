@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load filters %}
 
 {% block title %}
 모아트립 - 나만의 여행 만들기
@@ -40,7 +41,7 @@
                 <!-- 2. 본문 영역 -->
                 <div class="spot-card-body">
                     <h3>{{ item.title }}</h3>
-                    <p class="spot-card-desc">{{ item.addr1|default:"위치 정보 없음" }}</p>
+                    <p class="spot-card-desc">{{ item.addr1|short_addr }}</p>
                 </div>
 
                 <!-- 3. 하단 평점/후기 영역 -->

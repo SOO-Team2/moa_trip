@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
+{% load filters %}
 
 {% block title %}
 관광지 탐색 - 모아트립
@@ -99,7 +100,7 @@
           <span class="badge-pet explore-card-tag">반려동물 OK</span>
           {% endif %}
           <h3>{{ spot.title }}</h3>
-          <p>{{ spot.addr1|default:"위치 정보 없음" }}</p>
+          <p>{{ spot.addr1|short_addr }}</p>
           <div class="explore-card-footer">
             <span class="card-rating">★ 평점 4.5 (1)</span>
             <button type="button" class="btn-bookmark {% if spot.contentid in favorited_spot_codes %}is-favorited{% endif %}"

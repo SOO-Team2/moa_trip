@@ -144,9 +144,16 @@ MAILERS = {
 KMA_API_KEY = unquote(os.environ.get("KMA_API_KEY", "")) 
 
 # ========================================================
+# 네이버 지도 API (Dynamic Map) 설정
+# ========================================================
+NAVER_CLIENT_ID = os.environ.get("NAVER_CLIENT_ID", "")
+NAVER_CLIENT_SECRET = os.environ.get("NAVER_CLIENT_SECRET", "")
+
+# ========================================================
 # 미디어 파일 (관광지/프로필 이미지 업로드) 설정
 # ========================================================
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 

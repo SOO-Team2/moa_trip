@@ -1,4 +1,6 @@
 from django.db import models
+from .utils import short_address, fetch_public_data, api_items
+from .constants import REGIONS_DB, REGION_KEYWORDS
 
 
 # ==============================================================================
@@ -42,6 +44,49 @@ class Region(models.Model):
 # ==============================================================================
 # 3. 관광지 (TOURISTSPOT)
 # ==============================================================================
+class TouristSpotManager(models.Manager):
+    def insert_from_api(self, spot_code):
+        # API에서 관광지 정보를 가져와 DB에 없으면 등록
+        # DB에 이미 존재
+        spot = self.filter(spot_code=spot_code).select_related('region').first()
+        if spot:
+            return spot
+
+        # 공공데이터 API 조회
+        raw = fetch_public_data(
+            "http://apis.data.go.kr/B551011/KorService2/detailCommon2",
+            extra_params={"contentId": str(spot_code)}
+        )
+        items = api_items(raw)
+        item = items[0] if items else None
+        if not item or not item.get('title'):
+            return None
+
+        # 지역 코드 매핑
+        region_code = REGIONS_DB.get(str(item.get('areacode')))
+        if not region_code:
+            addr1 = item.get('addr1') or ''
+            for keyword, code in REGION_KEYWORDS:
+                if keyword in addr1:
+                    region_code = code
+                    break
+
+        region = Region.objects.filter(region_code=region_code).first()
+        if not region:
+            return None
+
+        # DB에 새로 등록
+        return self.create(
+            spot_code=spot_code,
+            region=region,
+            t_name=item.get('title'),
+            address=item.get('addr1') or '주소 정보 없음',
+            entry_fee=0,
+            pet_allowed=0,
+            image=item.get('firstimage') or None,
+        )
+
+
 class TouristSpot(models.Model):
     spot_code = models.CharField(db_column='SPOT_CODE', primary_key=True, max_length=20, verbose_name='관광지 코드')
     region = models.ForeignKey(Region, on_delete=models.DO_NOTHING, db_column='REGION_CODE', verbose_name='지역')
@@ -50,6 +95,8 @@ class TouristSpot(models.Model):
     entry_fee = models.IntegerField(db_column='ENTRY_FEE', verbose_name='입장료')
     pet_allowed = models.IntegerField(db_column='PET_ALLOWED', verbose_name='반려동물 동반 가능 여부')
     image = models.ImageField(db_column='IMAGE', upload_to='tourist_spots/', blank=True, null=True, verbose_name='이미지') # 이미지 컬럼 추가
+
+    objects = TouristSpotManager()
 
     class Meta:
         managed = False
@@ -62,11 +109,7 @@ class TouristSpot(models.Model):
 
     @property #함수를 변수처럼 사용
     def short_address(self):
-        if self.address:
-            words = self.address.strip().split()
-            if words:
-                return ' '.join(words[:3])
-        return self.address or '주소 정보 준비 중'
+        return short_address(self.address, default='주소 정보 준비 중')
 
 
 # ==============================================================================

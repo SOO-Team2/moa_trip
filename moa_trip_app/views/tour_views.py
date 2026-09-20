@@ -1,48 +1,10 @@
 import math
 import re
-from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta
+from django.conf import settings
 from django.shortcuts import render
 from ..models import Favorite
-from ..utils import fetch_public_data
-
-# ==============================================================================
-    # 기상청 단기예보 투영 공식
-    # lat(위도, mapy), lon(경도, mapx) -> (nx, ny)
-# ==============================================================================
-def convert_to_grid(lat, lon):
-    PI = math.pi
-    DEGRAD = PI / 180.0
-    
-    re = 6371.00877 / 5.0  # 격자 간격(5km)으로 나눈 지도 반경
-    slat1 = 30.0 * DEGRAD
-    slat2 = 60.0 * DEGRAD
-    olon = 126.0 * DEGRAD
-    olat = 38.0 * DEGRAD
-    
-    sn = math.tan(PI * 0.25 + slat2 * 0.5) / math.tan(PI * 0.25 + slat1 * 0.5)
-    sn = math.log(math.cos(slat1) / math.cos(slat2)) / math.log(sn)
-    sf = math.tan(PI * 0.25 + slat1 * 0.5)
-    sf = math.pow(sf, sn) * math.cos(slat1) / sn
-    ro = math.tan(PI * 0.25 + olat * 0.5)
-    ro = re * sf / math.pow(ro, sn)
-    
-    xo = 210 / 5.0  # 기준점 X좌표
-    yo = 675 / 5.0  # 기준점 Y좌표
-    
-    ra = math.tan(PI * 0.25 + float(lat) * DEGRAD * 0.5)
-    ra = re * sf / math.pow(ra, sn)
-    
-    theta = float(lon) * DEGRAD - olon
-    if theta > PI:
-        theta -= 2.0 * PI
-    if theta < -PI:
-        theta += 2.0 * PI
-    theta *= sn
-    
-    nx = int(ra * math.sin(theta) + xo + 1.5)
-    ny = int(ro - ra * math.cos(theta) + yo + 1.5)
-    return nx, ny
+from ..utils import fetch_public_data, api_items, api_totalcount, get_weather, to_grid
+from ..constants import REGION_FILTERS, get_region
 
 
 # ==============================================================================
@@ -51,30 +13,12 @@ def convert_to_grid(lat, lon):
 def main(request):
     tour_url = "http://apis.data.go.kr/B551011/KorService2/areaBasedList2"
     extra_params = {
-        "_type": "json",
-        "MobileOS": "ETC",
-        "MobileApp": "MoaTrip",
         "contentTypeId": "12",
         "numOfRows": 8,
         "arrange": "O",
     }
     tour_raw = fetch_public_data(tour_url, extra_params=extra_params)
-    tour_items = []
-    if tour_raw and isinstance(tour_raw, dict):
-        body = tour_raw.get('response', {}).get('body', {})
-        items_box = body.get('items') if isinstance(body, dict) else None
-        if isinstance(items_box, dict):
-            res_items = items_box.get('item', [])
-            tour_items = res_items if isinstance(res_items, list) else [res_items]
-
-    # 카드 주소는 최대 3어절까지만 표기
-    for item in tour_items:
-        if isinstance(item, dict):
-            addr = item.get('addr1')
-            if addr and isinstance(addr, str):
-                words = addr.strip().split()
-                if words:
-                    item['addr1'] = ' '.join(words[:3])
+    tour_items = api_items(tour_raw)
 
     return render(request, 'main.html', {"tour_items": tour_items})
 
@@ -82,28 +26,6 @@ def main(request):
 # ==============================================================================
 # 2. 관광지 (explore)
 # ==============================================================================
-TOUR_REGIONS = [
-    {"code": "all", "name": "전체"},
-    {"code": "1", "name": "서울"},
-    {"code": "2", "name": "인천"},
-    {"code": "31", "name": "경기"},
-    {"code": "32", "name": "강원"},
-    {"code": "33", "name": "충북"},
-    {"code": "34", "name": "충남"},
-    {"code": "3", "name": "대전"},
-    {"code": "8", "name": "세종"},
-    {"code": "35", "name": "경북"},
-    {"code": "36", "name": "경남"},
-    {"code": "4", "name": "대구"},
-    {"code": "7", "name": "울산"},
-    {"code": "6", "name": "부산"},
-    {"code": "37", "name": "전북"},
-    {"code": "38", "name": "전남"},
-    {"code": "5", "name": "광주"},
-    {"code": "39", "name": "제주"},
-]
-
-
 def explore(request):
     selected_region = request.GET.get('region', 'all')
     selected_rating = request.GET.get('min_rating')
@@ -121,9 +43,6 @@ def explore(request):
     tour_url = f"http://apis.data.go.kr/B551011/{service_name}/areaBasedList2"
 
     extra_params = {
-        "_type": "json",
-        "MobileOS": "ETC",
-        "MobileApp": "MoaTrip",
         "contentTypeId": "12",
         "numOfRows": num_of_rows,
         "pageNo": cur_page,
@@ -134,54 +53,16 @@ def explore(request):
         extra_params["areaCode"] = selected_region
 
     tour_raw = fetch_public_data(tour_url, extra_params=extra_params)
-    spots = []
-    total_count = 0
-
-    if tour_raw and isinstance(tour_raw, dict):
-        body = tour_raw.get('response', {}).get('body', {})
-        if isinstance(body, dict):
-            total_count = int(body.get('totalCount', 0) or 0)
-            items_box = body.get('items')
-            if isinstance(items_box, dict):
-                res_items = items_box.get('item', [])
-                spots = res_items if isinstance(res_items, list) else [res_items] #결과가 1개일 경우
-
-    # 카드 주소는 최대 3어절까지만 표기 
-    for spot in spots:
-        if isinstance(spot, dict):
-            addr = spot.get('addr1')
-            if addr and isinstance(addr, str):
-                words = addr.strip().split()
-                if words:
-                    spot['addr1'] = ' '.join(words[:3])
+    spots = api_items(tour_raw)
+    total_count = api_totalcount(tour_raw)
 
     if selected_sort == 'review':
         spots = list(reversed(spots))
 
-    # 반려동물 동반 가능 필터
-    if selected_pet: #필터 켰을 때
-        for spot in spots:
-            spot['is_pet_allowed'] = True
-    elif spots: #필터 껐을 때
-        def check_spot_pet(spot_item):
-            cid = spot_item.get('contentid')
-            if not cid:
-                spot_item['is_pet_allowed'] = False
-                return
-            pet_url = "http://apis.data.go.kr/B551011/KorPetTourService2/detailPetTour2"
-            raw = fetch_public_data(pet_url, extra_params={
-                "_type": "json", "MobileOS": "ETC", "MobileApp": "MoaTrip", "contentId": str(cid)
-            })
-            is_ok = False
-            if raw and isinstance(raw, dict):
-                body = raw.get('response', {}).get('body', {})
-                items_box = body.get('items') if isinstance(body, dict) else None
-                if isinstance(items_box, dict) and items_box.get('item'):
-                    is_ok = True
-            spot_item['is_pet_allowed'] = is_ok
-
-        with ThreadPoolExecutor(max_workers=min(len(spots), 10)) as executor: #병렬로 조회
-            list(executor.map(check_spot_pet, spots))
+    # 반려동물 동반 가능 필터: KorPetTourService2 API에서 조회하므로 모두 True
+    is_pet = bool(selected_pet)
+    for spot in spots:
+        spot['is_pet_allowed'] = is_pet
 
     user_id = request.session.get('user_id')
     favorited_spot_codes = set(
@@ -201,7 +82,7 @@ def explore(request):
 
     # 선택된 지역 이름 및 헤더 타이틀 작성
     selected_region_name = next(
-        (r['name'] for r in TOUR_REGIONS if r['code'] == selected_region),
+        (r['name'] for r in REGION_FILTERS if r['code'] == selected_region),
         '전체'
     )
     if selected_region == 'all' or not selected_region:
@@ -211,7 +92,7 @@ def explore(request):
 
     context = {
         'spots': spots,
-        'tour_regions': TOUR_REGIONS,
+        'tour_regions': REGION_FILTERS,
         'selected_region': selected_region,
         'selected_region_name': selected_region_name,
         'region_title': region_title,
@@ -232,23 +113,11 @@ def explore(request):
 
 
 # ==============================================================================
-# 3. 상세 페이지 (관광지 상세 + 반려동물 정보 + 기상청 중기예보)
+# 3. 상세 페이지 (관광지 상세 + 반려동물 정보 + 기상청 예보)
 # ==============================================================================
 def detail(request):
     content_id = request.GET.get('contentid', '').strip()
     req_areacode = request.GET.get('areacode', '').strip()
-
-    def extract_items(raw_json):
-        if not raw_json or not isinstance(raw_json, dict):
-            return []
-        body = raw_json.get('response', {}).get('body', {})
-        if not isinstance(body, dict):
-            return []
-        items_box = body.get('items')
-        if not items_box or not isinstance(items_box, dict):
-            return []
-        item = items_box.get('item', [])
-        return item if isinstance(item, list) else ([item] if item else [])
 
     spot = {}
     area_code = req_areacode if req_areacode and req_areacode != 'all' else "39"
@@ -258,38 +127,27 @@ def detail(request):
         raw_detail = fetch_public_data(
             "http://apis.data.go.kr/B551011/KorService2/detailCommon2",
             extra_params={
-                "_type": "json",
-                "MobileOS": "ETC",
-                "MobileApp": "MoaTrip",
                 "contentId": str(content_id),
             }
         )
-        items = extract_items(raw_detail)
+        items = api_items(raw_detail)
         if items and items[0].get('title'):
             spot = items[0]
             if spot.get('areacode'):
                 area_code = str(spot.get('areacode'))
 
     # 3. 권역 명칭 매핑
-    area_name_map = {
-        "11": "서울", "21": "부산", "22": "대구", "23": "인천", "24": "광주",
-        "25": "대전", "26": "울산", "8": "세종", "31": "경기", "32": "강원",
-        "51": "강원", "33": "충북", "34": "충남", "35": "경북", "36": "경남",
-        "37": "전북", "38": "전남", "39": "제주"
-    }
-    region_name = area_name_map.get(str(area_code), "해당 지역")
+    region_info = get_region(area_code)
+    region_name = region_info["name"]
 
     # 4-1. 반려동물 동반 상세 정보 조회 (detailPetTour2)
     pet = {}
     if content_id:
         pet_url = "http://apis.data.go.kr/B551011/KorPetTourService2/detailPetTour2"
         raw_pet = fetch_public_data(pet_url, extra_params={
-            "_type": "json",
-            "MobileOS": "ETC",
-            "MobileApp": "MoaTrip",
             "contentId": str(content_id),
         })
-        pet_items = extract_items(raw_pet)
+        pet_items = api_items(raw_pet)
         if pet_items:
             pet = pet_items[0]
 
@@ -301,14 +159,11 @@ def detail(request):
         raw_intro = fetch_public_data(
             "http://apis.data.go.kr/B551011/KorService2/detailIntro2",
             extra_params={
-                "_type": "json",
-                "MobileOS": "ETC",
-                "MobileApp": "MoaTrip",
                 "contentId": str(content_id),
                 "contentTypeId": str(c_type),
             }
         )
-        intro_items = extract_items(raw_intro)
+        intro_items = api_items(raw_intro)
         if intro_items:
             intro = intro_items[0]
 
@@ -316,14 +171,11 @@ def detail(request):
         raw_repeat_info = fetch_public_data(
             "http://apis.data.go.kr/B551011/KorService2/detailInfo2",
             extra_params={
-                "_type": "json",
-                "MobileOS": "ETC",
-                "MobileApp": "MoaTrip",
                 "contentId": str(content_id),
                 "contentTypeId": str(c_type),
             }
         )
-        repeat_info_items = extract_items(raw_repeat_info)
+        repeat_info_items = api_items(raw_repeat_info)
 
     # 4-3. 관광지 추가 이미지 목록 조회 (detailImage1/detailImage2)
     images = []
@@ -335,10 +187,9 @@ def detail(request):
     if content_id:
         img_url = "http://apis.data.go.kr/B551011/KorService2/detailImage2"
         raw_img = fetch_public_data(img_url, extra_params={
-            "_type": "json", "MobileOS": "ETC", "MobileApp": "MoaTrip",
             "contentId": str(content_id), "numOfRows": 20,
         })
-        img_items = extract_items(raw_img)
+        img_items = api_items(raw_img)
 
         for it in img_items:
             u = it.get('originimgurl') or it.get('smallimageurl')
@@ -514,11 +365,7 @@ def detail(request):
     if raw_contact:
         contact_tel = re.sub(r'<[^>]+>', '', str(raw_contact)).strip()
     else:
-        tel_map = {
-            "39": "064-120", "32": "033-120", "51": "033-120",
-            "11": "02-120", "21": "051-120", "35": "054-120", "38": "061-120", "31": "031-120"
-        }
-        contact_tel = tel_map.get(str(area_code), "1330 (관광안내콜센터)")
+        contact_tel = region_info["tel"]
 
     detail_info = {
         "fee": use_fee,
@@ -531,209 +378,15 @@ def detail(request):
         "contact": contact_tel,
     }
 
-   # 6. 날씨 데이터 수집 (단기예보 + 중기예보 조합)
-    area_default_grid = {
-        "11": (60, 127), "21": (98, 76),  "22": (89, 90),  "23": (55, 124),
-        "24": (58, 74),  "25": (67, 100), "26": (102, 84), "8": (66, 103),
-        "31": (60, 120), "32": (73, 134), "51": (73, 134), "33": (69, 107),
-        "34": (68, 100), "35": (89, 91),  "36": (90, 77),  
-        "37": (63, 89),  "38": (51, 67),  "39": (52, 38)
-    }
-
-    # spot의 mapx(경도), mapy(위도) 변환 우선 시도
-    nx, ny = None, None
-    try:
-        lat = spot.get('mapy')
-        lon = spot.get('mapx')
-        if lat and lon and float(lat) > 0 and float(lon) > 0:
-            nx, ny = convert_to_grid(float(lat), float(lon))
-    except Exception:
-        pass
-
-    if not nx or not ny:
-        nx, ny = area_default_grid.get(str(area_code), (90, 77 if str(area_code) == "36" else 60, 127))
-
-    now = datetime.now()
-
-    # 6-1. [단기예보] 기준 발표 시각 계산 (02, 05, 08, 11, 14, 17, 20, 23시)
-    base_hours = [2, 5, 8, 11, 14, 17, 20, 23] #[cite: 1]
-    cur_date = now.strftime("%Y%m%d")
-    available_hour = None
-    # 기상청 API 배포는 매 발표시각 10분 이후이므로 15분 기준으로 안전하게 커트[cite: 1]
-    for h in reversed(base_hours):
-        if now.hour > h or (now.hour == h and now.minute >= 15):
-            available_hour = h
-            break
-
-    if available_hour is not None:
-        v_base_time = f"{available_hour:02d}00" #[cite: 1]
-        v_base_date = cur_date #[cite: 1]
-    else:
-        v_base_time = "2300" #[cite: 1]
-        v_base_date = (now - timedelta(days=1)).strftime("%Y%m%d") #[cite: 1]
-
-    vilage_url = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst" #[cite: 1]
-    vilage_raw = fetch_public_data(vilage_url, extra_params={
-        "dataType": "JSON", "numOfRows": 1000, "pageNo": 1, #[cite: 1]
-        "base_date": v_base_date, "base_time": v_base_time, "nx": nx, "ny": ny #[cite: 1]
-    })
-    v_items = extract_items(vilage_raw)
-
-    # 6-2. [초단기실황] 현재 기온 및 실시간 날씨 조회[cite: 1]
-    # 40분 이후에 직전 정시 데이터 호출이 가장 안정적[cite: 1]
-    ncst_dt = now - timedelta(minutes=40)
-    ncst_url = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst" #[cite: 1]
-    ncst_raw = fetch_public_data(ncst_url, extra_params={
-        "dataType": "JSON", "numOfRows": 10, "pageNo": 1, #[cite: 1]
-        "base_date": ncst_dt.strftime("%Y%m%d"), "base_time": ncst_dt.strftime("%H00"), "nx": nx, "ny": ny #[cite: 1]
-    })
-    ncst_items = extract_items(ncst_raw)
-    current_temp = None
-    for it in ncst_items:
-        if it.get('category') == 'T1H': #[cite: 1]
-            try:
-                v = float(it.get('obsrValue', -999)) #[cite: 1]
-                if -50 <= v <= 60:  # 결측치(-999 등) 필터링[cite: 1]
-                    current_temp = v
-            except ValueError:
-                pass
-            break
-
-    # 6-3. [중기예보] 기상청 육상예보 및 기온 구역 코드
-    land_reg_map = {
-        "11": "11B00000", "31": "11B00000", "23": "11B00000",
-        "32": "11D10000", "51": "11D10000",
-        "33": "11C10000", "34": "11C20000", "25": "11C20000", "8": "11C20000",
-        "35": "11H10000", "22": "11H10000",
-        "36": "11H20000", "21": "11H20000", "26": "11H20000",
-        "37": "11F10000", "38": "11F20000", "24": "11F20000",
-        "39": "11G00000"
-    }
-    temp_reg_map = {
-        "11": "11B10101", "31": "11B20601", "23": "11B20201",
-        "32": "11D10301", "51": "11D10301",
-        "33": "11C10301", "34": "11C20101", "25": "11C20401", "8": "11C20404",
-        "35": "11H10701", "22": "11H10201",
-        "36": "11H20301", "21": "11H20201", "26": "11H20101",
-        "37": "11F10201", "38": "11F20501", "24": "11F20401",
-        "39": "11G00201"
-    }
-
-    reg_land = land_reg_map.get(str(area_code), "11H20000" if str(area_code) == "36" else "11D10000")
-    reg_temp = temp_reg_map.get(str(area_code), "11H20301" if str(area_code) == "36" else "11D10301")
-
-    tm_fc = (now - timedelta(days=1)).strftime("%Y%m%d") + "1800" if now.hour < 6 else now.strftime("%Y%m%d") + "0600"
-    raw_land = fetch_public_data("http://apis.data.go.kr/1360000/MidFcstInfoService/getMidLandFcst", extra_params={"regId": reg_land, "tmFc": tm_fc})
-    raw_temp = fetch_public_data("http://apis.data.go.kr/1360000/MidFcstInfoService/getMidTa", extra_params={"regId": reg_temp, "tmFc": tm_fc})
-
-    land_data = (extract_items(raw_land) or [{}])[0]
-    temp_data = (extract_items(raw_temp) or [{}])[0]
-
-    # 7. 단기 + 중기 예보 데이터 파싱 및 조립
-    icon_map = {"맑음": "☀️", "구름많음": "⛅", "흐림": "☁️", "비": "🌧️", "눈": "❄️", "소나기": "🌦️"}
-
-    # 단기예보 데이터 파싱 (TMP: 기온, POP: 강수확률, SKY: 하늘, PTY: 강수형태)
-    daily_short = {}
-    for item in v_items:
-        f_date = item.get('fcstDate')
-        f_time = item.get('fcstTime')
-        cat = item.get('category')
-        val = item.get('fcstValue')
-        if not f_date: continue
-        if f_date not in daily_short:
-            daily_short[f_date] = {'TMP': [], 'POP': [], 'SKY': {}, 'PTY': {}}
-
-        try:
-            if cat == 'TMP': daily_short[f_date]['TMP'].append(float(val))
-            elif cat == 'POP': daily_short[f_date]['POP'].append(int(val))
-            elif cat == 'SKY': daily_short[f_date]['SKY'][f_time] = val
-            elif cat == 'PTY': daily_short[f_date]['PTY'][f_time] = val
-        except (ValueError, TypeError):
-            pass
-
-    days_kr = ["월", "화", "수", "목", "금", "토", "일"]
-    weekly_forecast = []
-
-    for i in range(7):
-        target_dt = now + timedelta(days=i)
-        t_date_str = target_dt.strftime("%Y%m%d")
-        date_label = f"오늘 {target_dt.month}/{target_dt.day}" if i == 0 else f"{days_kr[target_dt.weekday()]} {target_dt.month}/{target_dt.day}"
-
-        # 1순위: 단기예보에 해당 날짜 기온 데이터가 있는 경우 우선 반영 (보통 0~4일차까지 커버)
-        if t_date_str in daily_short and daily_short[t_date_str]['TMP']:
-            dg = daily_short[t_date_str]
-            t_max = int(round(max(dg['TMP'])))
-            pop_max = max(dg['POP']) if dg['POP'] else 0
-
-            # 낮 12시~15시 시간대 날씨 우선 추출, 없으면 가장 늦은 시간대 채택
-            sky_val = str(dg['SKY'].get('1400', dg['SKY'].get('1200', list(dg['SKY'].values())[-1] if dg['SKY'] else '1')))
-            pty_val = str(dg['PTY'].get('1400', dg['PTY'].get('1200', list(dg['PTY'].values())[-1] if dg['PTY'] else '0')))
-
-            if pty_val in ['1', '4']:
-                w_desc, w_icon = ("소나기" if pty_val == '4' else "비"), ("🌦️" if pty_val == '4' else "🌧️")
-            elif pty_val in ['2', '3']:
-                w_desc, w_icon = "눈", "❄️"
-            elif sky_val == '4':
-                w_desc, w_icon = "흐림", "☁️"
-            elif sky_val == '3':
-                w_desc, w_icon = "구름많음", "⛅"
-            else:
-                w_desc, w_icon = "맑음", "☀️"
-
-            weekly_forecast.append({
-                "date": date_label,
-                "icon": w_icon,
-                "desc": w_desc,
-                "temp": f"{t_max}°",
-                "rain_prob": pop_max,
-            })
-
-        # 2순위: 단기예보 범위를 벗어난 5~6일차 이후는 중기예보(MidFcst) 데이터 적용
-        else:
-            day_idx = i  # i=3일차(9/20) -> taMax3, i=4일차(9/21) -> taMax4
-            wf = land_data.get(f"wf{day_idx}Pm", land_data.get(f"wf{day_idx}", "맑음"))
-            rn_st = land_data.get(f"rnSt{day_idx}Pm", land_data.get(f"rnSt{day_idx}", 20))
-            ta_max = temp_data.get(f"taMax{day_idx}")
-
-            if ta_max is not None:
-                final_temp = int(ta_max)
-            else:
-                # 단기예보 마지막 날 기온 기준으로 자연스럽게 보간
-                prev_temp = int(weekly_forecast[-1]['temp'].replace('°', '')) if weekly_forecast else 22
-                final_temp = prev_temp + (i % 2)
-
-            icon = next((v for k, v in icon_map.items() if k in wf), "☀️")
-
-            weekly_forecast.append({
-                "date": date_label,
-                "icon": icon,
-                "desc": wf,
-                "temp": f"{final_temp}°",
-                "rain_prob": rn_st,
-            })
-
-    # 실시간 사이드바 날씨 (현재 기온 및 결측치 보정)
-    today_w = weekly_forecast[0].copy()
-    if current_temp is not None:
-        today_w['temp'] = f"{float(current_temp):.1f}°"
-    else:
-        cur_fcst_time = f"{now.hour:02d}00"
-        matched_tmp = None
-        for item in v_items:
-            if item.get('fcstDate') == cur_date and item.get('category') == 'TMP':
-                if item.get('fcstTime') >= cur_fcst_time:
-                    matched_tmp = item.get('fcstValue')
-                    break
-        if matched_tmp is not None:
-            today_w['temp'] = f"{float(matched_tmp):.1f}°"
-        else:
-            today_w['temp'] = weekly_forecast[0]['temp']
+    # 6. 날씨 데이터 조회 (단기예보 + 중기예보 조합)
+    weather_info = get_weather(spot.get('mapy'), spot.get('mapx'), area_code)
 
     context = {
         "spot": spot,
         "detail_info": detail_info,
-        "weekly_forecast": weekly_forecast,
-        "today_weather": today_w,
+        "weekly_forecast": weather_info["weekly_forecast"],
+        "today_weather": weather_info["today_weather"],
         "gallery": gallery_photos,
+        "naver_client_id": getattr(settings, 'NAVER_CLIENT_ID', ''),
     }
     return render(request, 'detail.html', context)
