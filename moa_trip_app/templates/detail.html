@@ -46,7 +46,7 @@
 
         <h1 class="spot-title">{{ spot.title }}</h1>
         <div class="spot-sub">
-            {{ spot.addr1|default:"주소 정보 준비 중" }} · 평점 4.6 · 후기 212
+            {{ spot.addr1|default:"주소 정보 준비 중" }} · 평점 {{ avg_rating }} · 후기 {{ review_count }}
         </div>
 
         <div class="info-table">
@@ -105,20 +105,6 @@
             아직 등록된 후기가 없습니다. 첫 번째 후기를 남겨보세요!
         </div>
         {% endfor %}
-        <div class="review-item">
-            <div class="r-top">
-                <span class="r-writer">정명주</span>
-                <span>
-                    <svg viewBox="0 0 24 24" class="review-star-icon">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                    평점 5.0 · 2026.09.02
-                </span>
-                <div class="r-content">
-                    강아지와 함께 해변을 걸을 수 있어서 너무 좋았습니다. 바다 색깔도 에메랄드빛이고 주차장에서 해변까지 도보 3분 정도로 아주 가깝습니다.
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="spot-sidebar">

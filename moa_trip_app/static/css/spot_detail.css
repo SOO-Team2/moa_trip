@@ -385,18 +385,6 @@
   gap: 4px;
 }
 
-.review-star-icon {
-  width: 15px;
-  height: 15px;
-  fill: var(--color-rating);
-  stroke: var(--color-rating);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  flex-shrink: 0;
-  display: inline-block;
-}
-
 .r-content {
   font-size: 14px;
   color: var(--color-text);
