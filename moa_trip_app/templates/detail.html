@@ -93,7 +93,12 @@
             {% for r in reviews %}
             <div class="review-item">
                 <div class="r-top">
-                    <span class="r-writer">{{ r.user.nickname|default:r.user.user_id }}</span>
+                    <div class="r-header">
+                        <span class="r-writer">{{ r.user.nickname|default:r.user.user_id }}</span>
+                        {% if user_id and r.user.user_id == user_id %}
+                        <button type="button" class="review-delete-btn" onclick="deleteReview('{{ r.review_code }}')">삭제</button>
+                        {% endif %}
+                    </div>
                     <span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 4px;">
                         <svg width="18" height="18" viewBox="0 0 24 24"
                             style="fill: var(--color-rating); stroke: var(--color-rating); flex-shrink: 0;">
@@ -457,6 +462,45 @@
                 window.location.reload(); // 새로고침하여 등록된 후기 바로 반영
             } else {
                 alert(data.message || '후기 등록에 실패했습니다.');
+            }
+        })
+        .catch(() => {
+            alert('네트워크 오류가 발생했습니다.');
+        });
+    }
+
+    // 5. 후기 삭제
+    function deleteReview(reviewCode) {
+        if (!confirm('후기를 삭제하시겠습니까?')) {
+            return;
+        }
+
+        fetch('{% url "review_delete" %}', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                review_code: reviewCode
+            })
+        })
+        .then(res => {
+            if (res.status === 401) {
+                alert('로그인이 필요한 서비스입니다.');
+                window.location.href = '{% url "login" %}';
+                return null;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+            if (data.result === 'ok') {
+                alert('후기가 삭제되었습니다.');
+                window.location.reload();
+            } else {
+                alert(data.message || '삭제에 실패했습니다.');
             }
         })
         .catch(() => {
