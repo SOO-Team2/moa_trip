@@ -46,7 +46,7 @@ class Region(models.Model):
 # 3. 관광지 (TOURISTSPOT)
 # ==============================================================================
 class TouristSpotManager(models.Manager):
-    def _fetch_fee_and_pet(self, spot_code):
+    def fee_and_pet(self, spot_code):
         # 1. detailPetTour2 (반려동물 정보 전용 API)
         pet_raw = fetch_public_data(
             "http://apis.data.go.kr/B551011/KorPetTourService2/detailPetTour2",
@@ -142,7 +142,7 @@ class TouristSpotManager(models.Manager):
             return None
 
         # 입장료 및 반려동물 상세 정보 조회
-        entry_fee, pet_allowed = self._fetch_fee_and_pet(spot_code)
+        entry_fee, pet_allowed = self.fee_and_pet(spot_code)
 
         # DB에 새로 등록
         return self.create(
