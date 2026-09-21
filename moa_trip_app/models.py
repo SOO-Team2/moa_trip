@@ -1,3 +1,4 @@
+import re
 from django.db import models
 from .utils import short_address, fetch_public_data, api_items
 from .constants import REGIONS_DB, REGION_KEYWORDS
@@ -45,11 +46,64 @@ class Region(models.Model):
 # 3. 관광지 (TOURISTSPOT)
 # ==============================================================================
 class TouristSpotManager(models.Manager):
+    def fee_and_pet(self, spot_code):
+        # 1. detailPetTour2 (반려동물 정보 전용 API)
+        pet_raw = fetch_public_data(
+            "http://apis.data.go.kr/B551011/KorPetTourService2/detailPetTour2",
+            extra_params={"contentId": str(spot_code)}
+        )
+        p_items = api_items(pet_raw)
+        pet = p_items[0] if p_items else {}
+
+        # 2. detailIntro2 (소개 정보)
+        intro_raw = fetch_public_data(
+            "http://apis.data.go.kr/B551011/KorService2/detailIntro2",
+            extra_params={"contentId": str(spot_code), "contentTypeId": "12"}
+        )
+        i_items = api_items(intro_raw)
+        intro = i_items[0] if i_items else {}
+
+        # 3. detailInfo2 (usefee 없을 때 반복 정보 조회)
+        raw_fee = intro.get('usefee') or intro.get('usefeeleports') or ''
+        if not raw_fee:
+            info_raw = fetch_public_data(
+                "http://apis.data.go.kr/B551011/KorService2/detailInfo2",
+                extra_params={"contentId": str(spot_code), "contentTypeId": "12"}
+            )
+            for r in api_items(info_raw):
+                iname = (r.get('infoname') or '').replace(' ', '')
+                itext = (r.get('infotext') or '').strip()
+                if any(w in iname for w in ['입장료', '관람료', '이용요금', '이용료', '체험료', '요금']):
+                    if itext:
+                        raw_fee = itext
+                        break
+
+        # 반려동물 동반 가능 여부 (detailPetTour2 정보 우선 -> intro의 chkpet 판별)
+        pet_need = (pet.get('acmpyNeedMtr') or '').strip()
+        pet_etc = (pet.get('etcAcmpyInfo') or '').strip()
+        pet_type = (pet.get('acmpyTypeCd') or '').strip()
+        pet_cpam = (pet.get('acmpyPsblCpam') or '').strip()
+        chk_pet = (intro.get('chkpet') or '').strip()
+        is_pet = 1 if (pet_need or pet_etc or pet_type or pet_cpam or any(k in chk_pet for k in ['가능', '허용', '목줄', '케이지'])) else 0
+
+        # 입장료 숫자 추출 (무료 또는 미등록 시 0)
+        fee_num = 0
+        if raw_fee:
+            m = re.search(r'([0-9]{1,3}(?:,[0-9]{3})+|[0-9]+)\s*원', raw_fee)
+            if m:
+                try:
+                    fee_num = int(m.group(1).replace(',', ''))
+                except ValueError:
+                    fee_num = 0
+
+        return fee_num, is_pet
+
     def insert_from_api(self, spot_code):
         # API에서 관광지 정보를 가져와 DB에 없으면 등록
         # DB에 이미 존재
         spot = self.filter(spot_code=spot_code).select_related('region').first()
         if spot:
+            updates = []
             # 기존 데이터에 이미지가 비어있는 경우 API에서 보충
             if not spot.image or not spot.image.name:
                 raw = fetch_public_data(
@@ -59,7 +113,9 @@ class TouristSpotManager(models.Manager):
                 items = api_items(raw)
                 if items and items[0].get('firstimage'):
                     spot.image = items[0]['firstimage']
-                    spot.save(update_fields=['image'])
+                    updates.append('image')
+            if updates:
+                spot.save(update_fields=updates)
             return spot
 
         # 공공데이터 API 조회
@@ -85,14 +141,17 @@ class TouristSpotManager(models.Manager):
         if not region:
             return None
 
+        # 입장료 및 반려동물 상세 정보 조회
+        entry_fee, pet_allowed = self.fee_and_pet(spot_code)
+
         # DB에 새로 등록
         return self.create(
             spot_code=spot_code,
             region=region,
             t_name=item.get('title'),
             address=item.get('addr1') or '주소 정보 없음',
-            entry_fee=0,
-            pet_allowed=0,
+            entry_fee=entry_fee,
+            pet_allowed=pet_allowed,
             image=item.get('firstimage') or None,
         )
 

@@ -81,6 +81,12 @@
                 if (petBtn) {
                     petBtn.addEventListener('click', () => {
                         petBtn.classList.toggle('active');
+                        if (window.updatePetVisibility) {
+                            window.updatePetVisibility();
+                        }
+                        if (window.updateSummary) {
+                            window.updateSummary();
+                        }
                     });
                 }
             </script>
@@ -143,8 +149,16 @@
                                     <span style="color:#94a3b8; font-size:12px; font-weight:500;">사진 없음</span>
                                     {% endif %}
                                 </div>
-                                <h3><a href="{% url 'detail' %}">{{ favorite.spot.t_name }}</a></h3>
-                                <p>{{ favorite.spot.short_address }}</p>
+                                <h3><a href="{% url 'detail' %}?spot_code={{ favorite.spot.spot_code }}">{{ favorite.spot.t_name }}</a></h3>
+                                <p>
+                                    {{ favorite.spot.short_address }}
+                                    <span style="display:flex; align-items:center; gap:4px; margin-top:4px; font-size:12px; color:#64748b;">
+                                        <span>입장료: {% if favorite.spot.entry_fee %}{{ favorite.spot.entry_fee }}원{% else %}무료{% endif %}</span>
+                                        <span class="modal-pet-badge" style="display:none; font-weight:600; color:{% if favorite.spot.pet_allowed == 1 %}#10b981{% else %}#ef4444{% endif %};">
+                                            · {% if favorite.spot.pet_allowed == 1 %}🐾 동반 가능{% else %}⚠️ 동반 불가{% endif %}
+                                        </span>
+                                    </span>
+                                </p>
                             </article>
                         {% endfor %}
 
@@ -165,9 +179,9 @@
             <div class="summary-card">
                 <h3>일정 요약</h3>
 
-                <p><span>방문 장소</span> <strong id="summary-spot-count">곳</strong></p>
+                <p><span>방문 장소</span> <strong id="summary-spot-count">0곳</strong></p>
                 <p><span>예상 비용</span> <strong id="summary-total-fee">0원</strong></p>
-                <p><span>반려동물</span> <strong id="summary-pet-info">-</strong></p>
+                <p id="summary-pet-row" style="display: none;"><span>반려동물</span> <strong id="summary-pet-info">-</strong></p>
             </div>
         </section>
         <script>
@@ -175,13 +189,44 @@
             const spotCountDisplay = document.getElementById('summary-spot-count');
             const totalFeeDisplay = document.getElementById('summary-total-fee');
             const petInfoDisplay = document.getElementById('summary-pet-info');
+            const petRow = document.getElementById('summary-pet-row');
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-            function formatFee(fee) {
-                return `${fee.toLocaleString()}원`;
+            function isPetModeActive() {
+                const petBtn = document.querySelector('.companion-pet-btn');
+                return petBtn ? petBtn.classList.contains('active') : false;
             }
+            window.isPetModeActive = isPetModeActive;
+
+            function updatePetVisibility() {
+                const isPet = isPetModeActive();
+
+                // 1. 요약 카드에서 반려동물 행 표시/숨김
+                if (petRow) {
+                    petRow.style.display = isPet ? 'flex' : 'none';
+                }
+
+                // 2. 타임라인 카드의 반려동물 뱃지 표시/숨김
+                const petBadges = document.querySelectorAll('.timeline-pet-badge');
+                petBadges.forEach(badge => {
+                    badge.style.display = isPet ? 'inline' : 'none';
+                });
+
+                // 3. 즐겨찾기 팝업 내의 반려동물 뱃지 표시/숨김
+                const modalPetBadges = document.querySelectorAll('.modal-pet-badge');
+                modalPetBadges.forEach(badge => {
+                    badge.style.display = isPet ? 'inline' : 'none';
+                });
+            }
+            window.updatePetVisibility = updatePetVisibility;
+
+            function formatFee(fee) {
+                const num = parseInt(fee, 10) || 0;
+                return num === 0 ? '무료' : `${num.toLocaleString()}원`;
+            }
+
             function formatPet(petAllowed) {
-                return petAllowed ? '반려동물 동반 가능' : '반려동물 동반 불가';
+                return petAllowed ? '🐾 반려동물 동반 가능' : '⚠️ 반려동물 동반 불가';
             }
 
             // 방문 장소 수 / 예상 비용 / 반려동물 가능 여부 갱신
@@ -192,15 +237,24 @@
                 spotCountDisplay.textContent = `${count}곳`;
 
                 const totalFee = items.reduce((sum, item) => sum + (parseInt(item.dataset.entryFee, 10) || 0), 0);
-                totalFeeDisplay.textContent = formatFee(totalFee);
+                totalFeeDisplay.textContent = totalFee === 0 ? '0원' : `${totalFee.toLocaleString()}원`;
 
-                if (count === 0) {
-                    petInfoDisplay.textContent = '-';
-                } else {
-                    const petCount = items.filter(item => item.dataset.petAllowed === '1').length;
-                    petInfoDisplay.textContent = petCount === count ? `${count}곳 모두 가능` : `${petCount}곳 가능`;
+                if (isPetModeActive()) {
+                    if (count === 0) {
+                        petInfoDisplay.textContent = '-';
+                    } else {
+                        const petCount = items.filter(item => item.dataset.petAllowed === '1').length;
+                        if (petCount === count) {
+                            petInfoDisplay.innerHTML = `<span style="color:#10b981; font-weight:700;">${count}곳 모두 가능</span>`;
+                        } else if (petCount === 0) {
+                            petInfoDisplay.innerHTML = `<span style="color:#ef4444; font-weight:700;">모두 동반 불가</span>`;
+                        } else {
+                            petInfoDisplay.innerHTML = `<span style="color:#f59e0b; font-weight:700;">${count}곳 중 ${petCount}곳 가능</span>`;
+                        }
+                    }
                 }
             }
+            window.updateSummary = updateSummary;
 
             // 타임라인 카드 하나 만들기 (즐겨찾기에서 새로 담을 때 / 저장된 일정 불러올 때 공통 사용)
             function createTimelineItem({ spotCode, spotName, entryFee, petAllowed, itineraryCode, visitTime }) {
@@ -226,6 +280,13 @@
                     minute = mStr;
                 }
 
+                const isPet = isPetModeActive();
+                const petBadgeHtml = `
+                    <span class="timeline-pet-badge" style="display: ${isPet ? 'inline' : 'none'};">
+                        · ${petAllowed ? '<span style="color:#10b981; font-weight:600;">🐾 동반 가능</span>' : '<span style="color:#ef4444; font-weight:600;">⚠️ 동반 불가</span>'}
+                    </span>
+                `;
+
                 newItem.innerHTML = `
                     <div class="timeline-time-badge">
                         <select class="time-period-select">
@@ -238,7 +299,7 @@
                     </div>
                     <div class="timeline-card">
                         <h3>${spotName}</h3>
-                        <p>${formatFee(entryFee)} · ${formatPet(petAllowed)}</p>
+                        <p><span class="timeline-fee">${formatFee(entryFee)}</span>${petBadgeHtml}</p>
                         <button type="button" class="timeline-delete-btn" aria-label="삭제">✕</button>
                     </div>
                 `;
@@ -396,6 +457,7 @@
             });
 
             updateSummary();
+            updatePetVisibility();
 
             // 일정 저장 버튼 클릭 처리
             const saveBtn = document.querySelector('.btn-save-itinerary');
