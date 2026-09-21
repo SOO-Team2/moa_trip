@@ -177,12 +177,6 @@
   transition: var(--transition);
 }
 
-.weather-item:hover {
-  border-color: var(--color-primary-light);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(124, 58, 237, 0.08);
-}
-
 .weather-item .date {
   font-size: 12px;
   font-weight: 600;
