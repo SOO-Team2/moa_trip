@@ -141,70 +141,33 @@
         </div>
 
         <div class="review-header">
-            <div class="section-title">후기 212개</div>
-            <button type="button" class="review-write-btn" id="btn-toggle-review">후기 작성</button>
+            <div class="section-title">후기{{ review_count }}개</div>
+            <button type="button" class="review-write-btn" onclick="openReviewModal()">후기 작성</button>
         </div>
 
-        <!-- 후기 작성 박스 (클릭 시 최상단 후기를 아래로 밀어내며 나타남) -->
-        <div id="review-write-box" class="review-item" style="display: none;">
-            <div class="r-top">
-                <span class="r-writer">{{ user_nickname|default:request.session.user_id }}</span>
-                <div class="star-rating-wrap">
-                    <div class="star-rating" id="star-rating" role="radiogroup">
-                        <span class="star" data-score="1">
-                            <svg viewBox="0 0 24 24" class="star-icon">
-                                <polygon
-                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg>
-                        </span>
-                        <span class="star" data-score="2">
-                            <svg viewBox="0 0 24 24" class="star-icon">
-                                <polygon
-                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg>
-                        </span>
-                        <span class="star" data-score="3">
-                            <svg viewBox="0 0 24 24" class="star-icon">
-                                <polygon
-                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg>
-                        </span>
-                        <span class="star" data-score="4">
-                            <svg viewBox="0 0 24 24" class="star-icon">
-                                <polygon
-                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg>
-                        </span>
-                        <span class="star" data-score="5">
-                            <svg viewBox="0 0 24 24" class="star-icon">
-                                <polygon
-                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg>
-                        </span>
-                    </div>
-                    <input type="hidden" id="review-rating-input" value="0">
+        <div id="review-list-container">
+            {% for r in reviews %}
+            <div class="review-item">
+                <div class="r-top">
+                    <span class="r-writer"> {{
+                        r.user.nickname | default:r.user.user_id }}</span>
+                        <span>★ 평점 {{ r.rating }}.0 · {{ r.create_date|date:"Y.m.d" }}</span>
+                        <div class="r-content"> {{r.content}}
+                        </div>
                 </div>
-            </div></br>
-
-            <div class="review-textarea-wrap">
-                <textarea id="review-content-input" class="review-textarea" placeholder="작성자님의 솔직한 후기를 남겨주세요. (최대 255자)"
-                    maxlength="255"></textarea>
-            </div>
-
-            <div class="review-write-actions">
-                <button type="button" class="review-btn-cancel" id="btn-cancel-review">취소</button>
-                <button type="button" class="review-btn-submit" id="btn-submit-review">작성</button>
             </div>
         </div>
-
+        {% empty %}
+        <div style="text-align: center; padding: 40px 0; color: #94A3B8;">
+            아직 등록된 후기가 없습니다. 첫 번째 후기를 남겨보세요!
+        </div>
+        {% endfor %}
         <div class="review-item">
             <div class="r-top">
                 <span class="r-writer">정명주</span>
                 <span>
-                    <svg viewBox="0 0 24 24" class="review-star-icon"
-                        style="width: 15px; height: 15px; fill: var(--color-rating); stroke: var(--color-rating); stroke-width: 2; display: inline-block;">
-                        <polygon
-                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    <svg viewBox="0 0 24 24" class="review-star-icon" style="width: 15px; height: 15px; fill: var(--color-rating); stroke: var(--color-rating); stroke-width: 2; display: inline-block;">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                     </svg>
                     평점 5.0 · 2026.09.02
                 </span>
@@ -224,7 +187,9 @@
 
         <a href="{% url 'planner' %}?spot_code={{ spot.contentid }}&region={{ spot.areacode }}&title={{ spot.title|urlencode }}"
             class="sidebar-btn primary" style="display:block; text-align:center; text-decoration:none;">여행 일정 만들기</a>
-        <button class="sidebar-btn">즐겨찾기에 추가</button>
+        <button type="button" id="favorite-btn" class="sidebar-btn {% if is_favorited %}is-favorited{% endif %}" data-spot-code="{{ spot.contentid }}">
+            {% if is_favorited %}✓ 즐겨찾기 완료{% else %}즐겨찾기에 추가{% endif %}
+        </button>
 
         <div class="sidebar-map">
             <div id="naver-map" style="width: 100%; height: 200px;"></div>
@@ -233,8 +198,8 @@
                     rel="noopener noreferrer"
                     style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 6px; width: 100%;">
                     <span>📍</span>
-                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        {{spot.addr1|default:"주소 정보 준비 중" }}</span>
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{
+                        spot.addr1|default:"주소 정보 준비 중" }} · 평점 {{ avg_rating }} · 후기 {{ review_count }}</span>
                     <span
                         style="margin-left: auto; font-size: 11px; color: var(--color-primary); font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px;">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -255,6 +220,66 @@
     style="display: none; position: fixed; inset: 0; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; background: rgba(0, 0, 0, 0.88); align-items: center; justify-content: center; cursor: zoom-out; padding: 24px; box-sizing: border-box;">
     <img id="zoomImg" src="" alt="{{ spot.title }}"
         style="max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); cursor: zoom-out;">
+</div>
+<!-- 후기 작성 모달 팝업 -->
+<div id="reviewModal" class="review-modal-overlay" style="display: none;">
+    <div class="review-modal-box">
+        <div class="review-modal-header">
+            <h3>후기 작성</h3>
+            <button type="button" class="modal-close-btn" onclick="closeReviewModal()">&times;</button>
+        </div>
+        <form id="reviewForm" onsubmit="submitReview(event)">
+            <div class="form-group">
+                <label>관광지</label>
+                <div class="spot-name-preview">{{ spot.title }}</div>
+            </div>
+            <div class="form-group">
+                <label>작성자</label>
+                <div class="spot-name-preview">{{ user_nickname|default:request.session.user_id }}</div>
+            </div>
+            <div class="form-group">
+                <label>평점</label>
+                <div class="star-rating-wrap">
+                    <div class="star-rating" id="modal-star-rating" role="radiogroup">
+                        <span class="star" data-score="1">
+                            <svg viewBox="0 0 24 24" class="star-icon">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                        </span>
+                        <span class="star" data-score="2">
+                            <svg viewBox="0 0 24 24" class="star-icon">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                        </span>
+                        <span class="star" data-score="3">
+                            <svg viewBox="0 0 24 24" class="star-icon">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                        </span>
+                        <span class="star" data-score="4">
+                            <svg viewBox="0 0 24 24" class="star-icon">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                        </span>
+                        <span class="star" data-score="5">
+                            <svg viewBox="0 0 24 24" class="star-icon">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                        </span>
+                    </div>
+                    <input type="hidden" id="modal-rating-input" value="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="reviewContent">후기 내용</label>
+                <textarea name="content" id="reviewContent" placeholder="방문 후기를 솔직하게 남겨주세요. (최대 255자)" maxlength="255" required rows="4"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeReviewModal()">취소</button>
+                <button type="submit" class="btn-submit">등록하기</button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
 
@@ -314,6 +339,55 @@
 {% endif %}
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const favBtn = document.getElementById('favorite-btn');
+        if (!favBtn) return;
+
+        favBtn.addEventListener('click', function () {
+            const spotCode = favBtn.dataset.spotCode;
+            if (!spotCode) return;
+
+            fetch('{% url "favorite_toggle" %}', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ spot_code: spotCode })
+            })
+            .then(function (res) {
+                if (res.status === 401) {
+                    alert('로그인이 필요한 서비스입니다.');
+                    window.location.href = '{% url "login" %}';
+                    return null;
+                }
+                return res.json();
+            })
+            .then(function (data) {
+                if (!data) return;
+                if (data.result !== 'ok') {
+                    alert(data.message || '즐겨찾기 처리에 실패했습니다.');
+                    return;
+                }
+
+                // DB 저장 결과에 맞춰 버튼 상태 토글
+                if (data.is_favorited) {
+                    favBtn.classList.add('is-favorited');
+                    favBtn.textContent = '✓ 즐겨찾기 완료';
+                } else {
+                    favBtn.classList.remove('is-favorited');
+                    favBtn.textContent = '즐겨찾기에 추가';
+                }
+            })
+            .catch(function () {
+                alert('네트워크 오류가 발생했습니다.');
+            });
+        });
+    });
+</script>
+
+<script>
     // ==========================================
     // 이미지 크게 보기
     // ==========================================
@@ -363,113 +437,112 @@
             });
         });
 
-        // 후기 작성 폼 및 별점 인터랙션
-        const btnToggleReview = document.getElementById("btn-toggle-review");
-        const reviewWriteBox = document.getElementById("review-write-box");
-        const btnCancelReview = document.getElementById("btn-cancel-review");
-        const btnSubmitReview = document.getElementById("btn-submit-review");
-        const reviewContentInput = document.getElementById("review-content-input");
-        const starRating = document.getElementById("star-rating");
-        const ratingInput = document.getElementById("review-rating-input");
-
-        // 로그인 확인
-        const isLoggedIn = {% if request.session.user_id %}true{% else %}false{% endif %};
-
-    if (btnToggleReview && reviewWriteBox) { //AND
-        btnToggleReview.addEventListener("click", function () {
-            if (!isLoggedIn) {
-                if (confirm("로그인이 필요한 서비스입니다.")) {
-                    window.location.href = "{% url 'login' %}?next=" + encodeURIComponent(window.location.pathname + window.location.search); //로그인 후 상세 페이지 복귀
-                }
-                return;
-            }
-
-            // 작성 폼 펼치기/접기
-            if (reviewWriteBox.style.display === "none" || !reviewWriteBox.style.display) { //OR
-                reviewWriteBox.style.display = "block";
-                btnToggleReview.style.display = "none"; // 후기 작성 버튼 숨기기
-                reviewWriteBox.style.animation = "none";
-                reviewWriteBox.offsetHeight; //애니메이션 꺼짐 인식
-                reviewWriteBox.style.animation = "slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards";
-                if (reviewContentInput) {
-                    reviewContentInput.focus(); //자동 커서
-                }
-            } else {
-                reviewWriteBox.style.display = "none";
-                btnToggleReview.style.display = "";
-            }
-        });
-    }
-
-    let selectedScore = 0;
-    let renderStars = null;
-
-    // 별점 인터랙션
-    if (starRating) {
-        const stars = starRating.querySelectorAll(".star");
-        const rawScore = ratingInput ? parseInt(ratingInput.value, 10) : 0;
-        selectedScore = isNaN(rawScore) ? 0 : rawScore;
-
-        renderStars = function (score) { //별 칠하기
-            stars.forEach(star => {
-                const starVal = parseInt(star.getAttribute("data-score"), 10);
-                if (starVal <= score) {
-                    star.classList.add("active");
-                } else {
-                    star.classList.remove("active");
-                }
-            });
-        };
-
-        stars.forEach(star => {
-            star.addEventListener("click", function () { //클릭
-                selectedScore = parseInt(this.getAttribute("data-score"), 10);
-                if (ratingInput) {
-                    ratingInput.value = selectedScore;
-                }
-                renderStars(selectedScore);
-            });
-
-            star.addEventListener("mouseenter", function () { //호버
-                const hoverScore = parseInt(this.getAttribute("data-score"), 10);
-                renderStars(hoverScore);
-            });
-        });
-
-        starRating.addEventListener("mouseleave", function () { //클릭한 적 없다면 초기 상태로
-            renderStars(selectedScore);
-        });
-
-        // 초기 상태: 빈 별
-        renderStars(selectedScore);
-    }
-
-    if (btnCancelReview && reviewWriteBox) {
-        btnCancelReview.addEventListener("click", function () {
-            reviewWriteBox.style.display = "none";
-            if (btnToggleReview) {
-                btnToggleReview.style.display = ""; // 후기 작성 버튼 다시 보이기
-            }
-            selectedScore = 0;
-            if (ratingInput) ratingInput.value = "0";
-            if (renderStars) renderStars(0);
-        });
-    }
-
-    if (btnSubmitReview) {
-        btnSubmitReview.addEventListener("click", function () {
-            if (selectedScore === 0) {
-                alert("별점을 선택해주세요.");
-                return;
-            }
-            if (!reviewContentInput || !reviewContentInput.value.trim()) {
-                alert("후기 내용을 입력해주세요.");
-                if (reviewContentInput) reviewContentInput.focus();
-                return;
-            }
-            alert("후기가 입력되었습니다.");
-        });
-    }
     });
+</script>
+<script>
+    // 1. 후기 작성 모달 열기 (비로그인 체크)
+    function openReviewModal() {
+        const userId = "{{ request.session.user_id|default:'' }}";
+        if (!userId) {
+            alert('로그인이 필요한 서비스입니다.');
+            window.location.href = '{% url "login" %}';
+            return;
+        }
+        document.getElementById('reviewModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    // 2. 후기 작성 모달 닫기
+    function closeReviewModal() {
+        document.getElementById('reviewModal').style.display = 'none';
+        document.body.style.overflow = '';
+        document.getElementById('reviewForm').reset();
+        modalSelectedScore = 0;
+        document.getElementById('modal-rating-input').value = '0';
+        renderModalStars(0);
+    }
+
+    // 3. 모달 별점 위젯 인터랙션
+    let modalSelectedScore = 0;
+
+    function renderModalStars(score) {
+        document.querySelectorAll('#modal-star-rating .star').forEach(function (star) {
+            const starVal = parseInt(star.getAttribute('data-score'), 10);
+            star.classList.toggle('active', starVal <= score);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const modalStarRating = document.getElementById('modal-star-rating');
+        if (!modalStarRating) return;
+
+        modalStarRating.querySelectorAll('.star').forEach(function (star) {
+            star.addEventListener('click', function () {
+                modalSelectedScore = parseInt(this.getAttribute('data-score'), 10);
+                document.getElementById('modal-rating-input').value = modalSelectedScore;
+                renderModalStars(modalSelectedScore);
+            });
+
+            star.addEventListener('mouseenter', function () {
+                renderModalStars(parseInt(this.getAttribute('data-score'), 10));
+            });
+        });
+
+        modalStarRating.addEventListener('mouseleave', function () {
+            renderModalStars(modalSelectedScore);
+        });
+    });
+
+    // 4. 후기 등록 (AJAX 요청)
+    function submitReview(event) {
+        event.preventDefault();
+
+        const spotCode = "{{ spot.contentid }}";
+        const rating = document.getElementById('modal-rating-input').value;
+        const content = document.getElementById('reviewContent').value.trim();
+
+        if (rating === '0') {
+            alert('별점을 선택해주세요.');
+            return;
+        }
+        if (!content) {
+            alert('후기 내용을 입력해주세요.');
+            return;
+        }
+
+        fetch('{% url "review_add" %}', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                spot_code: spotCode,
+                rating: rating,
+                content: content
+            })
+        })
+        .then(res => {
+            if (res.status === 401) {
+                alert('로그인이 필요한 서비스입니다.');
+                window.location.href = '{% url "login" %}';
+                return null;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+            if (data.result === 'ok') {
+                alert('후기가 성공적으로 등록되었습니다!');
+                window.location.reload(); // 새로고침하여 등록된 후기 바로 반영
+            } else {
+                alert(data.message || '후기 등록에 실패했습니다.');
+            }
+        })
+        .catch(() => {
+            alert('네트워크 오류가 발생했습니다.');
+        });
+    }
 </script>
 {% endblock %}
