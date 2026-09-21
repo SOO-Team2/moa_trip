@@ -479,10 +479,10 @@
 }
 
 .weather-today>div:first-child {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--color-primary);
-  margin-bottom: 6px;
+  margin-bottom: 14px;
 }
 
 .w-temp {
