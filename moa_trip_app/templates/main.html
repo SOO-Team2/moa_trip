@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/main.css' %}">
+<link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.1">
 {% endblock %}
 
 {% block content %}
@@ -70,24 +70,24 @@
             {% if pet_items %}
             {% for item in pet_items %}
             <div class="card pet-card" onclick="location.href='{% url 'detail' %}?contentid={{ item.contentid }}'">
-            <div class="pet-card-thumb">
-                {% if item.firstimage %}
-                    <img src="{{ item.firstimage}}"  alt="{{ item.title}}">
-                {% endif %}
-            </div>
-            <div class="pet-card-body">
-                <div style="margin-bottom: 8px;">
-                    <span class="badge-pet">반려동물 OK</span>
+                <div class="pet-card-thumb">
+                    {% if item.firstimage %}
+                    <img src="{{ item.firstimage}}" alt="{{ item.title}}">
+                    {% endif %}
                 </div>
-                <h3>{{item.title}}</h3>
-                <p class="pet-location">{{item.addr1 | short_addr}}</p>
+                <div class="pet-card-body">
+                    <div style="margin-bottom: 8px;">
+                        <span class="badge-pet">반려동물 OK</span>
+                    </div>
+                    <h3>{{item.title}}</h3>
+                    <p class="pet-location">{{item.addr1 | short_addr}}</p>
+                </div>
             </div>
-        </div>
             {% endfor %}
-        {% endif %}
+            {% endif %}
         </div>
     </div>
-    
+
     <section class="cta-section">
         <h2>지금 로그인하고 나만의 여행 만들기</h2>
         <a href="{% url 'login' %}" class="btn-hero-primary">시작하기</a>

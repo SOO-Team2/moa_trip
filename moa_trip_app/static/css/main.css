@@ -99,16 +99,9 @@
   transform: scale(1.05);
 }
 
-/* Fallback placeholder when img src is empty or broken */
 .spot-card-thumb::after {
-  content: '🏝️';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 36px;
-  opacity: 0.3;
-  pointer-events: none;
+  display: none !important;
+  content: none !important;
 }
 
 .spot-card-badge {
