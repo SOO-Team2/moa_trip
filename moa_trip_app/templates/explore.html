@@ -12,6 +12,8 @@
 {% endblock %}
 
 {% block content %}
+{% url 'explore' as explore_url %}
+{% url 'detail' as detail_url %}
 <div class="explore-layout">
   <aside class="explore-content-left">
     <h1>관광지 탐색</h1>
@@ -42,11 +44,11 @@
       <div class="explore-filter-rating">
         <h3>평점</h3>
         <div class="rating-filter-group">
-          <input type="radio" name="min_rating" id="rating-45" value="4.5" class="rating-radio">
+          <input type="radio" name="min_rating" id="rating-45" value="4.5" class="rating-radio" {% if selected_rating == '4.5' %}checked{% endif %}>
           <label for="rating-45" class="rating-filter-btn">4.5 이상</label>
-          <input type="radio" name="min_rating" id="rating-40" value="4.0" class="rating-radio">
+          <input type="radio" name="min_rating" id="rating-40" value="4.0" class="rating-radio" {% if selected_rating == '4.0' %}checked{% endif %}>
           <label for="rating-40" class="rating-filter-btn">4.0 이상</label>
-          <input type="radio" name="min_rating" id="rating-35" value="3.5" class="rating-radio">
+          <input type="radio" name="min_rating" id="rating-35" value="3.5" class="rating-radio" {% if selected_rating == '3.5' %}checked{% endif %}>
           <label for="rating-35" class="rating-filter-btn">3.5 이상</label>
         </div>
       </div>
@@ -55,7 +57,7 @@
       <div class="filter-actions">
         <button type="submit">필터 적용</button>
         <div class="filter-reset-wrapper">
-          <button type="button" onclick="location.href='{% url 'explore' %}'">초기화</button>
+          <button type="button" onclick="location.href='{{ explore_url }}'">초기화</button>
         </div>
       </div>
     </form>
@@ -82,7 +84,7 @@
       {% if spots %}
       {% for spot in spots %}
       <article class="explore-card"
-        onclick="location.href='{% url 'detail' %}?contentid={{ spot.contentid }}&areacode={{ spot.areacode|default:selected_region }}'"
+        onclick="location.href='{{ detail_url }}?contentid={{ spot.contentid }}&areacode={{ spot.areacode|default:selected_region }}'"
         style="cursor: pointer;">
         <!-- 1. 이미지 영역 (CSS: .explore-card-image) -->
         <div class="explore-card-image">

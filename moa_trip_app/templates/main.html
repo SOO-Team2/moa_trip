@@ -11,6 +11,7 @@
 {% endblock %}
 
 {% block content %}
+{% url 'detail' as detail_url %}
 <section class="hero-section">
     <h1 class="hero-title">어디로 떠날까요?</h1>
     <p class="hero-subtitle">내 일정과 조건에 맞는 국내 여행지를 한눈에 발견해보세요</p>
@@ -30,7 +31,7 @@
         <div class="spot-grid-4">
             {% if tour_items %}
             {% for item in tour_items %}
-            <article class="spot-card" onclick="location.href='{% url 'detail' %}?contentid={{ item.contentid }}'">
+            <article class="spot-card" onclick="location.href='{{ detail_url }}?contentid={{ item.contentid }}'">
                 <!-- 1. 썸네일 영역 -->
                 <div class="spot-card-thumb">
                     {% if item.firstimage %}
@@ -74,7 +75,7 @@
         <div class="pet-grid-3">
             {% if pet_items %}
             {% for item in pet_items %}
-            <div class="pet-card" onclick="location.href='{% url 'detail' %}?contentid={{ item.contentid }}'">
+            <div class="pet-card" onclick="location.href='{{ detail_url }}?contentid={{ item.contentid }}'">
                 <div class="pet-card-thumb">
                     {% if item.firstimage %}
                     <img src="{{ item.firstimage}}" alt="{{ item.title}}">
