@@ -1,5 +1,5 @@
 import uuid
-from django.db.models import Avg
+from django.db.models import Avg, Count
 from django.http import JsonResponse
 from django.utils import timezone
 import math
@@ -27,7 +27,28 @@ def main(request):
     tour_raw = fetch_public_data(tour_url, extra_params=extra_params)
     all_tour_items = api_items(tour_raw)
     tour_items = random.sample(all_tour_items, min(len(all_tour_items), 8))
-    
+
+    # 추가(추천 관광지 카드에 실제 평점/후기 갯수 반영)
+    content_ids = [item.get('contentid') for item in tour_items if item.get('contentid')]
+    review_stats = {}
+    if content_ids:
+        stats = (
+            Review.objects.filter(spot_id__in=content_ids)
+            .values('spot_id')
+            .annotate(avg_rating=Avg('rating'), review_count=Count('review_code'))
+        )
+        for stat in stats:
+            rounded_avg = round(stat['avg_rating'], 1)
+            review_stats[stat['spot_id']] = {
+                'avg_rating' : int(rounded_avg) if rounded_avg.is_integer() else rounded_avg,
+                'review_count' : stat['review_count'],
+            }
+
+    for item in tour_items:
+        stat = review_stats.get(item.get('contentid'), {})
+        item['avg_rating'] = stat.get('avg_rating', 0)
+        item['review_count'] = stat.get('review_count', 0)
+
     # 2. 반려동물 동반 가능 관광지 랜덤 조회
     pet_url = "http://apis.data.go.kr/B551011/KorPetTourService2/areaBasedList2"
     pet_params ={
@@ -83,6 +104,27 @@ def explore(request):
     is_pet = bool(selected_pet)
     for spot in spots:
         spot['is_pet_allowed'] = is_pet
+
+    # --- 추가 (관광지 카드에 실제 평점/후기 개수 반영)
+    content_ids = [spot.get('contentid') for spot in spots if spot.get('contentid')]
+    review_stats = {}
+    if content_ids:
+        stats = (
+            Review.objects.filter(spot_id__in=content_ids)
+            .values('spot_id')
+            .annotate(avg_rating=Avg('rating'), review_count=Count('review_code'))
+        )
+        for stat in stats:
+            rounded_avg = round(stat['avg_rating'], 1)
+            review_stats[stat['spot_id']] = {
+                'avg_rating': int(rounded_avg) if rounded_avg.is_integer() else rounded_avg,
+                'review_count': stat['review_count'],
+            }
+
+    for spot in spots:
+        stat = review_stats.get(spot.get('contentid'), {})
+        spot['avg_rating'] = stat.get('avg_rating', 0)
+        spot['review_count'] = stat.get('review_count', 0)
 
     user_id = request.session.get('user_id')
     favorited_spot_codes = set(
