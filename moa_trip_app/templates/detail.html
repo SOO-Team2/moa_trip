@@ -83,7 +83,7 @@
         </div>
 
         <div class="review-header">
-            <div class="section-title">후기{{ review_count }}개</div>
+            <div class="section-title">후기 {{ review_count }}개</div>
             <button type="button" class="review-write-btn" onclick="openReviewModal()">후기 작성</button>
         </div>
 
@@ -99,7 +99,7 @@
         </div>
         {% empty %}
         <div style="text-align: center; padding: 40px 0; color: #94A3B8;">
-            아직 등록된 후기가 없습니다. 첫 번째 후기를 남겨보세요!
+            아직 등록된 후기가 없습니다.
         </div>
         {% endfor %}
         </div>
@@ -164,31 +164,13 @@
                 <label>평점</label>
                 <div class="star-rating-wrap">
                     <div class="star-rating" id="modal-star-rating" role="radiogroup">
-                        <span class="star" data-score="1">
+                        {% for i in "12345" %}
+                        <span class="star" data-score="{{ forloop.counter }}">
                             <svg viewBox="0 0 24 24" class="star-icon">
                                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                             </svg>
                         </span>
-                        <span class="star" data-score="2">
-                            <svg viewBox="0 0 24 24" class="star-icon">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg>
-                        </span>
-                        <span class="star" data-score="3">
-                            <svg viewBox="0 0 24 24" class="star-icon">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg>
-                        </span>
-                        <span class="star" data-score="4">
-                            <svg viewBox="0 0 24 24" class="star-icon">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg>
-                        </span>
-                        <span class="star" data-score="5">
-                            <svg viewBox="0 0 24 24" class="star-icon">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg>
-                        </span>
+                        {% endfor %}
                     </div>
                     <input type="hidden" id="modal-rating-input" value="0">
                 </div>
@@ -291,7 +273,7 @@
             .then(function (data) {
                 if (!data) return;
                 if (data.result !== 'ok') {
-                    alert(data.message || '즐겨찾기 처리에 실패했습니다.');
+                    alert(data.message || '즐겨찾기 추가에 실패했습니다.');
                     return;
                 }
 
@@ -351,7 +333,7 @@
     });
 
     // ==========================================
-    // 초기화 후 이미지 크게 및 후기 작성
+    // 초기화 후 이미지 크게 보기
     // ==========================================
     document.addEventListener("DOMContentLoaded", function () {
         var galleryDivs = document.querySelectorAll('.spot-gallery > div');

@@ -419,11 +419,9 @@ def detail(request):
     weather_info = get_weather(spot.get('mapy'), spot.get('mapx'), area_code)
 
     # 7. 회원 닉네임 조회
-    user_nickname = request.session.get('nickname')
-    if user_id and not user_nickname:
-        user_obj = Users.objects.filter(user_id=user_id).first()
-        if user_obj:
-            user_nickname = user_obj.nickname
+    user_id = request.session.get('user_id')
+    user_obj = Users.objects.filter(user_id=user_id).first()
+    user_nickname = user_obj.nickname
 
     context = {
         "spot": spot,
@@ -436,6 +434,7 @@ def detail(request):
         "reviews": reviews,
         "review_count": review_count,
         "avg_rating": avg_rating,
+        "user_id": user_id,
         "user_nickname": user_nickname,
     }
     return render(request, 'detail.html', context)

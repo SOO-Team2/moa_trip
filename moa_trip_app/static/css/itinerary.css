@@ -193,9 +193,7 @@
 
 .btn-delete-itinerary:hover,
 .btn-delete-itinerary:active {
-  border-color: var(--color-primary);
-  background-color: var(--color-primary);
-  color: #ffffff;
+  background-color: #F3F4F6;
 }
 
 /* Timeline Items with connecting line */
