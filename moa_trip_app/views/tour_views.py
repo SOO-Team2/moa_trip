@@ -136,7 +136,7 @@ def explore(request):
 # 3. 상세 페이지 (관광지 상세 + 반려동물 정보 + 기상청 예보)
 # ==============================================================================
 def detail(request):
-    content_id = request.GET.get('contentid', '').strip()
+    content_id = (request.GET.get('contentid') or request.GET.get('spot_code') or '').strip()
     req_areacode = request.GET.get('areacode', '').strip()
 
     # --- 추가 (로그인 회원 및 해당 관광지 즐겨찾기 여부 조회)
@@ -420,8 +420,8 @@ def detail(request):
 
     # 7. 회원 닉네임 조회
     user_id = request.session.get('user_id')
-    user_obj = Users.objects.filter(user_id=user_id).first()
-    user_nickname = user_obj.nickname
+    user_obj = Users.objects.filter(user_id=user_id).first() if user_id else None
+    user_nickname = user_obj.nickname if user_obj else ''
 
     context = {
         "spot": spot,
