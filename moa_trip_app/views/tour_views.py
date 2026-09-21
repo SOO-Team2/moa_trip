@@ -399,11 +399,8 @@ def detail(request):
 
     # 7. 회원 닉네임 조회
     user_id = request.session.get('user_id')
-    user_nickname = request.session.get('nickname')
-    if user_id and not user_nickname:
-        user_obj = Users.objects.filter(user_id=user_id).first()
-        if user_obj:
-            user_nickname = user_obj.nickname
+    user_obj = Users.objects.filter(user_id=user_id).first()
+    user_nickname = user_obj.nickname
 
     context = {
         "spot": spot,
@@ -412,6 +409,7 @@ def detail(request):
         "today_weather": weather_info["today_weather"],
         "gallery": gallery_photos,
         "naver_client_id": getattr(settings, 'NAVER_CLIENT_ID', ''),
+        "user_id": user_id,
         "user_nickname": user_nickname,
     }
     return render(request, 'detail.html', context)

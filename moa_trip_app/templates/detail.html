@@ -7,60 +7,6 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/spot_detail.css' %}">
-<style>
-    .spot-gallery>div {
-        overflow: hidden;
-        border-radius: 8px;
-        cursor: pointer;
-        position: relative;
-    }
-
-    .spot-gallery>div::after {
-        pointer-events: none !important;
-    }
-
-    .spot-gallery img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center;
-        display: block;
-        position: relative;
-        z-index: 2;
-        cursor: zoom-in;
-        transition: transform 0.25s ease;
-    }
-
-    .spot-gallery>div:hover img {
-        transform: scale(1.03);
-    }
-
-    .image-zoom-overlay {
-        position: fixed;
-        inset: 0;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: 99999;
-        background: rgba(0, 0, 0, 0.88);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        cursor: zoom-out;
-        padding: 24px;
-        box-sizing: border-box;
-    }
-
-    .image-zoom-overlay img {
-        max-width: 90vw;
-        max-height: 90vh;
-        object-fit: contain;
-        border-radius: 8px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-        cursor: zoom-out;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -148,7 +94,7 @@
         <!-- 후기 작성 박스 (클릭 시 최상단 후기를 아래로 밀어내며 나타남) -->
         <div id="review-write-box" class="review-item" style="display: none;">
             <div class="r-top">
-                <span class="r-writer">{{ user_nickname|default:request.session.user_id }}</span>
+                <span class="r-writer">{{ user_nickname|default:user_id|default:"작성자" }}</span>
                 <div class="star-rating-wrap">
                     <div class="star-rating" id="star-rating" role="radiogroup">
                         <span class="star" data-score="1">
@@ -225,8 +171,7 @@
                     rel="noopener noreferrer"
                     style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 6px; width: 100%;">
                     <span>📍</span>
-                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{
-                        spot.addr1|default:"주소 정보 준비 중" }}</span>
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ spot.addr1|default:"주소 정보 준비 중" }}</span>
                     <span
                         style="margin-left: auto; font-size: 11px; color: var(--color-primary); font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px;">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
