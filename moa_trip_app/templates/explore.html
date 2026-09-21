@@ -44,11 +44,11 @@
       <div class="explore-filter-rating">
         <h3>평점</h3>
         <div class="rating-filter-group">
-          <input type="radio" name="min_rating" id="rating-45" value="4.5" class="rating-radio">
+          <input type="radio" name="min_rating" id="rating-45" value="4.5" class="rating-radio" {% if selected_rating == '4.5' %}checked{% endif %}>
           <label for="rating-45" class="rating-filter-btn">4.5 이상</label>
-          <input type="radio" name="min_rating" id="rating-40" value="4.0" class="rating-radio">
+          <input type="radio" name="min_rating" id="rating-40" value="4.0" class="rating-radio" {% if selected_rating == '4.0' %}checked{% endif %}>
           <label for="rating-40" class="rating-filter-btn">4.0 이상</label>
-          <input type="radio" name="min_rating" id="rating-35" value="3.5" class="rating-radio">
+          <input type="radio" name="min_rating" id="rating-35" value="3.5" class="rating-radio" {% if selected_rating == '3.5' %}checked{% endif %}>
           <label for="rating-35" class="rating-filter-btn">3.5 이상</label>
         </div>
       </div>
