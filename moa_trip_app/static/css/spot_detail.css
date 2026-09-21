@@ -57,7 +57,7 @@
 }
 
 .spot-gallery>div::after {
-  pointer-events: none;
+  pointer-events: none !important;
 }
 
 .spot-gallery .main-photo {
@@ -394,6 +394,7 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   flex-shrink: 0;
+  display: inline-block;
 }
 
 .r-content {
@@ -541,8 +542,8 @@
 .image-zoom-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9999;
-  background: rgba(0, 0, 0, 0.85);
+  z-index: 99999;
+  background: rgba(0, 0, 0, 0.88);
   display: none;
   align-items: center;
   justify-content: center;
@@ -556,10 +557,11 @@
   max-height: 90vh;
   object-fit: contain;
   border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
   cursor: zoom-out;
   animation: scaleIn 0.2s ease;
 }
+
 
 @keyframes fadeIn {
   from {
@@ -590,7 +592,7 @@
   inset: 0;
   z-index: 99999;
   background: rgba(0, 0, 0, 0.5);
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 20px;

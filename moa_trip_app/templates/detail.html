@@ -7,60 +7,6 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/spot_detail.css' %}">
-<style>
-    .spot-gallery>div {
-        overflow: hidden;
-        border-radius: 8px;
-        cursor: pointer;
-        position: relative;
-    }
-
-    .spot-gallery>div::after {
-        pointer-events: none !important;
-    }
-
-    .spot-gallery img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center;
-        display: block;
-        position: relative;
-        z-index: 2;
-        cursor: zoom-in;
-        transition: transform 0.25s ease;
-    }
-
-    .spot-gallery>div:hover img {
-        transform: scale(1.03);
-    }
-
-    .image-zoom-overlay {
-        position: fixed;
-        inset: 0;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: 99999;
-        background: rgba(0, 0, 0, 0.88);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        cursor: zoom-out;
-        padding: 24px;
-        box-sizing: border-box;
-    }
-
-    .image-zoom-overlay img {
-        max-width: 90vw;
-        max-height: 90vh;
-        object-fit: contain;
-        border-radius: 8px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-        cursor: zoom-out;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -68,24 +14,21 @@
     <div class="spot-gallery">
         <div class="main-photo" onclick="openZoom(this)">
             {% if gallery.photo1 %}
-            <img src="{{ gallery.photo1 }}" alt="{{ spot.title }}"
-                style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+            <img src="{{ gallery.photo1 }}" alt="{{ spot.title }}">
             {% else %}
             <span>대표 사진</span>
             {% endif %}
         </div>
         <div onclick="openZoom(this)">
             {% if gallery.photo2 %}
-            <img src="{{ gallery.photo2 }}" alt="{{ spot.title }}"
-                style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+            <img src="{{ gallery.photo2 }}" alt="{{ spot.title }}">
             {% else %}
             <span>사진</span>
             {% endif %}
         </div>
         <div class="more-photo" onclick="openZoom(this)">
             {% if gallery.photo3 %}
-            <img src="{{ gallery.photo3 }}" alt="{{ spot.title }}"
-                style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+            <img src="{{ gallery.photo3 }}" alt="{{ spot.title }}">
             {% else %}
             <span>사진</span>
             {% endif %}
@@ -166,7 +109,7 @@
             <div class="r-top">
                 <span class="r-writer">정명주</span>
                 <span>
-                    <svg viewBox="0 0 24 24" class="review-star-icon" style="width: 15px; height: 15px; fill: var(--color-rating); stroke: var(--color-rating); stroke-width: 2; display: inline-block;">
+                    <svg viewBox="0 0 24 24" class="review-star-icon">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                     </svg>
                     평점 5.0 · 2026.09.02
@@ -216,13 +159,11 @@
 </div>
 
 <!-- 이미지 확대 오버레이-->
-<div id="imageZoomOverlay" class="image-zoom-overlay" onclick="closeZoom()"
-    style="display: none; position: fixed; inset: 0; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; background: rgba(0, 0, 0, 0.88); align-items: center; justify-content: center; cursor: zoom-out; padding: 24px; box-sizing: border-box;">
-    <img id="zoomImg" src="" alt="{{ spot.title }}"
-        style="max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); cursor: zoom-out;">
+<div id="imageZoomOverlay" class="image-zoom-overlay" onclick="closeZoom()">
+    <img id="zoomImg" src="" alt="{{ spot.title }}">
 </div>
 <!-- 후기 작성 모달 팝업 -->
-<div id="reviewModal" class="review-modal-overlay" style="display: none;">
+<div id="reviewModal" class="review-modal-overlay">
     <div class="review-modal-box">
         <div class="review-modal-header">
             <h3>후기 작성</h3>
