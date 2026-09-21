@@ -1,4 +1,5 @@
 import math
+import random
 import re
 from django.conf import settings
 from django.shortcuts import render
@@ -8,20 +9,35 @@ from ..constants import REGION_FILTERS, get_region
 
 
 # ==============================================================================
-# 1. 메인 (추천 관광지 8개)
+# 1. 메인 (랜덤 추천 관광지 8개 + 반려동물 동반 가능 관광지 랜덤 3개 조회)
 # ==============================================================================
 def main(request):
+    # 1. 랜덤 추천 관광지 8개
     tour_url = "http://apis.data.go.kr/B551011/KorService2/areaBasedList2"
     extra_params = {
         "contentTypeId": "12",
-        "numOfRows": 8,
-        "arrange": "O",
+        "numOfRows": 30,
+        "pageNo" : random.randint(1, 10),
+        "arrange": "Q",
     }
     tour_raw = fetch_public_data(tour_url, extra_params=extra_params)
-    tour_items = api_items(tour_raw)
+    all_tour_items = api_items(tour_raw)
+    tour_items = random.sample(all_tour_items, min(len(all_tour_items), 8))
+    
+    # 2. 반려동물 동반 가능 관광지 랜덤 조회
+    pet_url = "http://apis.data.go.kr/B551011/KorPetTourService2/areaBasedList2"
+    pet_params ={
+        "contentTypeId": "12",
+        "numOfRows" : 30,
+        "pageNo" : random.randint(1, 5),
+        "arrange" : "Q",
+    }
+    pet_raw = fetch_public_data(pet_url, extra_params=pet_params)
+    all_pet_items = api_items(pet_raw)
 
-    return render(request, 'main.html', {"tour_items": tour_items})
+    pet_items = random.sample(all_pet_items, min(len(all_pet_items), 3))
 
+    return render(request, 'main.html', {"tour_items": tour_items, "pet_items": pet_items,})
 
 # ==============================================================================
 # 2. 관광지 (explore)
