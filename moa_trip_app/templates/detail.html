@@ -91,7 +91,7 @@
             {% for r in reviews %}
             <div class="review-item">
                 <div class="r-top">
-                    <span class="r-writer"> {{ user_nickname | default:user_id }}</span>
+                    <span class="r-writer">{{ r.user.nickname | default:r.user.user_id }}</span>
                         <span>★ 평점 {{ r.rating }} · {{ r.create_date|date:"Y.m.d" }}</span>
                         <div class="r-content"> {{r.content}}
                 </div>
