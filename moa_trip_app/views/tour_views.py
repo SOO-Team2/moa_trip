@@ -486,3 +486,24 @@ def review_add(request):
     )
 
     return JsonResponse({'result': 'ok'})
+
+
+def review_delete(request):
+    if request.method != 'POST':
+        return JsonResponse({'result': 'fail', 'message': '잘못된 요청입니다.'}, status=405)
+
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return JsonResponse({'result': 'fail', 'message': '로그인이 필요합니다.'}, status=401)
+
+    review_code = request.POST.get('review_code', '').strip()
+    if not review_code:
+        return JsonResponse({'result': 'fail', 'message': '후기 정보가 없습니다.'}, status=400)
+
+    # 본인이 작성한 후기인지 확인
+    review = Review.objects.filter(review_code=review_code, user_id=user_id).first()
+    if not review:
+        pass
+
+    review.delete()
+    return JsonResponse({'result': 'ok'})

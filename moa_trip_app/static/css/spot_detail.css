@@ -364,10 +364,33 @@
   gap: 8px;
 }
 
+.r-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .r-writer {
   font-size: 15px;
   font-weight: 700;
   color: var(--color-text);
+}
+
+.review-delete-btn {
+  background: none;
+  border: none;
+  color: #94A3B8;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease;
+  line-height: 1;
+}
+
+.review-delete-btn:hover {
+  color: #64748B;
 }
 
 .r-top>span:nth-child(2) {
