@@ -45,8 +45,7 @@
         {% endif %}
 
         <h1 class="spot-title">{{ spot.title }}</h1>
-        <div class="spot-sub">
-            {{ spot.addr1|default:"주소 정보 준비 중" }} · 평점 {{ avg_rating }} · 후기 {{ review_count }}
+        <div class="spot-sub">{{ spot.addr1|default:"주소 정보 준비 중" }} · 평점 {{ avg_rating }} · 후기 {{ review_count }}
         </div>
 
         <div class="info-table">
@@ -96,7 +95,6 @@
                         r.user.nickname | default:r.user.user_id }}</span>
                         <span>★ 평점 {{ r.rating }}.0 · {{ r.create_date|date:"Y.m.d" }}</span>
                         <div class="r-content"> {{r.content}}
-                        </div>
                 </div>
             </div>
         </div>
@@ -105,8 +103,8 @@
             아직 등록된 후기가 없습니다. 첫 번째 후기를 남겨보세요!
         </div>
         {% endfor %}
+        </div>
     </div>
-
     <div class="spot-sidebar">
         <div class="weather-today">
             <div>실시간 날씨</div>
@@ -127,8 +125,7 @@
                     rel="noopener noreferrer"
                     style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 6px; width: 100%;">
                     <span>📍</span>
-                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{
-                        spot.addr1|default:"주소 정보 준비 중" }} · 평점 {{ avg_rating }} · 후기 {{ review_count }}</span>
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ spot.addr1|default:"주소 정보 준비 중" }}</span>
                     <span
                         style="margin-left: auto; font-size: 11px; color: var(--color-primary); font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px;">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
