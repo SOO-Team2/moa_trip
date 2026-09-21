@@ -102,7 +102,13 @@
         <ul class="mypage-review-list">
           {% for review in reviews %}
           <li class="mypage-review-item">
-            <div class="review-thumb">🌅</div>
+            <div class="review-thumb">
+              {% if review.spot.image %}
+              <img src="{{ review.spot.image }}" alt="{{ review.spot.t_name }}">
+              {% else %}
+              🌅
+              {% endif %}
+            </div>
             <div class="review-content">
               <h3>{{ review.spot.t_name }}</h3>
               <p>{{ review.content }}</p>
