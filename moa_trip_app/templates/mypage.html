@@ -64,9 +64,10 @@
 
         <!-- 관광지 카드 그리드 (API 반복문) -->
         <div class="mypage-spot-grid">
+          {% url 'detail' as detail_url %}
           {% for favorite in favorites %}
           <article class="mypage-spot-card"
-            onclick="location.href='{% url 'detail' %}?contentid={{ favorite.spot.spot_code }}'">
+            onclick="location.href='{{ detail_url}}?contentid={{ favorite.spot.spot_code }}'">
             <div class="mypage-spot-thumb">
               {% if favorite.spot.image.name and 'http' in favorite.spot.image.name %}
               <img src="{{ favorite.spot.image.name }}" alt="{{ favorite.spot.t_name }}"
