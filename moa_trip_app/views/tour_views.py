@@ -1,9 +1,13 @@
+import uuid
+from django.db.models import Avg
+from django.http import JsonResponse
+from django.utils import timezone
 import math
 import random
 import re
 from django.conf import settings
 from django.shortcuts import render
-from ..models import Favorite, Users
+from ..models import Favorite, Review, TouristSpot, Users
 from ..utils import fetch_public_data, api_items, api_totalcount, get_weather, to_grid
 from ..constants import REGION_FILTERS, get_region
 
@@ -134,6 +138,23 @@ def explore(request):
 def detail(request):
     content_id = request.GET.get('contentid', '').strip()
     req_areacode = request.GET.get('areacode', '').strip()
+
+    # --- 추가 (로그인 회원 및 해당 관광지 즐겨찾기 여부 조회)
+    user_id = request.session.get('user_id')
+    is_favorited = False
+    if user_id and content_id:
+        is_favorited = Favorite.objects.filter(user_id=user_id, spot_id=content_id).exists()
+
+    # ---추가 (해당 관광지의 후기 목록 및 평점 통계 조회)
+    reviews = []
+    review_count = 0
+    avg_rating = 0.0
+    if content_id:
+        reviews = Review.objects.filter(spot_id=content_id).select_related('user').order_by('-create_date')
+        review_count = reviews.count()
+        if review_count > 0:
+            avg = reviews.aggregate(Avg('rating'))['rating__avg']
+            avg_rating = round(avg, 1) if avg else 0.0
 
     spot = {}
     area_code = req_areacode if req_areacode and req_areacode != 'all' else "39"
@@ -398,7 +419,6 @@ def detail(request):
     weather_info = get_weather(spot.get('mapy'), spot.get('mapx'), area_code)
 
     # 7. 회원 닉네임 조회
-    user_id = request.session.get('user_id')
     user_nickname = request.session.get('nickname')
     if user_id and not user_nickname:
         user_obj = Users.objects.filter(user_id=user_id).first()
@@ -412,6 +432,52 @@ def detail(request):
         "today_weather": weather_info["today_weather"],
         "gallery": gallery_photos,
         "naver_client_id": getattr(settings, 'NAVER_CLIENT_ID', ''),
+        "is_favorited": is_favorited,
+        "reviews": reviews,
+        "review_count": review_count,
+        "avg_rating": avg_rating,
         "user_nickname": user_nickname,
     }
     return render(request, 'detail.html', context)
+
+def review_add(request):
+    if request.method != 'POST':
+        return JsonResponse({'result': 'fail', 'message': '잘못된 요청입니다.'}, status=405)
+
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return JsonResponse({'result': 'fail', 'message': '로그인이 필요합니다.'}, status=401)
+
+    spot_code = request.POST.get('spot_code', '').strip()
+    rating = request.POST.get('rating', '5').strip()
+    content = request.POST.get('content', '').strip()
+
+    if not spot_code:
+        return JsonResponse({'result': 'fail', 'message': '관광지 정보가 없습니다.'}, status=400)
+    if not content:
+        return JsonResponse({'result': 'fail', 'message': '후기 내용을 입력해주세요.'}, status=400)
+
+    try:
+        rating_val = int(rating)
+        if rating_val < 1 or rating_val > 5:
+            rating_val = 5
+    except ValueError:
+        rating_val = 5
+
+    # 관광지가 DB에 없으면 자동 등록
+    spot = TouristSpot.objects.insert_from_api(spot_code)
+    if not spot:
+        return JsonResponse({'result': 'fail', 'message': '관광지 정보를 불러올 수 없습니다.'}, status=404)
+
+    # 후기 생성 (REVIEW 테이블 INSERT)
+    review_code = 'REV' + uuid.uuid4().hex[:17].upper()
+    Review.objects.create(
+        review_code=review_code,
+        user_id=user_id,
+        spot=spot,
+        rating=rating_val,
+        create_date=timezone.now(),
+        content=content,
+    )
+
+    return JsonResponse({'result': 'ok'})
