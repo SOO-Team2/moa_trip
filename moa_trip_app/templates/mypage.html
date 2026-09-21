@@ -64,9 +64,10 @@
 
         <!-- 관광지 카드 그리드 (API 반복문) -->
         <div class="mypage-spot-grid">
+          {% url 'detail' as detail_url %}
           {% for favorite in favorites %}
           <article class="mypage-spot-card"
-            onclick="location.href='{% url 'detail' %}?contentid={{ favorite.spot.spot_code }}'">
+            onclick="location.href='{{ detail_url}}?contentid={{ favorite.spot.spot_code }}'">
             <div class="mypage-spot-thumb">
               {% if favorite.spot.image.name and 'http' in favorite.spot.image.name %}
               <img src="{{ favorite.spot.image.name }}" alt="{{ favorite.spot.t_name }}"
@@ -113,10 +114,18 @@
               <h3>{{ review.spot.t_name }}</h3>
               <p>{{ review.content }}</p>
             </div>
-            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0;">
+            <div style="display: flex; flex-direction: row; align-items: flex-end; gap: 10px; flex-shrink: 0;">
               {% if review.rating %}
-              <span style="font-size: 13px; font-weight: 700; color: var(--color-rating, #F59E0B);">★ {{ review.rating }}.0</span>
+              <span style="font-size: 13px; font-weight: 700; color: var(--color-rating, #F59E0B); display: inline-flex; align-items: center; gap: 4px;">
+                <svg width="18" height="18" viewBox="0 0 24 24"
+                  style="fill: var(--color-rating); stroke: var(--color-rating); flex-shrink: 0;">
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+                {{ review.rating }}.0
+              </span>
               {% endif %}
+
               <span class="review-date">{{ review.create_date|date:"Y.m.d" }}</span>
             </div>
           </li>
