@@ -74,7 +74,7 @@
         <div class="pet-grid-3">
             {% if pet_items %}
             {% for item in pet_items %}
-            <div class="card pet-card" onclick="location.href='{% url 'detail' %}?contentid={{ item.contentid }}'">
+            <div class="pet-card" onclick="location.href='{% url 'detail' %}?contentid={{ item.contentid }}'">
                 <div class="pet-card-thumb">
                     {% if item.firstimage %}
                     <img src="{{ item.firstimage}}" alt="{{ item.title}}">
