@@ -99,13 +99,64 @@
 
         <div class="review-header">
             <div class="section-title">후기 212개</div>
-            <button class="review-write-btn">후기 작성</button>
+            <button type="button" class="review-write-btn" id="btn-toggle-review">후기 작성</button>
+        </div>
+
+        <!-- 후기 작성 박스 (클릭 시 최상단 후기를 아래로 밀어내며 나타남) -->
+        <div id="review-write-box" class="review-item" style="display: none;">
+            <div class="r-top">
+                <span class="r-writer">{{ request.session.nickname|default:request.session.user_id }}</span>
+                <div class="star-rating-wrap">
+                    <div class="star-rating" id="star-rating" role="radiogroup">
+                        <span class="star" data-score="1">
+                            <svg viewBox="0 0 24 24" class="star-icon">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                        </span>
+                        <span class="star" data-score="2">
+                            <svg viewBox="0 0 24 24" class="star-icon">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                        </span>
+                        <span class="star" data-score="3">
+                            <svg viewBox="0 0 24 24" class="star-icon">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                        </span>
+                        <span class="star" data-score="4">
+                            <svg viewBox="0 0 24 24" class="star-icon">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                        </span>
+                        <span class="star" data-score="5">
+                            <svg viewBox="0 0 24 24" class="star-icon">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                        </span>
+                    </div>
+                    <input type="hidden" id="review-rating-input" value="0">
+                </div>
+            </div></br>
+
+            <div class="review-textarea-wrap">
+                <textarea id="review-content-input" class="review-textarea" placeholder="작성자님의 솔직한 후기를 남겨주세요. (최대 255자)" maxlength="255"></textarea>
+            </div>
+
+            <div class="review-write-actions">
+                <button type="button" class="review-btn-cancel" id="btn-cancel-review">취소</button>
+                <button type="button" class="review-btn-submit" id="btn-submit-review">작성</button>
+            </div>
         </div>
 
         <div class="review-item">
             <div class="r-top">
                 <span class="r-writer">정명주</span>
-                <span>★ 평점 5.0 · 2026.09.02</span>
+                <span>
+                    <svg viewBox="0 0 24 24" class="review-star-icon" style="width: 15px; height: 15px; fill: var(--color-rating); stroke: var(--color-rating); stroke-width: 2; display: inline-block;">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                    평점 5.0 · 2026.09.02
+                </span>
                 <div class="r-content">
                     강아지와 함께 해변을 걸을 수 있어서 너무 좋았습니다. 바다 색깔도 에메랄드빛이고 주차장에서 해변까지 도보 3분 정도로 아주 가깝습니다.
                 </div>
@@ -197,4 +248,115 @@
     });
 </script>
 {% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const btnToggleReview = document.getElementById("btn-toggle-review");
+    const reviewWriteBox = document.getElementById("review-write-box");
+    const btnCancelReview = document.getElementById("btn-cancel-review");
+    const btnSubmitReview = document.getElementById("btn-submit-review");
+    const reviewContentInput = document.getElementById("review-content-input");
+    const starRating = document.getElementById("star-rating");
+    const ratingInput = document.getElementById("review-rating-input");
+
+    // 로그인 확인
+    const isLoggedIn = {% if request.session.user_id %}true{% else %}false{% endif %};
+
+    if (btnToggleReview && reviewWriteBox) { //AND
+        btnToggleReview.addEventListener("click", function () {
+            if (!isLoggedIn) {
+                if (confirm("로그인이 필요한 서비스입니다.")) {
+                    window.location.href = "{% url 'login' %}?next=" + encodeURIComponent(window.location.pathname + window.location.search); //로그인 후 상세 페이지 복귀
+                }
+                return;
+            }
+
+            // 작성 폼 펼치기/접기
+            if (reviewWriteBox.style.display === "none" || !reviewWriteBox.style.display) { //OR
+                reviewWriteBox.style.display = "block";
+                btnToggleReview.style.display = "none"; // 후기 작성 버튼 숨기기
+                reviewWriteBox.style.animation = "none";
+                reviewWriteBox.offsetHeight; //애니메이션 꺼짐 인식
+                reviewWriteBox.style.animation = "slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards";
+                if (reviewContentInput) {
+                    reviewContentInput.focus(); //자동 커서
+                }
+            } else {
+                reviewWriteBox.style.display = "none";
+                btnToggleReview.style.display = "";
+            }
+        });
+    }
+
+    let selectedScore = 0;
+    let renderStars = null;
+
+    // 별점 인터랙션
+    if (starRating) {
+        const stars = starRating.querySelectorAll(".star");
+        const rawScore = ratingInput ? parseInt(ratingInput.value, 10) : 0;
+        selectedScore = isNaN(rawScore) ? 0 : rawScore;
+
+        renderStars = function (score) { //별 칠하기
+            stars.forEach(star => {
+                const starVal = parseInt(star.getAttribute("data-score"), 10);
+                if (starVal <= score) {
+                    star.classList.add("active");
+                } else {
+                    star.classList.remove("active");
+                }
+            });
+        };
+
+        stars.forEach(star => {
+            star.addEventListener("click", function () { //클릭
+                selectedScore = parseInt(this.getAttribute("data-score"), 10);
+                if (ratingInput) {
+                    ratingInput.value = selectedScore;
+                }
+                renderStars(selectedScore);
+            });
+
+            star.addEventListener("mouseenter", function () { //호버
+                const hoverScore = parseInt(this.getAttribute("data-score"), 10);
+                renderStars(hoverScore);
+            });
+        });
+
+        starRating.addEventListener("mouseleave", function () { //클릭한 적 없다면 초기 상태로
+            renderStars(selectedScore);
+        });
+
+        // 초기 상태: 빈 별
+        renderStars(selectedScore);
+    }
+
+    if (btnCancelReview && reviewWriteBox) {
+        btnCancelReview.addEventListener("click", function () {
+            reviewWriteBox.style.display = "none";
+            if (btnToggleReview) {
+                btnToggleReview.style.display = ""; // 후기 작성 버튼 다시 보이기
+            }
+            selectedScore = 0;
+            if (ratingInput) ratingInput.value = "0";
+            if (renderStars) renderStars(0);
+        });
+    }
+
+    if (btnSubmitReview) {
+        btnSubmitReview.addEventListener("click", function () {
+            if (selectedScore === 0) {
+                alert("별점을 선택해주세요.");
+                return;
+            }
+            if (!reviewContentInput || !reviewContentInput.value.trim()) {
+                alert("후기 내용을 입력해주세요.");
+                if (reviewContentInput) reviewContentInput.focus();
+                return;
+            }
+            alert("후기가 입력되었습니다.");
+        });
+    }
+});
+</script>
 {% endblock %}
