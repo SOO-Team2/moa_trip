@@ -8,42 +8,84 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/spot_detail.css' %}">
 <style>
-  .spot-gallery > div {
-    overflow: hidden;
-    border-radius: 8px;
-  }
-  .spot-gallery img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-    position: relative;
-    z-index: 2;
-  }
+    .spot-gallery>div {
+        overflow: hidden;
+        border-radius: 8px;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .spot-gallery>div::after {
+        pointer-events: none !important;
+    }
+
+    .spot-gallery img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+        position: relative;
+        z-index: 2;
+        cursor: zoom-in;
+        transition: transform 0.25s ease;
+    }
+
+    .spot-gallery>div:hover img {
+        transform: scale(1.03);
+    }
+
+    .image-zoom-overlay {
+        position: fixed;
+        inset: 0;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 99999;
+        background: rgba(0, 0, 0, 0.88);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: zoom-out;
+        padding: 24px;
+        box-sizing: border-box;
+    }
+
+    .image-zoom-overlay img {
+        max-width: 90vw;
+        max-height: 90vh;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+        cursor: zoom-out;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="spot-wrap">
     <div class="spot-gallery">
-        <div class="main-photo">
+        <div class="main-photo" onclick="openZoom(this)">
             {% if gallery.photo1 %}
-            <img src="{{ gallery.photo1 }}" alt="{{ spot.title }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+            <img src="{{ gallery.photo1 }}" alt="{{ spot.title }}"
+                style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
             {% else %}
             <span>대표 사진</span>
             {% endif %}
         </div>
-        <div>
+        <div onclick="openZoom(this)">
             {% if gallery.photo2 %}
-            <img src="{{ gallery.photo2 }}" alt="{{ spot.title }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+            <img src="{{ gallery.photo2 }}" alt="{{ spot.title }}"
+                style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
             {% else %}
             <span>사진</span>
             {% endif %}
         </div>
-        <div class="more-photo">
+        <div class="more-photo" onclick="openZoom(this)">
             {% if gallery.photo3 %}
-            <img src="{{ gallery.photo3 }}" alt="{{ spot.title }}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+            <img src="{{ gallery.photo3 }}" alt="{{ spot.title }}"
+                style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
             {% else %}
             <span>사진</span>
             {% endif %}
@@ -55,7 +97,8 @@
         <span class="badge-pet tag">반려동물 동반 가능</span>
         {% elif detail_info.pet_status == 'unknown' %}
         {% else %}
-        <span class="badge-pet tag" style="background-color: #F3F4F6; color: #6B7280; box-shadow: none;">반려동물 동반 불가</span>
+        <span class="badge-pet tag" style="background-color: #F3F4F6; color: #6B7280; box-shadow: none;">반려동물 동반
+            불가</span>
         {% endif %}
 
         <h1 class="spot-title">{{ spot.title }}</h1>
@@ -178,11 +221,16 @@
         <div class="sidebar-map">
             <div id="naver-map" style="width: 100%; height: 200px;"></div>
             <div class="map-address">
-                <a href="https://map.naver.com/v5/search/{{ spot.title|urlencode }}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 6px; width: 100%;">
+                <a href="https://map.naver.com/v5/search/{{ spot.title|urlencode }}" target="_blank"
+                    rel="noopener noreferrer"
+                    style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 6px; width: 100%;">
                     <span>📍</span>
-                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ spot.addr1|default:"주소 정보 준비 중" }}</span>
-                    <span style="margin-left: auto; font-size: 11px; color: var(--color-primary); font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px;">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{
+                        spot.addr1|default:"주소 정보 준비 중" }}</span>
+                    <span
+                        style="margin-left: auto; font-size: 11px; color: var(--color-primary); font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                             <polyline points="15 3 21 3 21 9"></polyline>
                             <line x1="10" y1="14" x2="21" y2="3"></line>
@@ -193,11 +241,19 @@
         </div>
     </div>
 </div>
+
+<!-- 이미지 확대 오버레이-->
+<div id="imageZoomOverlay" class="image-zoom-overlay" onclick="closeZoom()"
+    style="display: none; position: fixed; inset: 0; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; background: rgba(0, 0, 0, 0.88); align-items: center; justify-content: center; cursor: zoom-out; padding: 24px; box-sizing: border-box;">
+    <img id="zoomImg" src="" alt="{{ spot.title }}"
+        style="max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); cursor: zoom-out;">
+</div>
 {% endblock %}
 
 {% block extra_js %}
 {% if naver_client_id %}
-<script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId={{ naver_client_id }}"></script>
+<script type="text/javascript"
+    src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId={{ naver_client_id }}"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () { //html 완전히 로드된 후
         const mapContainer = document.getElementById('naver-map');
@@ -250,113 +306,163 @@
 {% endif %}
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const btnToggleReview = document.getElementById("btn-toggle-review");
-    const reviewWriteBox = document.getElementById("review-write-box");
-    const btnCancelReview = document.getElementById("btn-cancel-review");
-    const btnSubmitReview = document.getElementById("btn-submit-review");
-    const reviewContentInput = document.getElementById("review-content-input");
-    const starRating = document.getElementById("star-rating");
-    const ratingInput = document.getElementById("review-rating-input");
-
-    // 로그인 확인
-    const isLoggedIn = {% if request.session.user_id %}true{% else %}false{% endif %};
-
-    if (btnToggleReview && reviewWriteBox) { //AND
-        btnToggleReview.addEventListener("click", function () {
-            if (!isLoggedIn) {
-                if (confirm("로그인이 필요한 서비스입니다.")) {
-                    window.location.href = "{% url 'login' %}?next=" + encodeURIComponent(window.location.pathname + window.location.search); //로그인 후 상세 페이지 복귀
-                }
-                return;
-            }
-
-            // 작성 폼 펼치기/접기
-            if (reviewWriteBox.style.display === "none" || !reviewWriteBox.style.display) { //OR
-                reviewWriteBox.style.display = "block";
-                btnToggleReview.style.display = "none"; // 후기 작성 버튼 숨기기
-                reviewWriteBox.style.animation = "none";
-                reviewWriteBox.offsetHeight; //애니메이션 꺼짐 인식
-                reviewWriteBox.style.animation = "slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards";
-                if (reviewContentInput) {
-                    reviewContentInput.focus(); //자동 커서
-                }
+    // ==========================================
+    // 1. 이미지 확대 (Zoom) 기능
+    // ==========================================
+    window.openZoom = function (el) {
+        var src = '';
+        if (el) {
+            if (el.tagName === 'IMG') {
+                src = el.src;
             } else {
-                reviewWriteBox.style.display = "none";
-                btnToggleReview.style.display = "";
+                var img = el.querySelector('img');
+                if (img) src = img.src;
             }
+        }
+        if (src) {
+            var overlay = document.getElementById('imageZoomOverlay');
+            var zoomImg = document.getElementById('zoomImg');
+            if (overlay && zoomImg) {
+                zoomImg.src = src;
+                overlay.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+    };
+
+    window.closeZoom = function () {
+        var overlay = document.getElementById('imageZoomOverlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    };
+
+    window.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            window.closeZoom();
+        }
+    });
+
+    // ==========================================
+    // 2. DOM 로드 후 초기화 (갤러리 클릭 및 후기 작성)
+    // ==========================================
+    document.addEventListener("DOMContentLoaded", function () {
+        // 갤러리 이미지 클릭 시 확대 팝업 연결
+        var galleryDivs = document.querySelectorAll('.spot-gallery > div');
+        galleryDivs.forEach(function (div) {
+            div.addEventListener('click', function () {
+                window.openZoom(this);
+            });
         });
-    }
 
-    let selectedScore = 0;
-    let renderStars = null;
+        // 후기 작성 폼 및 별점 인터랙션
+        const btnToggleReview = document.getElementById("btn-toggle-review");
+        const reviewWriteBox = document.getElementById("review-write-box");
+        const btnCancelReview = document.getElementById("btn-cancel-review");
+        const btnSubmitReview = document.getElementById("btn-submit-review");
+        const reviewContentInput = document.getElementById("review-content-input");
+        const starRating = document.getElementById("star-rating");
+        const ratingInput = document.getElementById("review-rating-input");
 
-    // 별점 인터랙션
-    if (starRating) {
-        const stars = starRating.querySelectorAll(".star");
-        const rawScore = ratingInput ? parseInt(ratingInput.value, 10) : 0;
-        selectedScore = isNaN(rawScore) ? 0 : rawScore;
+        // 로그인 확인
+        const isLoggedIn = {% if request.session.user_id %}true{% else %}false{% endif %};
 
-        renderStars = function (score) { //별 칠하기
-            stars.forEach(star => {
-                const starVal = parseInt(star.getAttribute("data-score"), 10);
-                if (starVal <= score) {
-                    star.classList.add("active");
+        if (btnToggleReview && reviewWriteBox) {
+            btnToggleReview.addEventListener("click", function () {
+                if (!isLoggedIn) {
+                    if (confirm("로그인이 필요한 서비스입니다.")) {
+                        window.location.href = "{% url 'login' %}?next=" + encodeURIComponent(window.location.pathname + window.location.search);
+                    }
+                    return;
+                }
+
+                // 작성 폼 펼치기/접기
+                if (reviewWriteBox.style.display === "none" || !reviewWriteBox.style.display) {
+                    reviewWriteBox.style.display = "block";
+                    btnToggleReview.style.display = "none"; // 후기 작성 버튼 숨기기
+                    reviewWriteBox.style.animation = "none";
+                    reviewWriteBox.offsetHeight; // reflow 트리거
+                    reviewWriteBox.style.animation = "slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards";
+                    if (reviewContentInput) {
+                        reviewContentInput.focus();
+                    }
                 } else {
-                    star.classList.remove("active");
+                    reviewWriteBox.style.display = "none";
+                    btnToggleReview.style.display = "";
                 }
             });
-        };
+        }
 
-        stars.forEach(star => {
-            star.addEventListener("click", function () { //클릭
-                selectedScore = parseInt(this.getAttribute("data-score"), 10);
-                if (ratingInput) {
-                    ratingInput.value = selectedScore;
-                }
+        let selectedScore = 0;
+        let renderStars = null;
+
+        // 별점 인터랙션
+        if (starRating) {
+            const stars = starRating.querySelectorAll(".star");
+            const rawScore = ratingInput ? parseInt(ratingInput.value, 10) : 0;
+            selectedScore = isNaN(rawScore) ? 0 : rawScore;
+
+            renderStars = function (score) {
+                stars.forEach(star => {
+                    const starVal = parseInt(star.getAttribute("data-score"), 10);
+                    if (starVal <= score) {
+                        star.classList.add("active");
+                    } else {
+                        star.classList.remove("active");
+                    }
+                });
+            };
+
+            stars.forEach(star => {
+                star.addEventListener("click", function () {
+                    selectedScore = parseInt(this.getAttribute("data-score"), 10);
+                    if (ratingInput) {
+                        ratingInput.value = selectedScore;
+                    }
+                    renderStars(selectedScore);
+                });
+
+                star.addEventListener("mouseenter", function () {
+                    const hoverScore = parseInt(this.getAttribute("data-score"), 10);
+                    renderStars(hoverScore);
+                });
+            });
+
+            starRating.addEventListener("mouseleave", function () {
                 renderStars(selectedScore);
             });
 
-            star.addEventListener("mouseenter", function () { //호버
-                const hoverScore = parseInt(this.getAttribute("data-score"), 10);
-                renderStars(hoverScore);
-            });
-        });
-
-        starRating.addEventListener("mouseleave", function () { //클릭한 적 없다면 초기 상태로
+            // 초기 상태: 빈 별
             renderStars(selectedScore);
-        });
+        }
 
-        // 초기 상태: 빈 별
-        renderStars(selectedScore);
-    }
+        if (btnCancelReview && reviewWriteBox) {
+            btnCancelReview.addEventListener("click", function () {
+                reviewWriteBox.style.display = "none";
+                if (btnToggleReview) {
+                    btnToggleReview.style.display = ""; // 후기 작성 버튼 다시 보이기
+                }
+                selectedScore = 0;
+                if (ratingInput) ratingInput.value = "0";
+                if (renderStars) renderStars(0);
+            });
+        }
 
-    if (btnCancelReview && reviewWriteBox) {
-        btnCancelReview.addEventListener("click", function () {
-            reviewWriteBox.style.display = "none";
-            if (btnToggleReview) {
-                btnToggleReview.style.display = ""; // 후기 작성 버튼 다시 보이기
-            }
-            selectedScore = 0;
-            if (ratingInput) ratingInput.value = "0";
-            if (renderStars) renderStars(0);
-        });
-    }
-
-    if (btnSubmitReview) {
-        btnSubmitReview.addEventListener("click", function () {
-            if (selectedScore === 0) {
-                alert("별점을 선택해주세요.");
-                return;
-            }
-            if (!reviewContentInput || !reviewContentInput.value.trim()) {
-                alert("후기 내용을 입력해주세요.");
-                if (reviewContentInput) reviewContentInput.focus();
-                return;
-            }
-            alert("후기가 입력되었습니다.");
-        });
-    }
-});
+        if (btnSubmitReview) {
+            btnSubmitReview.addEventListener("click", function () {
+                if (selectedScore === 0) {
+                    alert("별점을 선택해주세요.");
+                    return;
+                }
+                if (!reviewContentInput || !reviewContentInput.value.trim()) {
+                    alert("후기 내용을 입력해주세요.");
+                    if (reviewContentInput) reviewContentInput.focus();
+                    return;
+                }
+                alert("후기가 입력되었습니다.");
+            });
+        }
+    });
 </script>
 {% endblock %}
