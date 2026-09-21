@@ -158,7 +158,7 @@
             </div>
             <div class="form-group">
                 <label>작성자</label>
-                <div class="spot-name-preview">{{ user_nickname|default:request.session.user_id }}</div>
+                <div class="spot-name-preview">{{ user_nickname|default:user_id }}</div>
             </div>
             <div class="form-group">
                 <label>평점</label>
@@ -348,7 +348,7 @@
 <script>
     // 1. 후기 작성 모달 열기 (비로그인 체크)
     function openReviewModal() {
-        const userId = "{{ request.session.user_id|default:'' }}";
+        const userId = "{{ user_id|default:'' }}";
         if (!userId) {
             alert('로그인이 필요한 서비스입니다.');
             window.location.href = '{% url "login" %}';
@@ -440,7 +440,7 @@
         .then(data => {
             if (!data) return;
             if (data.result === 'ok') {
-                alert('후기가 성공적으로 등록되었습니다!');
+                alert('후기가 등록되었습니다.');
                 closeReviewModal(); //모달 먼저 닫고
                 window.location.reload(); // 새로고침하여 등록된 후기 바로 반영
             } else {

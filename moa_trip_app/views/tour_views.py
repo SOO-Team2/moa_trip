@@ -424,8 +424,10 @@ def detail(request):
 
     # 7. 회원 닉네임 조회
     user_id = request.session.get('user_id')
-    user_obj = Users.objects.filter(user_id=user_id).first()
-    user_nickname = user_obj.nickname if user_obj else None
+    user_nickname = ""
+    if user_id:
+        user_obj = Users.objects.filter(user_id=user_id).first()
+        user_nickname = user_obj.nickname if (user_obj and user_obj.nickname) else user_id
 
     context = {
         "spot": spot,
@@ -438,6 +440,7 @@ def detail(request):
         "reviews": reviews,
         "review_count": review_count,
         "avg_rating": avg_rating,
+        "user_id": user_id,
         "user_nickname": user_nickname,
     }
     return render(request, 'detail.html', context)
