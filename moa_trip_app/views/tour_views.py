@@ -438,6 +438,7 @@ def detail(request):
         "reviews": reviews,
         "review_count": review_count,
         "avg_rating": avg_rating,
+        "user_id": user_id,
         "user_nickname": user_nickname,
     }
     return render(request, 'detail.html', context)
