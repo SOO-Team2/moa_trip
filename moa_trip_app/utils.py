@@ -132,7 +132,7 @@ def get_weather(lat, lon, areacode):
     if not nx or not ny:
         nx, ny = region_info["grid"]
 
-    # [초단기실황] 실시간 기온 및 풍속 조회
+    # [초단기실황] 실시간 기온 및 강수량 조회
     ncst_dt = now - timedelta(minutes=40) # 매시 40분 이후 API 제공
     ncst_url = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst"
     ncst_raw = fetch_public_data(ncst_url, extra_params={
@@ -142,7 +142,6 @@ def get_weather(lat, lon, areacode):
     ncst_items = api_items(ncst_raw)
 
     current_temp = None
-    current_wind = None
     current_rain = None
     for it in ncst_items:
         category = it.get('category')
@@ -162,7 +161,7 @@ def get_weather(lat, lon, areacode):
             except (ValueError, TypeError):
                 pass
 
-        if current_temp is not None and current_wind is not None and current_rain is not None:
+        if current_temp is not None and current_rain is not None:
             break
 
     # [단기예보] 발표 시각 계산 후 호출
@@ -218,7 +217,7 @@ def get_weather(lat, lon, areacode):
         if not f_date:
             continue
         if f_date not in daily_short:
-            daily_short[f_date] = {'TMP': [], 'SKY': {}, 'PTY': {}, 'WSD': {}}
+            daily_short[f_date] = {'TMP': [], 'SKY': {}, 'PTY': {}}
 
         try:
             if cat == 'TMP': #최고 기온 계산 위해 리스트에 담음
@@ -227,8 +226,6 @@ def get_weather(lat, lon, areacode):
                 daily_short[f_date]['SKY'][f_time] = val #날씨 대표 아이콘 12시~14시
             elif cat == 'PTY':
                 daily_short[f_date]['PTY'][f_time] = val
-            elif cat == 'WSD':
-                daily_short[f_date]['WSD'][f_time] = val
         except (ValueError, TypeError):
             pass
 
@@ -308,22 +305,6 @@ def get_weather(lat, lon, areacode):
             today_w['temp'] = f"{float(matched_tmp):.1f}°"
         elif weekly_forecast:
             today_w['temp'] = weekly_forecast[0]['temp']
-
-    # 풍속 설정 (초단기실황 관측값 우선, 없으면 단기예보 값, 없으면 기본값)
-    if current_wind is not None:
-        today_w['wind_speed'] = f"{float(current_wind):.1f}"
-    else:
-        cur_fcst_time = f"{now.hour:02d}00"
-        matched_wsd = None
-        for item in v_items:
-            if item.get('fcstDate') == cur_date and item.get('category') == 'WSD':
-                if item.get('fcstTime') >= cur_fcst_time:
-                    matched_wsd = item.get('fcstValue')
-                    break
-        if matched_wsd is not None:
-            today_w['wind_speed'] = f"{float(matched_wsd):.1f}"
-        else:
-            today_w['wind_speed'] = "1.5"
 
     # 강수량 설정 (초단기실황)
     if current_rain is not None:

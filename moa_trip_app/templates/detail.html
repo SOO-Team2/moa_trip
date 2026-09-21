@@ -148,7 +148,7 @@
 {% if naver_client_id %}
 <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId={{ naver_client_id }}"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () { //html 완전히 로드된 후
         const mapContainer = document.getElementById('naver-map');
         if (!mapContainer) return;
 
@@ -157,8 +157,8 @@
         const mapX = parseFloat(rawMapX);
         const mapY = parseFloat(rawMapY);
 
-        if (!isNaN(mapX) && !isNaN(mapY) && mapX > 0 && mapY > 0) {
-            const spotPosition = new naver.maps.LatLng(mapY, mapX);
+        if (!isNaN(mapX) && !isNaN(mapY) && mapX > 0 && mapY > 0) { //좌표 정상 -> 지도 그리기
+            const spotPosition = new naver.maps.LatLng(mapY, mapX); //위도, 경도
             const mapOptions = {
                 center: spotPosition,
                 zoom: 15,
@@ -168,15 +168,15 @@
                 }
             };
 
-            const map = new naver.maps.Map(mapContainer, mapOptions);
+            const map = new naver.maps.Map(mapContainer, mapOptions); //실제 지도 렌더링
 
             const marker = new naver.maps.Marker({
                 position: spotPosition,
                 map: map,
-                title: "{{ spot.title|escapejs }}"
+                title: "{{ spot.title|escapejs }}" //Django 템플릿 필터
             });
 
-            const infoWindow = new naver.maps.InfoWindow({
+            const infoWindow = new naver.maps.InfoWindow({ //말풍선
                 content: '<div style="padding: 8px 12px; font-size: 13px; font-weight: 600; color: #1E293B; white-space: nowrap;">{{ spot.title|escapejs }}</div>',
                 borderWidth: 1,
                 borderColor: '#E2E8F0',
@@ -186,13 +186,13 @@
 
             naver.maps.Event.addListener(marker, "click", function () {
                 if (infoWindow.getMap()) {
-                    infoWindow.close();
+                    infoWindow.close(); //이미 열려있으면 닫기
                 } else {
                     infoWindow.open(map, marker);
                 }
             });
         } else {
-            mapContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748B;font-size:13px;">위치 좌표가 제공되지 않는 관광지입니다.</div>';
+            mapContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748B;font-size:13px;">주소 정보 준비 중</div>';
         }
     });
 </script>
