@@ -148,7 +148,6 @@ def detail(request):
     # ---추가 (해당 관광지의 후기 목록 및 평점 통계 조회)
     reviews = []
     review_count = 0
-    # [수정] 기본값 및 정수 평점은 int 타입으로 반환
     avg_rating = 0
     if content_id:
         reviews = Review.objects.filter(spot_id=content_id).select_related('user').order_by('-create_date')
@@ -157,8 +156,7 @@ def detail(request):
             avg = reviews.aggregate(Avg('rating'))['rating__avg']
             if avg is not None:
                 rounded_avg = round(avg, 1)
-                # [수정] 소수점이 .0으로 끝나면 int 타입 변환, 소수점 있으면 float 유지
-                avg_rating = int(rounded_avg) if rounded_avg.is_integer() else rounded_avg
+                avg_rating = int(rounded_avg) if rounded_avg.is_integer() else rounded_avg #.0으로 끝나면 int 타입 변환
             else:
                 avg_rating = 0
 
