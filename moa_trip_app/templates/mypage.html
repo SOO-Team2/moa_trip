@@ -42,7 +42,7 @@
   <!-- 탭 메뉴 영역 -->
   <nav class="mypage-nav">
     <ul>
-      <li class="active"><a href="#" data-tab= "dashboard">대시보드</a></li>
+      <li class="active"><a href="#" data-tab="dashboard">대시보드</a></li>
       <li><a href="#" data-tab="bookmark">즐겨찾기</a></li>
       <li><a href="#" data-tab="review">후기</a></li>
       <li><a href="#" data-tab="itinerary">여행 일정</a></li>
@@ -65,14 +65,18 @@
         <!-- 관광지 카드 그리드 (API 반복문) -->
         <div class="mypage-spot-grid">
           {% for favorite in favorites %}
-          <article class="mypage-spot-card" onclick="location.href='{% url 'detail' %}?contentid={{ favorite.spot.spot_code }}'">
+          <article class="mypage-spot-card"
+            onclick="location.href='{% url 'detail' %}?contentid={{ favorite.spot.spot_code }}'">
             <div class="mypage-spot-thumb">
               {% if favorite.spot.image.name and 'http' in favorite.spot.image.name %}
-              <img src="{{ favorite.spot.image.name }}" alt="{{ favorite.spot.t_name }}" style="width:100%; height:100%; object-fit:cover; position:absolute; inset:0;">
+              <img src="{{ favorite.spot.image.name }}" alt="{{ favorite.spot.t_name }}"
+                style="width:100%; height:100%; object-fit:cover; position:absolute; inset:0;">
               {% else %}
-              🏖️
+              <span>사진 없음</span>
               {% endif %}
-              <button type="button" class="mypage-spot-delete-btn" onclick="event.stopPropagation(); deleteFavorite(this, '{{ favorite.spot.spot_code }}')" aria-label="삭제">✕</button>
+              <button type="button" class="mypage-spot-delete-btn"
+                onclick="event.stopPropagation(); deleteFavorite(this, '{{ favorite.spot.spot_code }}')"
+                aria-label="삭제">✕</button>
             </div>
             <h3>{{ favorite.spot.t_name }}</h3>
             <p>{{ favorite.spot.short_address }}</p>
@@ -119,15 +123,16 @@
 
         {% url 'planner' as planner_url %}
         {% for itinerary in itineraries %}
-          <article class="itinerary-card">
-            <h3>{{ itinerary.itinerary_title }}</h3>
-            <p>{{ itinerary.itinerary_date|date:"Y.m.d" }} · {{ itinerary.spot_count }}곳</p>
-            <div class="itinerary-actions">
-              <button type="button" onclick="location.href='{{ planner_url }}?itinerary_code={{ itinerary.itinerary_code }}'">열기</button>
-              {% csrf_token %}
-              <button type="button" onclick="deleteItinerary(this, '{{ itinerary.itinerary_code }}')">삭제</button>
-            </div>
-          </article>
+        <article class="itinerary-card">
+          <h3>{{ itinerary.itinerary_title }}</h3>
+          <p>{{ itinerary.itinerary_date|date:"Y.m.d" }} · {{ itinerary.spot_count }}곳</p>
+          <div class="itinerary-actions">
+            <button type="button"
+              onclick="location.href='{{ planner_url }}?itinerary_code={{ itinerary.itinerary_code }}'">열기</button>
+            {% csrf_token %}
+            <button type="button" onclick="deleteItinerary(this, '{{ itinerary.itinerary_code }}')">삭제</button>
+          </div>
+        </article>
         {% empty %}
         <p>아직 일정이 없습니다.</p>
         {% endfor %}
@@ -144,31 +149,31 @@
             'X-CSRFToken': csrftoken,
             'Content-Type': 'application/x-www-form-urlencoded'
           },
-          body: new URLSearchParams({spot_code: spotCode}).toString()
+          body: new URLSearchParams({ spot_code: spotCode }).toString()
         })
-        .then(response => response.json())
-        .then(data => {
-          if (data.result !== 'ok') {
-            alert(data.message || '삭제에 실패했습니다.');
-            return;
-          }
-          const card = button.closest('.mypage-spot-card');
-          const grid = card.closest('.mypage-spot-grid');
+          .then(response => response.json())
+          .then(data => {
+            if (data.result !== 'ok') {
+              alert(data.message || '삭제에 실패했습니다.');
+              return;
+            }
+            const card = button.closest('.mypage-spot-card');
+            const grid = card.closest('.mypage-spot-grid');
 
-          card.remove();
+            card.remove();
 
-          const count = grid.querySelectorAll('.mypage-spot-card').length;
-          // 즐겨찾기 숫자 변경
-          document.getElementById('bookmark-stat-count').textContent = count;
-          document.getElementById('bookmark-section-count').textContent = count;
+            const count = grid.querySelectorAll('.mypage-spot-card').length;
+            // 즐겨찾기 숫자 변경
+            document.getElementById('bookmark-stat-count').textContent = count;
+            document.getElementById('bookmark-section-count').textContent = count;
 
-          // 0개가 되면 버튼 문구를 '+ 관광지 담기'로 변경
-          if (count === 0) {
-            const addBtn = document.getElementById('btn-add-favorite');
-            if (addBtn) addBtn.textContent = '+ 관광지 담기';
-          }
-        })
-        .catch(() => alert('삭제 중 오류가 발생했습니다.'));
+            // 0개가 되면 버튼 문구를 '+ 관광지 담기'로 변경
+            if (count === 0) {
+              const addBtn = document.getElementById('btn-add-favorite');
+              if (addBtn) addBtn.textContent = '+ 관광지 담기';
+            }
+          })
+          .catch(() => alert('삭제 중 오류가 발생했습니다.'));
       }
 
       function deleteItinerary(button, itineraryCode) {
@@ -182,31 +187,31 @@
             'X-CSRFToken': csrftoken,
             'Content-Type': 'application/x-www-form-urlencoded'
           },
-          body: new URLSearchParams({itinerary_code: itineraryCode}).toString()
+          body: new URLSearchParams({ itinerary_code: itineraryCode }).toString()
         })
-        .then(response => response.json())
-        .then(data => {
-          if (data.result !== 'ok') {
-            alert(data.message || '삭제에 실패했습니다.');
-            return;
-          }
-          const card = button.closest('.itinerary-card');
-          const list = card.closest('.itinerary-list');
+          .then(response => response.json())
+          .then(data => {
+            if (data.result !== 'ok') {
+              alert(data.message || '삭제에 실패했습니다.');
+              return;
+            }
+            const card = button.closest('.itinerary-card');
+            const list = card.closest('.itinerary-list');
 
-          card.remove();
+            card.remove();
 
-          const count = list.querySelectorAll('.itinerary-card').length;
-          // 여행 일정 숫자 변경
-          document.getElementById('itinerary-count').textContent = count;
+            const count = list.querySelectorAll('.itinerary-card').length;
+            // 여행 일정 숫자 변경
+            document.getElementById('itinerary-count').textContent = count;
 
-          // 일정 없으면 메시지 표시
-          if (count === 0) {
-            const emptyMessage = document.createElement('p');
-            emptyMessage.textContent = '아직 일정이 없습니다.';
+            // 일정 없으면 메시지 표시
+            if (count === 0) {
+              const emptyMessage = document.createElement('p');
+              emptyMessage.textContent = '아직 일정이 없습니다.';
 
-            list.appendChild(emptyMessage);
-          }
-        })
+              list.appendChild(emptyMessage);
+            }
+          })
       }
 
       // 탭(대시보드 / 즐겨찾기 / 작성한 후기 / 저장한 여행 일정) 전환 기능

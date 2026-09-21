@@ -140,7 +140,7 @@
                                     {% if favorite.spot.image.name and 'http' in favorite.spot.image.name %}
                                     <img src="{{ favorite.spot.image.name }}" alt="{{ favorite.spot.t_name }}" style="width:100%; height:100%; object-fit:cover; position:absolute; inset:0;">
                                     {% else %}
-                                    🏖️
+                                    <span style="color:#94a3b8; font-size:12px; font-weight:500;">사진 없음</span>
                                     {% endif %}
                                 </div>
                                 <h3><a href="{% url 'detail' %}">{{ favorite.spot.t_name }}</a></h3>

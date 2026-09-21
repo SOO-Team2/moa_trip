@@ -50,6 +50,16 @@ class TouristSpotManager(models.Manager):
         # DB에 이미 존재
         spot = self.filter(spot_code=spot_code).select_related('region').first()
         if spot:
+            # 기존 데이터에 이미지가 비어있는 경우 API에서 보충
+            if not spot.image or not spot.image.name:
+                raw = fetch_public_data(
+                    "http://apis.data.go.kr/B551011/KorService2/detailCommon2",
+                    extra_params={"contentId": str(spot_code)}
+                )
+                items = api_items(raw)
+                if items and items[0].get('firstimage'):
+                    spot.image = items[0]['firstimage']
+                    spot.save(update_fields=['image'])
             return spot
 
         # 공공데이터 API 조회
