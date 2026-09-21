@@ -97,9 +97,6 @@ def explore(request):
     spots = api_items(tour_raw)
     total_count = api_totalcount(tour_raw)
 
-    if selected_sort == 'review':
-        spots = list(reversed(spots))
-
     # 반려동물 동반 가능 필터: KorPetTourService2 API에서 조회하므로 모두 True
     is_pet = bool(selected_pet)
     for spot in spots:
@@ -125,6 +122,18 @@ def explore(request):
         stat = review_stats.get(spot.get('contentid'), {})
         spot['avg_rating'] = stat.get('avg_rating', 0)
         spot['review_count'] = stat.get('review_count', 0)
+
+    # --- 추가 (평점 필터 적용)
+    if selected_rating:
+        try:
+            min_rating = float(selected_rating)
+            spots = [spot for spot in spots if spot['avg_rating'] >= min_rating]
+        except ValueError:
+            pass
+
+    # --- 추가 (후기순 정렬: 실제 후기 개수 기준)
+    if selected_sort == 'review':
+        spots.sort(key=lambda spot: spot['review_count'], reverse=True)
 
     user_id = request.session.get('user_id')
     favorited_spot_codes = set(
