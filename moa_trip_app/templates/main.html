@@ -62,48 +62,32 @@
     <div class="section-wrapper">
         <div class="section-header">
             <h2 class="section-title">반려동물과 함께 떠나요</h2>
-            <a href="{% url 'explore' %}" class="link-more">전체 보기 &gt;</a>
+            <!-- 클릭 시 탐색 페이지의 반려동물 필터(pet_allowed=1)로 이동 -->
+            <a href="{% url 'explore' %}?pet_allowed=1" class="link-more">전체 보기 &gt;</a>
         </div>
 
-        <div class="festival-grid-3">
-            <!-- 축제 1 -->
-            <div class="card festival-card">
-                <div class="festival-card-thumb">
-                    <img src="#" alt="제주 해녀 축제">
-                </div>
-                <div class="festival-card-body">
-                    <span class="festival-date">09.05 — 09.14</span>
-                    <h3>제주 해녀 축제</h3>
-                    <p class="festival-location">제주시 구좌읍 해녀박물관</p>
-                </div>
+        <div class="pet-grid-3">
+            {% if pet_items %}
+            {% for item in pet_items %}
+            <div class="card pet-card" onclick="location.href='{% url 'detail' %}?contentid={{ item.contentid }}'">
+            <div class="pet-card-thumb">
+                {% if item.firstimage %}
+                    <img src="{{ item.firstimage}}"  alt="{{ item.title}}">
+                {% endif %}
             </div>
-
-            <!-- 축제 2 -->
-            <div class="card festival-card">
-                <div class="festival-card-thumb">
-                    <img src="#" alt="서귀포 칠십리 축제">
+            <div class="pet-card-body">
+                <div style="margin-bottom: 8px;">
+                    <span class="badge-pet">반려동물 OK</span>
                 </div>
-                <div class="festival-card-body">
-                    <span class="festival-date">09.10 — 09.20</span>
-                    <h3>서귀포 칠십리 축제</h3>
-                    <p class="festival-location">서귀포시 전지연 일대</p>
-                </div>
+                <h3>{{item.title}}</h3>
+                <p class="pet-location">{{item.addr1 | short_addr}}</p>
             </div>
-
-            <!-- 축제 3 -->
-            <div class="card festival-card">
-                <div class="festival-card-thumb">
-                    <img src="#" alt="한라산 억새 축제">
-                </div>
-                <div class="festival-card-body">
-                    <span class="festival-date">09.19 — 09.22</span>
-                    <h3>한라산 억새 축제</h3>
-                    <p class="festival-location">제주시 애월읍 새별오름</p>
-                </div>
-            </div>
+        </div>
+            {% endfor %}
+        {% endif %}
         </div>
     </div>
-
+    
     <section class="cta-section">
         <h2>지금 로그인하고 나만의 여행 만들기</h2>
         <a href="{% url 'login' %}" class="btn-hero-primary">시작하기</a>

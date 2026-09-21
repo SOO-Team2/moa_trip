@@ -159,13 +159,13 @@
 }
 
 /* 3-Column Festival Grid */
-.festival-grid-3 {
+.pet-grid-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
 
-.festival-card {
+.pet-card {
   display: flex;
   flex-direction: column;
   background-color: var(--color-card-bg);
@@ -177,7 +177,7 @@
   cursor: pointer;
 }
 
-.festival-card-thumb {
+.pet-card-thumb {
   width: 100%;
   height: 200px;
   background-color: #EDE9FE;
@@ -185,19 +185,19 @@
   overflow: hidden;
 }
 
-.festival-card-thumb img {
+.pet-card-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
 
-.festival-card:hover .festival-card-thumb img {
+.pet-card:hover .pet-card-thumb img {
   transform: scale(1.05);
 }
 
-.festival-card-thumb::after {
-  content: '🎪';
+.pet-card-thumb::after {
+  content: '🐾';
   position: absolute;
   top: 50%;
   left: 50%;
@@ -207,11 +207,11 @@
   pointer-events: none;
 }
 
-.festival-card-body {
+.pet-card-body {
   padding: 20px;
 }
 
-.festival-date {
+.pet-date {
   display: inline-block;
   font-size: 12px;
   font-weight: 700;
@@ -222,14 +222,14 @@
   margin-bottom: 10px;
 }
 
-.festival-card-body h3 {
+.pet-card-body h3 {
   font-size: 18px;
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: 6px;
 }
 
-.festival-location {
+.pet-location {
   font-size: 14px;
   color: var(--color-text-muted);
 }
