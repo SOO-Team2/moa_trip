@@ -20,7 +20,6 @@ def login_ok(request):
 
     if user and check_password(pw, user.pw):
         request.session['user_id'] = user.user_id
-        request.session['nickname'] = user.nickname
         return redirect('../../')
     return render(request, 'login_ok.html')
 

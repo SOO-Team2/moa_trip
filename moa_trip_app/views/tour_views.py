@@ -3,7 +3,7 @@ import random
 import re
 from django.conf import settings
 from django.shortcuts import render
-from ..models import Favorite
+from ..models import Favorite, Users
 from ..utils import fetch_public_data, api_items, api_totalcount, get_weather, to_grid
 from ..constants import REGION_FILTERS, get_region
 
@@ -397,6 +397,14 @@ def detail(request):
     # 6. 날씨 데이터 조회 (단기예보 + 중기예보 조합)
     weather_info = get_weather(spot.get('mapy'), spot.get('mapx'), area_code)
 
+    # 7. 회원 닉네임 조회
+    user_id = request.session.get('user_id')
+    user_nickname = request.session.get('nickname')
+    if user_id and not user_nickname:
+        user_obj = Users.objects.filter(user_id=user_id).first()
+        if user_obj:
+            user_nickname = user_obj.nickname
+
     context = {
         "spot": spot,
         "detail_info": detail_info,
@@ -404,5 +412,6 @@ def detail(request):
         "today_weather": weather_info["today_weather"],
         "gallery": gallery_photos,
         "naver_client_id": getattr(settings, 'NAVER_CLIENT_ID', ''),
+        "user_nickname": user_nickname,
     }
     return render(request, 'detail.html', context)

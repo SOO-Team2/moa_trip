@@ -148,7 +148,7 @@
         <!-- 후기 작성 박스 (클릭 시 최상단 후기를 아래로 밀어내며 나타남) -->
         <div id="review-write-box" class="review-item" style="display: none;">
             <div class="r-top">
-                <span class="r-writer">{{ request.session.nickname|default:request.session.user_id }}</span>
+                <span class="r-writer">{{ user_nickname|default:request.session.user_id }}</span>
                 <div class="star-rating-wrap">
                     <div class="star-rating" id="star-rating" role="radiogroup">
                         <span class="star" data-score="1">
