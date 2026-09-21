@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/spot_detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/spot_detail.css' %}?v=1.2">
 {% endblock %}
 
 {% block content %}
@@ -45,7 +45,7 @@
         {% endif %}
 
         <h1 class="spot-title">{{ spot.title }}</h1>
-        <div class="spot-sub">{{ spot.addr1|default:"주소 정보 준비 중" }} · 평점 {{ avg_rating }} · 후기 {{ review_count }}
+        <div class="spot-sub">{{ spot.addr1|default:"주소 정보 준비 중" }} · 평점 {{ avg_rating|floatformat:-1 }} · 후기 {{ review_count }}
         </div>
 
         <div class="info-table">
@@ -91,17 +91,16 @@
             {% for r in reviews %}
             <div class="review-item">
                 <div class="r-top">
-                    <span class="r-writer"> {{r.user.nickname | default:r.user.user_id }}</span>
-                        <span>★ 평점 {{ r.rating }}.0 · {{ r.create_date|date:"Y.m.d" }}</span>
-                        <div class="r-content"> {{r.content}}
+                    <span class="r-writer">{{ r.user.nickname|default:r.user.user_id }}</span>
+                    <span>★ 평점 {{ r.rating }} · {{ r.create_date|date:"Y.m.d" }}</span>
+                    <div class="r-content">{{ r.content }}</div>
                 </div>
             </div>
-        </div>
-        {% empty %}
-        <div style="text-align: center; padding: 40px 0; color: #94A3B8;">
-            아직 등록된 후기가 없습니다.
-        </div>
-        {% endfor %}
+            {% empty %}
+            <div style="text-align: center; padding: 40px 0; color: #94A3B8;">
+                아직 등록된 후기가 없습니다.
+            </div>
+            {% endfor %}
         </div>
     </div>
     <div class="spot-sidebar">
@@ -113,7 +112,8 @@
 
         <a href="{% url 'planner' %}?spot_code={{ spot.contentid }}&region={{ spot.areacode }}&title={{ spot.title|urlencode }}"
             class="sidebar-btn primary" style="display:block; text-align:center; text-decoration:none;">여행 일정 만들기</a>
-        <button type="button" id="favorite-btn" class="sidebar-btn {% if is_favorited %}is-favorited{% endif %}" data-spot-code="{{ spot.contentid }}">
+        <button type="button" id="favorite-btn" class="sidebar-btn {% if is_favorited %}is-favorited{% endif %}"
+            data-spot-code="{{ spot.contentid }}">
             {% if is_favorited %}✓ 즐겨찾기 완료{% else %}즐겨찾기에 추가{% endif %}
         </button>
 
@@ -124,7 +124,8 @@
                     rel="noopener noreferrer"
                     style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 6px; width: 100%;">
                     <span>📍</span>
-                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ spot.addr1|default:"주소 정보 준비 중" }}</span>
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        {{spot.addr1|default:"주소 정보 준비 중" }}</span>
                     <span
                         style="margin-left: auto; font-size: 11px; color: var(--color-primary); font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px;">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -141,11 +142,11 @@
 </div>
 
 <!-- 이미지 확대 오버레이-->
-<div id="imageZoomOverlay" class="image-zoom-overlay" onclick="closeZoom()">
+<div id="imageZoomOverlay" class="image-zoom-overlay" onclick="closeZoom()" style="display: none;">
     <img id="zoomImg" src="" alt="{{ spot.title }}">
 </div>
 <!-- 후기 작성 모달 팝업 -->
-<div id="reviewModal" class="review-modal-overlay">
+<div id="reviewModal" class="review-modal-overlay" style="display: none;">
     <div class="review-modal-box">
         <div class="review-modal-header">
             <h3>후기 작성</h3>
@@ -158,7 +159,7 @@
             </div>
             <div class="form-group">
                 <label>작성자</label>
-                <div class="spot-name-preview">{{ user_nickname|default:request.session.user_id }}</div>
+                <div class="spot-name-preview">{{ user_nickname|default:user_id|default:"로그인 필요" }}</div>
             </div>
             <div class="form-group">
                 <label>평점</label>
@@ -166,8 +167,9 @@
                     <div class="star-rating" id="modal-star-rating" role="radiogroup">
                         {% for i in "12345" %}
                         <span class="star" data-score="{{ forloop.counter }}">
-                            <svg viewBox="0 0 24 24" class="star-icon">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            <svg width="22" height="22" viewBox="0 0 24 24" class="star-icon">
+                                <polygon
+                                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                             </svg>
                         </span>
                         {% endfor %}
@@ -177,7 +179,8 @@
             </div>
             <div class="form-group">
                 <label for="reviewContent">후기 내용</label>
-                <textarea name="content" id="reviewContent" placeholder="방문 후기를 솔직하게 남겨주세요. (최대 255자)" maxlength="255" required rows="4"></textarea>
+                <textarea name="content" id="reviewContent" placeholder="방문 후기를 솔직하게 남겨주세요. (최대 255자)" maxlength="255"
+                    required rows="4"></textarea>
             </div>
             <div class="modal-actions">
                 <button type="button" class="btn-cancel" onclick="closeReviewModal()">취소</button>
@@ -262,33 +265,33 @@
                 },
                 body: new URLSearchParams({ spot_code: spotCode })
             })
-            .then(function (res) {
-                if (res.status === 401) {
-                    alert('로그인이 필요한 서비스입니다.');
-                    window.location.href = '{% url "login" %}';
-                    return null;
-                }
-                return res.json();
-            })
-            .then(function (data) {
-                if (!data) return;
-                if (data.result !== 'ok') {
-                    alert(data.message || '즐겨찾기 추가에 실패했습니다.');
-                    return;
-                }
+                .then(function (res) {
+                    if (res.status === 401) {
+                        alert('로그인이 필요한 서비스입니다.');
+                        window.location.href = '{% url "login" %}';
+                        return null;
+                    }
+                    return res.json();
+                })
+                .then(function (data) {
+                    if (!data) return;
+                    if (data.result !== 'ok') {
+                        alert(data.message || '즐겨찾기 추가에 실패했습니다.');
+                        return;
+                    }
 
-                // DB 저장 결과에 맞춰 버튼 상태 토글
-                if (data.is_favorited) {
-                    favBtn.classList.add('is-favorited');
-                    favBtn.textContent = '✓ 즐겨찾기 완료';
-                } else {
-                    favBtn.classList.remove('is-favorited');
-                    favBtn.textContent = '즐겨찾기에 추가';
-                }
-            })
-            .catch(function () {
-                alert('네트워크 오류가 발생했습니다.');
-            });
+                    // DB 저장 결과에 맞춰 버튼 상태 토글
+                    if (data.is_favorited) {
+                        favBtn.classList.add('is-favorited');
+                        favBtn.textContent = '✓ 즐겨찾기 완료';
+                    } else {
+                        favBtn.classList.remove('is-favorited');
+                        favBtn.textContent = '즐겨찾기에 추가';
+                    }
+                })
+                .catch(function () {
+                    alert('네트워크 오류가 발생했습니다.');
+                });
         });
     });
 </script>
@@ -348,7 +351,7 @@
 <script>
     // 1. 후기 작성 모달 열기 (비로그인 체크)
     function openReviewModal() {
-        const userId = "{{ request.session.user_id|default:'' }}";
+        const userId = "{{ user_id|default:'' }}";
         if (!userId) {
             alert('로그인이 필요한 서비스입니다.');
             window.location.href = '{% url "login" %}';
@@ -440,7 +443,7 @@
         .then(data => {
             if (!data) return;
             if (data.result === 'ok') {
-                alert('후기가 성공적으로 등록되었습니다!');
+                alert('후기가 등록되었습니다.');
                 closeReviewModal(); //모달 먼저 닫고
                 window.location.reload(); // 새로고침하여 등록된 후기 바로 반영
             } else {

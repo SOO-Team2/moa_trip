@@ -341,6 +341,14 @@
   border-radius: var(--radius-card);
   padding: 20px;
   box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.mypage-review-item:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .review-thumb {

@@ -136,7 +136,7 @@ def explore(request):
 # 3. 상세 페이지 (관광지 상세 + 반려동물 정보 + 기상청 예보)
 # ==============================================================================
 def detail(request):
-    content_id = request.GET.get('contentid', '').strip()
+    content_id = (request.GET.get('contentid') or request.GET.get('spot_code') or '').strip()
     req_areacode = request.GET.get('areacode', '').strip()
 
     # --- 추가 (로그인 회원 및 해당 관광지 즐겨찾기 여부 조회)
@@ -148,13 +148,17 @@ def detail(request):
     # ---추가 (해당 관광지의 후기 목록 및 평점 통계 조회)
     reviews = []
     review_count = 0
-    avg_rating = 0.0
+    avg_rating = 0
     if content_id:
         reviews = Review.objects.filter(spot_id=content_id).select_related('user').order_by('-create_date')
         review_count = reviews.count()
         if review_count > 0:
             avg = reviews.aggregate(Avg('rating'))['rating__avg']
-            avg_rating = round(avg, 1) if avg else 0.0
+            if avg is not None:
+                rounded_avg = round(avg, 1)
+                avg_rating = int(rounded_avg) if rounded_avg.is_integer() else rounded_avg #.0으로 끝나면 int 타입 변환
+            else:
+                avg_rating = 0
 
     spot = {}
     area_code = req_areacode if req_areacode and req_areacode != 'all' else "39"
@@ -420,8 +424,10 @@ def detail(request):
 
     # 7. 회원 닉네임 조회
     user_id = request.session.get('user_id')
-    user_obj = Users.objects.filter(user_id=user_id).first()
-    user_nickname = user_obj.nickname
+    user_nickname = ""
+    if user_id:
+        user_obj = Users.objects.filter(user_id=user_id).first()
+        user_nickname = user_obj.nickname if (user_obj and user_obj.nickname) else user_id
 
     context = {
         "spot": spot,
