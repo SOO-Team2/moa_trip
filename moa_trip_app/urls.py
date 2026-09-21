@@ -11,6 +11,7 @@ urlpatterns = [
     path('planner/delete/', views.planner_delete_spot, name='planner_delete_spot'),
     path('planner/update/', views.planner_update_itinerary, name='planner_update_itinerary'),
     path('favorite/toggle/', views.favorite_toggle, name='favorite_toggle'),
+    path('review/add/', views.review_add, name='review_add'),
     path('mypage/', views.mypage, name='mypage'),
     path('login/', views.login, name='login'),
     path('login/login_ok/', views.login_ok, name='login_ok'),
