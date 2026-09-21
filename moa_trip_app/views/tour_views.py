@@ -148,13 +148,17 @@ def detail(request):
     # ---추가 (해당 관광지의 후기 목록 및 평점 통계 조회)
     reviews = []
     review_count = 0
-    avg_rating = 0.0
+    avg_rating = 0
     if content_id:
         reviews = Review.objects.filter(spot_id=content_id).select_related('user').order_by('-create_date')
         review_count = reviews.count()
         if review_count > 0:
             avg = reviews.aggregate(Avg('rating'))['rating__avg']
-            avg_rating = round(avg, 1) if avg else 0.0
+            if avg is not None:
+                rounded_avg = round(avg, 1)
+                avg_rating = int(rounded_avg) if rounded_avg.is_integer() else rounded_avg #.0으로 끝나면 int 타입 변환
+            else:
+                avg_rating = 0
 
     spot = {}
     area_code = req_areacode if req_areacode and req_areacode != 'all' else "39"
@@ -434,7 +438,6 @@ def detail(request):
         "reviews": reviews,
         "review_count": review_count,
         "avg_rating": avg_rating,
-        "user_id": user_id,
         "user_nickname": user_nickname,
     }
     return render(request, 'detail.html', context)

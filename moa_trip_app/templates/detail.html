@@ -45,7 +45,7 @@
         {% endif %}
 
         <h1 class="spot-title">{{ spot.title }}</h1>
-        <div class="spot-sub">{{ spot.addr1|default:"주소 정보 준비 중" }} · 평점 {{ avg_rating }} · 후기 {{ review_count }}
+        <div class="spot-sub">{{ spot.addr1|default:"주소 정보 준비 중" }} · 평점 {{ avg_rating|floatformat:-1 }} · 후기 {{ review_count }}
         </div>
 
         <div class="info-table">
@@ -91,10 +91,9 @@
             {% for r in reviews %}
             <div class="review-item">
                 <div class="r-top">
-                    <span class="r-writer"> {{ r.user.nickname | default:r.user.user_id }}</span>
-                    <span>★ 평점 {{ r.rating }}.0 · {{ r.create_date|date:"Y.m.d" }}</span>
-                    <div class="r-content"> {{r.content}}
-                    </div>
+                    <span class="r-writer">{{ r.user.nickname|default:r.user.user_id }}</span>
+                    <span>★ 평점 {{ r.rating }} · {{ r.create_date|date:"Y.m.d" }}</span>
+                    <div class="r-content">{{ r.content }}</div>
                 </div>
             </div>
             {% empty %}
@@ -433,26 +432,27 @@
                 content: content
             })
         })
-            .then(res => {
-                if (res.status === 401) {
-                    alert('로그인이 필요한 서비스입니다.');
-                    window.location.href = '{% url "login" %}';
-                    return null;
-                }
-                return res.json();
-            })
-            .then(data => {
-                if (!data) return;
-                if (data.result === 'ok') {
-                    alert('후기가 등록되었습니다.');
-                    window.location.reload(); // 새로고침하여 등록된 후기 바로 반영
-                } else {
-                    alert(data.message || '후기 등록에 실패했습니다.');
-                }
-            })
-            .catch(() => {
-                alert('네트워크 오류가 발생했습니다.');
-            });
+        .then(res => {
+            if (res.status === 401) {
+                alert('로그인이 필요한 서비스입니다.');
+                window.location.href = '{% url "login" %}';
+                return null;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
+            if (data.result === 'ok') {
+                alert('후기가 성공적으로 등록되었습니다!');
+                closeReviewModal(); //모달 먼저 닫고
+                window.location.reload(); // 새로고침하여 등록된 후기 바로 반영
+            } else {
+                alert(data.message || '후기 등록에 실패했습니다.');
+            }
+        })
+        .catch(() => {
+            alert('네트워크 오류가 발생했습니다.');
+        });
     }
 </script>
 {% endblock %}

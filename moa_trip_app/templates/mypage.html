@@ -103,8 +103,8 @@
           {% for review in reviews %}
           <li class="mypage-review-item" onclick="location.href='{% url 'detail' %}?contentid={{ review.spot.spot_code }}'">
             <div class="review-thumb" style="overflow: hidden; position: relative;">
-              {% if review.spot.image.name and 'http' in review.spot.image.name %}
-              <img src="{{ review.spot.image.name }}" alt="{{ review.spot.t_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+              {% if review.spot.image %}
+              <img src="{{ review.spot.image }}" alt="{{ review.spot.t_name }}" style="width: 100%; height: 100%; object-fit: cover;">
               {% else %}
               🌅
               {% endif %}
