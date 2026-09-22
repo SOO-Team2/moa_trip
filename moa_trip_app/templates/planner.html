@@ -221,12 +221,6 @@
                 petBadges.forEach(badge => {
                     badge.style.display = isPet ? 'inline' : 'none';
                 });
-
-                // 3. 즐겨찾기 팝업 내의 반려동물 뱃지 표시/숨김
-                const modalPetBadges = document.querySelectorAll('.modal-pet-badge');
-                modalPetBadges.forEach(badge => {
-                    badge.style.display = isPet ? 'inline' : 'none';
-                });
             }
             window.updatePetVisibility = updatePetVisibility;
 
@@ -255,11 +249,11 @@
                     } else {
                         const petCount = items.filter(item => item.dataset.petAllowed === '1').length;
                         if (petCount === count) {
-                            petInfoDisplay.innerHTML = `<span style="color:#10b981; font-weight:700;">${count}곳 모두 가능</span>`;
+                            petInfoDisplay.innerHTML = `<span>모두 가능</span>`;
                         } else if (petCount === 0) {
-                            petInfoDisplay.innerHTML = `<span style="color:#ef4444; font-weight:700;">모두 동반 불가</span>`;
+                            petInfoDisplay.innerHTML = `<span>모두 불가</span>`;
                         } else {
-                            petInfoDisplay.innerHTML = `<span style="color:#f59e0b; font-weight:700;">${count}곳 중 ${petCount}곳 가능</span>`;
+                            petInfoDisplay.innerHTML = `<span>${count}곳 중 ${petCount}곳 가능</span>`;
                         }
                     }
                 }
@@ -293,7 +287,7 @@
                 const isPet = isPetModeActive();
                 const petBadgeHtml = `
                     <span class="timeline-pet-badge" style="display: ${isPet ? 'inline' : 'none'};">
-                        · ${petAllowed ? '<span style="color:#10b981; font-weight:600;">🐾 동반 가능</span>' : '<span style="color:#ef4444; font-weight:600;">⚠️ 동반 불가</span>'}
+                        · ${petAllowed ? '<span>반려동물 가능</span>' : '<span>반려동물 불가</span>'}
                     </span>
                 `;
 

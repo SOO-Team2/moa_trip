@@ -71,7 +71,7 @@ def explore(request):
     selected_region = request.GET.get('region', 'all')
     selected_rating = request.GET.get('min_rating')
     selected_pet = request.GET.get('pet_allowed')
-    selected_sort = request.GET.get('sort', 'rating')
+    selected_sort = request.GET.get('sort', '')
     try:
         cur_page = max(1, int(request.GET.get('page', 1)))
     except (ValueError, TypeError):
@@ -131,9 +131,17 @@ def explore(request):
         except ValueError:
             pass
 
-    # --- 추가 (후기순 정렬: 실제 후기 개수 기준)
-    if selected_sort == 'review':
-        spots.sort(key=lambda spot: spot['review_count'], reverse=True)
+    # 정렬: 평점순 / 후기순
+    if selected_sort == 'rating':
+        spots.sort(
+            key=lambda spot: (float(spot.get('avg_rating') or 0), int(spot.get('review_count') or 0)),
+            reverse=True #오름차순이 기본
+        )
+    elif selected_sort == 'review':
+        spots.sort(
+            key=lambda spot: (int(spot.get('review_count') or 0), float(spot.get('avg_rating') or 0)),
+            reverse=True
+        )
 
     user_id = request.session.get('user_id')
     favorited_spot_codes = set(
