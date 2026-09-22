@@ -20,8 +20,10 @@ def mypage(request):
             spot_count=Count('itinerarytime'),
             region_name=Subquery(sub_region)
         )
-        reviews = Review.objects.filter(user_id=user_id).select_related('spot') #models.py 필드 이름
-        favorites = Favorite.objects.filter(user_id=user_id).select_related('spot')
+        itineraries = Itinerary.objects.filter(user_id=user_id).annotate(spot_count=Count('itinerarytime'))
+        reviews = Review.objects.filter(user_id=user_id).select_related('spot').order_by('-create_date') #models.py 필드 이름
+        favorites = Favorite.objects.filter(user_id=user_id).select_related('spot').order_by('-create_date')
+
         context = { 'user':user, 'itineraries':itineraries, 'reviews':reviews, 'favorites':favorites }
     except Users.DoesNotExist:
         # 세션은 남아있는데 DB에 회원이 없으면 세션 비우고 로그인 페이지로 이동
