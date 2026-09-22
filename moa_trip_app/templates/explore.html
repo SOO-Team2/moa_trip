@@ -73,7 +73,7 @@
         <span>정렬</span>
 
         <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}{% if selected_pet %}pet_allowed=1&{% endif %}sort=rating"
-          class="sort-btn {% if selected_sort != 'review' %}active{% endif %}">평점순</a>
+          class="sort-btn {% if selected_sort == 'rating' %}active{% endif %}">평점순</a>
         <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}{% if selected_pet %}pet_allowed=1&{% endif %}sort=review"
           class="sort-btn {% if selected_sort == 'review' %}active{% endif %}">후기순</a>
 
@@ -108,7 +108,7 @@
               <svg width="14" height="14" viewBox="0 0 24 24" style="fill: var(--color-rating); stroke: var(--color-rating); flex-shrink: 0;">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
               </svg>
-              {% if spot.review_count %}평점 {{ spot.avg_rating }} ({{ spot.review_count }}){% else %}평점 없음{% endif %}
+              {% if spot.review_count %} {{ spot.avg_rating }} ({{ spot.review_count }}){% else %}0 (0){% endif %}
             </span>
             <button type="button" class="btn-bookmark {% if spot.contentid in favorited_spot_codes %}is-favorited{% endif %}"
               data-spot-code="{{ spot.contentid }}" onclick="event.stopPropagation();">
