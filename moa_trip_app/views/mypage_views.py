@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.db.models import Count
-from ..models import Users, Itinerary, Review, Favorite
+from django.db.models import Count, Subquery, OuterRef
+from ..models import Users, Itinerary, ItineraryTime, Review, Favorite
 
 # ==============================================================================
 # 5. 마이페이지
@@ -12,7 +12,14 @@ def mypage(request):
         return HttpResponse('<script>alert("로그인이 필요한 페이지입니다."); location.href="../login/";</script>')
     try:
         user = Users.objects.get(user_id=user_id)
-        itineraries = Itinerary.objects.filter(user_id=user_id).annotate(spot_count=Count('itinerarytime'))
+        sub_region = ItineraryTime.objects.filter(
+            itinerary=OuterRef('pk')
+        ).order_by('itinerary_time_id').values('spot__region__region_name')[:1]
+
+        itineraries = Itinerary.objects.filter(user_id=user_id).annotate(
+            spot_count=Count('itinerarytime'),
+            region_name=Subquery(sub_region)
+        )
         reviews = Review.objects.filter(user_id=user_id).select_related('spot') #models.py 필드 이름
         favorites = Favorite.objects.filter(user_id=user_id).select_related('spot')
         context = { 'user':user, 'itineraries':itineraries, 'reviews':reviews, 'favorites':favorites }

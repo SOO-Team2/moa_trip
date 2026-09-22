@@ -210,6 +210,24 @@
   color: var(--color-text);
 }
 
+/* 전체보기 버튼 (대시보드) */
+.view-all {
+  display: none;
+  align-items: center;
+  gap: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #94A3B8;
+  text-decoration: none;
+  padding: 8px 8px 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.mypage-main-layout.dashboard-active .view-all {
+  display: inline-flex;
+}
+
 /* Spot Card Grid (3-column inside mypage dashboard) */
 .mypage-spot-grid {
   display: grid;
@@ -303,11 +321,18 @@
 }
 
 /* Reviews Section */
-.mypage-review-section h2 {
+.review-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.review-section-header h2 {
   font-size: 20px;
   font-weight: 800;
   color: var(--color-text);
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .mypage-review-list {
@@ -387,6 +412,11 @@
   display: none !important;
 }
 
+/* 대시보드: 작성한 후기가 4개 이하면 전체보기 숨기기 */
+.mypage-main-layout.dashboard-active .mypage-review-section:not(:has(.mypage-review-item:nth-child(5))) #review-view-all {
+  display: none !important;
+}
+
 /* '즐겨찾기' 탭 4열 배치 */
 .mypage-main-layout.bookmark-only .bookmark-section-header h2 {
   font-size: 24px;
@@ -404,11 +434,15 @@
 }
 
 /* '후기' 탭 2열 배치 */
-.mypage-main-layout.review-only .mypage-review-section h2 {
+.mypage-main-layout.review-only .review-section-header {
+  margin-bottom: 24px;
+}
+
+.mypage-main-layout.review-only .review-section-header h2 {
   font-size: 24px;
   font-weight: 800;
   letter-spacing: -0.5px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
 }
 
 .mypage-main-layout.review-only .mypage-review-list {
@@ -438,12 +472,18 @@
   padding: 0;
 }
 
-.mypage-main-layout.itinerary-only .mypage-itinerary-aside h2 {
+.mypage-main-layout.itinerary-only .itinerary-section-header {
+  margin-bottom: 24px;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.mypage-main-layout.itinerary-only .itinerary-section-header h2 {
   font-size: 24px;
   font-weight: 800;
   color: var(--color-text);
   letter-spacing: -0.5px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
   padding-bottom: 0;
   border-bottom: none;
 }
@@ -513,13 +553,22 @@
   top: 96px;
 }
 
-.mypage-itinerary-aside h2 {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--color-text);
+.itinerary-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 20px;
   padding-bottom: 14px;
   border-bottom: 1px solid var(--color-border);
+}
+
+.itinerary-section-header h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 .itinerary-list {

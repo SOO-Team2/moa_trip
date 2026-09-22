@@ -263,6 +263,19 @@ class Itinerary(models.Model):
     def __str__(self):
         return f"{self.itinerary_title or self.itinerary_code} ({self.user.nickname})"
 
+    @property
+    def region_name(self):
+        if hasattr(self, '_region_name'):
+            return self._region_name
+        first_item = self.itinerarytime_set.select_related('spot__region').first()
+        if first_item and first_item.spot and first_item.spot.region:
+            return first_item.spot.region.region_name
+        return ''
+
+    @region_name.setter
+    def region_name(self, value):
+        self._region_name = value
+
     
 # ==============================================================================
 # 9. 일정 방문 시간 (ITINERARY_TIME) - ITINERARY의 자식 테이블
