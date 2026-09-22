@@ -81,12 +81,7 @@
                 if (petBtn) {
                     petBtn.addEventListener('click', () => {
                         petBtn.classList.toggle('active');
-                        if (window.updatePetVisibility) {
-                            window.updatePetVisibility();
-                        }
-                        if (window.updateSummary) {
-                            window.updateSummary();
-                        }
+                        // '여행 제목 적용' 버튼을 눌렀을 때 타임라인과 요약 카드의 반려동물 정보가 변경되도록 처리
                     });
                 }
             </script>
@@ -124,10 +119,22 @@
 
                     // 여행지와 제목 가져오기
                     const regionName = selectedOption ? selectedOption.textContent.trim() : '지역';
-                    const titleText = titleInput.value.trim();
+                    const titleText = titleInput.value.trim() || '새로운 여행 일정';
 
                     // 헤더 타이틀 변경
                     headerTitle.textContent = `${regionName} · ${titleText}`;
+
+                    // 반려동물 정보 적용 (요약 카드 및 타임라인 뱃지 갱신)
+                    if (window.applyPetMode) {
+                        window.applyPetMode();
+                    }
+                });
+
+                titleInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        submitBtn.click();
+                    }
                 });
             </script>
             <div class="timeline-list"></div>
@@ -186,11 +193,20 @@
             const petRow = document.getElementById('summary-pet-row');
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
+            let appliedPetMode = {% if itinerary and itinerary.pet_accompanied %}true{% else %}false{% endif %};
+
             function isPetModeActive() {
-                const petBtn = document.querySelector('.companion-pet-btn');
-                return petBtn ? petBtn.classList.contains('active') : false;
+                return appliedPetMode;
             }
             window.isPetModeActive = isPetModeActive;
+
+            function applyPetMode() {
+                const petBtn = document.querySelector('.companion-pet-btn');
+                appliedPetMode = petBtn ? petBtn.classList.contains('active') : false;
+                updatePetVisibility();
+                updateSummary();
+            }
+            window.applyPetMode = applyPetMode;
 
             function updatePetVisibility() {
                 const isPet = isPetModeActive();
@@ -406,6 +422,7 @@
 
             {% if itinerary.pet_accompanied %}
             petBtn.classList.add('active');
+            appliedPetMode = true;
             {% endif %}
 
             const loadedRegionOption = regionSelect.options[regionSelect.selectedIndex];
@@ -463,7 +480,7 @@
                 const itineraryTitle = titleInput.value.trim() || (selectedRegionOption ? selectedRegionOption.textContent.trim() : '');
                 const itineraryDate = document.getElementById('planner-date').value;
                 const companion = activeCompanionBtn ? activeCompanionBtn.textContent : '';
-                const petAccompanied = petBtn.classList.contains('active') ? 'true' : 'false';
+                const petAccompanied = isPetModeActive() ? 'true' : 'false';
 
                 let hasFailed = false;
 
