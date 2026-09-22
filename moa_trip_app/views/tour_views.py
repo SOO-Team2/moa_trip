@@ -9,7 +9,7 @@ from django.conf import settings
 from django.shortcuts import render
 from ..models import Favorite, Review, TouristSpot, Users
 from ..utils import fetch_public_data, api_items, api_totalcount, get_weather, to_grid
-from ..constants import REGION_FILTERS, get_region
+from ..constants import REGION_FILTERS, REGIONS_DB, get_region
 
 
 # ==============================================================================
@@ -79,69 +79,189 @@ def explore(request):
 
     num_of_rows = 10
 
-    #API 호출 기본 정보
-    service_name = "KorPetTourService2" if selected_pet else "KorService2"
-    tour_url = f"http://apis.data.go.kr/B551011/{service_name}/areaBasedList2"
-
-    extra_params = {
-        "contentTypeId": "12",
-        "numOfRows": num_of_rows,
-        "pageNo": cur_page,
-        "arrange": "O",
-    }
-
-    if selected_region and selected_region != 'all':
-        extra_params["areaCode"] = selected_region
-
-    tour_raw = fetch_public_data(tour_url, extra_params=extra_params)
-    spots = api_items(tour_raw)
-    total_count = api_totalcount(tour_raw)
-
-    # 반려동물 동반 가능 필터: KorPetTourService2 API에서 조회하므로 모두 True
-    is_pet = bool(selected_pet)
-    for spot in spots:
-        spot['is_pet_allowed'] = is_pet
-
-    # --- 추가 (관광지 카드에 실제 평점/후기 개수 반영)
-    content_ids = [spot.get('contentid') for spot in spots if spot.get('contentid')]
-    review_stats = {}
-    if content_ids:
-        stats = (
-            Review.objects.filter(spot_id__in=content_ids)
-            .values('spot_id')
-            .annotate(avg_rating=Avg('rating'), review_count=Count('review_code'))
-        )
-        for stat in stats:
-            rounded_avg = round(stat['avg_rating'], 1)
-            review_stats[stat['spot_id']] = {
-                'avg_rating': int(rounded_avg) if rounded_avg.is_integer() else rounded_avg,
-                'review_count': stat['review_count'],
-            }
-
-    for spot in spots:
-        stat = review_stats.get(spot.get('contentid'), {})
-        spot['avg_rating'] = stat.get('avg_rating', 0)
-        spot['review_count'] = stat.get('review_count', 0)
-
-    # --- 추가 (평점 필터 적용)
+    # --------------------------------------------------------------------------
+    # 평점 필터 적용된 경우 -> DB 조회
+    # --------------------------------------------------------------------------
     if selected_rating:
         try:
-            min_rating = float(selected_rating)
-            spots = [spot for spot in spots if spot['avg_rating'] >= min_rating]
+            min_rating_val = float(selected_rating)
         except ValueError:
-            pass
+            min_rating_val = 0.0
 
-    # 정렬: 평점순 / 후기순
-    if selected_sort == 'rating':
-        spots.sort(
-            key=lambda spot: (float(spot.get('avg_rating') or 0), int(spot.get('review_count') or 0)),
-            reverse=True #오름차순이 기본
+        # DB에서 리뷰 평점 집계 (리뷰 1건 이상, 평균 평점 >= min_rating_val)
+        spot_qs = (
+            TouristSpot.objects.annotate(
+                avg_rating=Avg('review__rating'),
+                review_count=Count('review__review_code')
+            )
+            .filter(review_count__gt=0, avg_rating__gte=min_rating_val)
         )
-    elif selected_sort == 'review':
-        spots.sort(
-            key=lambda spot: (int(spot.get('review_count') or 0), float(spot.get('avg_rating') or 0)),
-            reverse=True
-        )
+
+        # 지역 필터
+        if selected_region and selected_region != 'all':
+            db_region_code = REGIONS_DB.get(str(selected_region))
+            if db_region_code:
+                spot_qs = spot_qs.filter(region_id=db_region_code)
+
+        # 반려동물 필터
+        if selected_pet:
+            spot_qs = spot_qs.filter(pet_allowed=1)
+
+        # 정렬: 평점순 / 후기순
+        if selected_sort == 'review':
+            spot_qs = spot_qs.order_by('-review_count', '-avg_rating')
+        else:
+            spot_qs = spot_qs.order_by('-avg_rating', '-review_count')
+
+        total_count = spot_qs.count()
+
+        # DB 페이징
+        start_idx = (cur_page - 1) * num_of_rows
+        end_idx = start_idx + num_of_rows
+        paged_spots = spot_qs[start_idx:end_idx]
+
+        # explore.html에 맞게 딕셔너리 리스트 생성
+        spots = []
+        for obj in paged_spots:
+            rounded_avg = round(float(obj.avg_rating or 0), 1)
+            spots.append({
+                'contentid': obj.spot_code,
+                'areacode': selected_region if (selected_region and selected_region != 'all') else '',
+                'title': obj.t_name,
+                'addr1': obj.address,
+                'firstimage': str(obj.image) if obj.image else None,
+                'is_pet_allowed': bool(obj.pet_allowed),
+                'avg_rating': int(rounded_avg) if rounded_avg.is_integer() else rounded_avg,
+                'review_count': obj.review_count,
+            })
+
+    # --------------------------------------------------------------------------
+    # 평점 필터 없는 경우
+    # --------------------------------------------------------------------------
+    else:
+        service_name = "KorPetTourService2" if selected_pet else "KorService2"
+        tour_url = f"http://apis.data.go.kr/B551011/{service_name}/areaBasedList2"
+        base_params = {
+            "contentTypeId": "12",
+            "numOfRows": num_of_rows,
+            "arrange": "O",
+        }
+        if selected_region and selected_region != 'all':
+            base_params["areaCode"] = selected_region
+
+        # 정렬(평점순 또는 후기순)을 선택한 경우:
+        # DB에 등록된 관광지 우선 배치, 그 뒤로 API 데이터 순서대로 연결
+        if selected_sort in ('rating', 'review'):
+            db_qs = (
+                TouristSpot.objects.annotate(
+                    avg_rating=Avg('review__rating'),
+                    review_count=Count('review__review_code')
+                )
+                .filter(review_count__gt=0)
+            )
+            if selected_region and selected_region != 'all':
+                db_region_code = REGIONS_DB.get(str(selected_region))
+                if db_region_code:
+                    db_qs = db_qs.filter(region_id=db_region_code)
+            if selected_pet:
+                db_qs = db_qs.filter(pet_allowed=1)
+
+            if selected_sort == 'review':
+                db_qs = db_qs.order_by('-review_count', '-avg_rating')
+            else:
+                db_qs = db_qs.order_by('-avg_rating', '-review_count')
+
+            db_spots_all = list(db_qs)
+            db_count = len(db_spots_all)
+            db_spot_codes = {str(obj.spot_code) for obj in db_spots_all}
+
+            # API 총 개수 파악
+            tour_raw = fetch_public_data(tour_url, extra_params={**base_params, "pageNo": 1})
+            api_total = api_totalcount(tour_raw)
+            total_count = max(api_total, db_count)
+
+            page_start = (cur_page - 1) * num_of_rows
+            page_end = page_start + num_of_rows
+
+            spots = []
+
+            # DB 관광지 먼저 추가
+            if page_start < db_count:
+                current_db_slice = db_spots_all[page_start:min(page_end, db_count)]
+                for obj in current_db_slice:
+                    rounded_avg = round(float(obj.avg_rating or 0), 1)
+                    spots.append({
+                        'contentid': obj.spot_code,
+                        'areacode': selected_region if (selected_region and selected_region != 'all') else '',
+                        'title': obj.t_name,
+                        'addr1': obj.address,
+                        'firstimage': str(obj.image) if obj.image else None,
+                        'is_pet_allowed': bool(obj.pet_allowed),
+                        'avg_rating': int(rounded_avg) if rounded_avg.is_integer() else rounded_avg,
+                        'review_count': obj.review_count,
+                    })
+
+            # 뒤로 API 데이터 채우기
+            needed_api = num_of_rows - len(spots)
+            if needed_api > 0:
+                api_offset = page_start - min(page_start, db_count)
+                start_api_page = (api_offset // num_of_rows) + 1
+                end_api_page = ((api_offset + needed_api - 1) // num_of_rows) + 1
+
+                fetched_api_items = []
+                for p in range(start_api_page, end_api_page + 1):
+                    if p == 1 and tour_raw:
+                        p_items = api_items(tour_raw)
+                    else:
+                        p_raw = fetch_public_data(tour_url, extra_params={**base_params, "pageNo": p})
+                        p_items = api_items(p_raw)
+
+                    for item in p_items:
+                        # DB에서 이미 노출된 관광지는 배제
+                        if str(item.get('contentid')) not in db_spot_codes:
+                            fetched_api_items.append(item)
+
+                inner_start = api_offset % num_of_rows
+                slice_api = fetched_api_items[inner_start:inner_start + needed_api]
+
+                is_pet = bool(selected_pet)
+                for item in slice_api:
+                    item['is_pet_allowed'] = is_pet
+                    item['avg_rating'] = 0
+                    item['review_count'] = 0
+                    spots.append(item)
+
+        # 정렬 미선택 시: 기존 API 실시간 페이징
+        else:
+            tour_raw = fetch_public_data(tour_url, extra_params={**base_params, "pageNo": cur_page})
+            spots = api_items(tour_raw)
+            total_count = api_totalcount(tour_raw)
+
+            # 반려동물 동반 가능 필터
+            is_pet = bool(selected_pet)
+            for spot in spots:
+                spot['is_pet_allowed'] = is_pet
+
+            # 관광지 카드에 실제 평점/후기 개수 반영
+            content_ids = [spot.get('contentid') for spot in spots if spot.get('contentid')]
+            review_stats = {}
+            if content_ids:
+                stats = (
+                    Review.objects.filter(spot_id__in=content_ids)
+                    .values('spot_id')
+                    .annotate(avg_rating=Avg('rating'), review_count=Count('review_code'))
+                )
+                for stat in stats:
+                    rounded_avg = round(stat['avg_rating'], 1)
+                    review_stats[stat['spot_id']] = {
+                        'avg_rating': int(rounded_avg) if rounded_avg.is_integer() else rounded_avg,
+                        'review_count': stat['review_count'],
+                    }
+
+            for spot in spots:
+                stat = review_stats.get(spot.get('contentid'), {})
+                spot['avg_rating'] = stat.get('avg_rating', 0)
+                spot['review_count'] = stat.get('review_count', 0)
 
     user_id = request.session.get('user_id')
     favorited_spot_codes = set(
@@ -168,6 +288,11 @@ def explore(request):
         region_title = "전체 관광지"
     else:
         region_title = f"{selected_region_name} 지역 관광지"
+
+    if selected_pet:
+        region_title = f"{region_title}"
+    if selected_rating:
+        region_title = f"{region_title}"
 
     context = {
         'spots': spots,
