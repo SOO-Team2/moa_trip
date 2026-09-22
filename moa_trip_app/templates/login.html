@@ -22,25 +22,74 @@
 
     <main class="auth-right-panel">
       <nav class="auth-tabs">
-        <a href="#" class="active">로그인</a>
-        <a href="#">회원가입</a>
+        <a class="active" data-tab="login">로그인</a>
+        <a data-tab="signup">회원가입</a>
       </nav>
 
-      <form class="auth-form" method="post" action="#">
+      <form class="auth-form" method="post" action="login_ok/" id="login-form">
         {% csrf_token %}
         <div class="auth-field-group">
           <label>아이디</label>
-          <input type="text" placeholder="myun9ju" required>
+          <input type="text" name="user_id" placeholder="아이디를 입력하세요" required>
         </div>
 
         <div class="auth-field-group">
           <label>비밀번호</label>
-          <input type="password" placeholder="비밀번호를 입력하세요" required>
+          <input type="password" name="pw" placeholder="비밀번호를 입력하세요" required>
         </div>
 
         <button type="submit" class="auth-submit-btn">로그인</button>
       </form>
+
+      <form class="auth-form" method="post" action="../signup/" id="signup-form" style="display: none;">
+        {% csrf_token %}
+        <div class="auth-field-group">
+          <label>아이디</label>
+          <input type="text" name="user_id" placeholder="아이디를 입력하세요" required>
+        </div>
+         <div class="auth-field-group">
+          <label>닉네임</label>
+          <input type="text" name="nickname" placeholder="닉네임을 입력하세요" required>
+        </div>
+        <div class="auth-field-group">
+          <label>비밀번호</label>
+          <input type="password" name="pw" placeholder="비밀번호를 입력하세요" required>
+        </div>
+        <div class="auth-field-group">
+          <label>이메일</label>
+          <input type="email" name="email" placeholder="이메일을 입력하세요" required>
+        </div>
+        <button type="submit" class="auth-submit-btn">회원가입</button>
+      </form>
     </main>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/trim.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.auth-tabs a');
+    const loginform = document.getElementById('login-form');
+    const signupform = document.getElementById('signup-form');
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        tabs.forEach(function (t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+
+        if (tab.dataset.tab == 'signup') {
+          loginform.style.display = 'none';  
+          signupform.style.display = 'flex';
+        } else {
+          signupform.style.display = 'none';
+          loginform.style.display = 'flex';
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}

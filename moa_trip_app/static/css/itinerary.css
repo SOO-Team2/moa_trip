@@ -95,7 +95,7 @@
   color: var(--color-primary);
 }
 
-.companion-pet-legend {
+.companion-pet-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -103,7 +103,20 @@
   color: var(--color-primary);
   font-weight: 600;
   background-color: var(--color-primary-light);
-  padding: 4px 10px;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+}
+
+.companion-pet-btn:hover,
+.companion-pet-btn.active {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #ffffff;
+  font-weight: 600;
+  background-color: var(--color-primary);
+  padding: 5px 10px;
   border-radius: var(--radius-full);
 }
 
@@ -166,6 +179,23 @@
   background-color: var(--color-primary-hover);
 }
 
+.btn-delete-itinerary {
+  padding: 8px 18px;
+  margin-right: 8px;
+  background-color: transparent;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.btn-delete-itinerary:hover,
+.btn-delete-itinerary:active {
+  background-color: #F3F4F6;
+}
+
 /* Timeline Items with connecting line */
 .timeline-list {
   position: relative;
@@ -210,6 +240,51 @@
   padding: 3px 8px;
   border-radius: var(--radius-full);
   margin-bottom: 8px;
+}
+
+.timeline-time-badge select {
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-primary);
+    outline: none;
+    padding: 0;
+    margin: 0;
+    padding: 2px;
+}
+
+/* 드롭다운 화살표 숨기기 */
+.timeline-time-badge select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+.timeline-time-badge input[type="number"] {
+    width: 15px;
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-align: center;
+    outline: none;
+    padding: 2px 0;
+}
+
+/* placeholder 색상 맞추기 */
+.timeline-time-badge input[type="number"]::placeholder {
+    color: var(--color-primary);
+    opacity: 0.7;
+}
+
+/* 숫자 입력창 화살표 숨기기 */
+.timeline-time-badge input[type="number"]::-webkit-outer-spin-button,
+.timeline-time-badge input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .timeline-card {
@@ -258,6 +333,32 @@
   background-color: var(--color-primary-subtle);
 }
 
+/* 즐겨찾기 목록 팝업 */
+.spot-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.15); /* 반투명 검은색 배경 */
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* 다른 콘텐츠들보다 위에 오도록 설정 */
+}
+
+/* 팝업 실제 박스 컨텐츠 */
+.spot-modal-content {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 850px;
+    max-height: 80vh;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
 /* ==========================================================================
    RIGHT: SUMMARY & STATS PANEL (280px)
    ========================================================================== */
@@ -296,4 +397,97 @@
 .summary-card p strong {
   color: var(--color-primary);
   font-weight: 700;
+}
+
+/* ==========================================================================
+   TIMELINE ITEM DELETE BUTTON (Hover to show)
+   ========================================================================== */
+.timeline-delete-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid #ffffff;
+  background-color: #ffffff;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+  z-index: 3;
+}
+
+.timeline-card:hover .timeline-delete-btn {
+  opacity: 1;
+  visibility: visible;
+}
+
+.timeline-delete-btn:hover { 
+  border-color: #EF4444;
+  color: #EF4444;
+}
+
+/* ==========================================================================
+   SPOT SEARCH (Add place)
+   ========================================================================== */
+.spot-search-wrap {
+  position: relative;
+  margin-top: 12px;
+}
+
+.spot-search-input {
+  width: 100%;
+  padding: 14px;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--color-text);
+  outline: none;
+  transition: var(--transition);
+}
+
+.spot-search-input:focus {
+  border-style: solid;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.spot-search-results {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  z-index: 10;
+  list-style: none;
+  padding: 4px;
+}
+
+.spot-search-results:empty {
+  display: none;
+}
+
+.spot-search-results li {
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--color-text);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.spot-search-results li:hover {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
 }

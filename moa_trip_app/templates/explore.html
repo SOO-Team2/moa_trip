@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
+{% load filters %}
 
 {% block title %}
 관광지 탐색 - 모아트립
@@ -10,38 +12,30 @@
 {% endblock %}
 
 {% block content %}
+{% url 'explore' as explore_url %}
+{% url 'detail' as detail_url %}
 <div class="explore-layout">
   <aside class="explore-content-left">
     <h1>관광지 탐색</h1>
-    <div class="explore-filter">
+    <form method="get" action="{% url 'explore' %}" class="explore-filter">
       <h2>맞춤 필터</h2>
 
       <!-- 지역 필터 -->
       <div class="explore-filter-region">
         <h3>지역</h3>
+        {% for r in tour_regions %}
         <div>
-          <input type="radio" name="region" id="r-jeju" checked>
-          <label for="r-jeju">제주도</label>
+          <input type="radio" name="region" id="r-{{ r.code }}" value="{{ r.code }}" {% if selected_region == r.code or not selected_region and r.code == 'all' %}checked{% endif %}>
+          <label for="r-{{ r.code }}">{{ r.name }}</label>
         </div>
-        <div>
-          <input type="radio" name="region" id="r-gangwon">
-          <label for="r-gangwon">강원도</label>
-        </div>
-        <div>
-          <input type="radio" name="region" id="r-jeonnam">
-          <label for="r-jeonnam">전라남도</label>
-        </div>
-        <div>
-          <input type="radio" name="region" id="r-gyeongbuk">
-          <label for="r-gyeongbuk">경상북도</label>
-        </div>
+        {% endfor %}
       </div>
 
       <!-- 반려동물 필터 -->
       <div class="explore-filter-pet">
         <h3>반려동물</h3>
-        <label>
-          <input type="checkbox" checked>
+        <label for="cb-pet-allowed" style="cursor: pointer; display: flex; align-items: center; gap: 10px;">
+          <input type="checkbox" name="pet_allowed" id="cb-pet-allowed" value="1" {% if selected_pet %}checked{% endif %}>
           <span>반려동물 동반 가능</span>
         </label>
       </div>
@@ -49,111 +43,156 @@
       <!-- 평점 필터 -->
       <div class="explore-filter-rating">
         <h3>평점</h3>
-        <div>
-          <button type="button" class="rating-filter-btn active">4.5 이상</button>
-          <button type="button" class="rating-filter-btn">4.0 이상</button>
-          <button type="button" class="rating-filter-btn">3.5 이상</button>
+        <div class="rating-filter-group">
+          <input type="radio" name="min_rating" id="rating-45" value="4.5" class="rating-radio" {% if selected_rating == '4.5' %}checked{% endif %}>
+          <label for="rating-45" class="rating-filter-btn">4.5 이상</label>
+          <input type="radio" name="min_rating" id="rating-40" value="4.0" class="rating-radio" {% if selected_rating == '4.0' %}checked{% endif %}>
+          <label for="rating-40" class="rating-filter-btn">4.0 이상</label>
+          <input type="radio" name="min_rating" id="rating-35" value="3.5" class="rating-radio" {% if selected_rating == '3.5' %}checked{% endif %}>
+          <label for="rating-35" class="rating-filter-btn">3.5 이상</label>
         </div>
       </div>
-    </div>
 
-    <!-- 하단 버튼 영역 -->
-    <div class="filter-actions">
-      <button type="button">필터 적용</button>
-      <div class="filter-reset-wrapper">
-        <button type="button">초기화</button>
+      <!-- 하단 버튼 영역 -->
+      <div class="filter-actions">
+        <button type="submit">필터 적용</button>
+        <div class="filter-reset-wrapper">
+          <button type="button" onclick="location.href='{{ explore_url }}'">초기화</button>
+        </div>
       </div>
-    </div>
+    </form>
   </aside>
 
   <section class="explore-content-right">
     <header class="explore-content-header">
       <div>
-        <h2>선택한 지역의 관광지</h2>
-        <span>1,284곳</span>
+        <h2>{{ region_title }}</h2>
+        <span>{{ total_count|default:0|intcomma }}곳</span>
       </div>
       <div>
         <span>정렬</span>
-        <button type="button" class="sort-btn active">평점순</button>
-        <button type="button" class="sort-btn">후기순</button>
+
+        <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}{% if selected_pet %}pet_allowed=1&{% endif %}sort=rating"
+          class="sort-btn {% if selected_sort == 'rating' %}active{% endif %}">평점순</a>
+        <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}{% if selected_pet %}pet_allowed=1&{% endif %}sort=review"
+          class="sort-btn {% if selected_sort == 'review' %}active{% endif %}">후기순</a>
+
       </div>
     </header>
-    
     <!-- 관광지 카드 목록 영역 -->
     <section class="explore-grid-2">
-
-      <!-- 카드 1 -->
-      <article class="explore-card">
+      {% if spots %}
+      {% for spot in spots %}
+      <article class="explore-card"
+        onclick="location.href='{{ detail_url }}?contentid={{ spot.contentid }}&areacode={{ spot.areacode|default:selected_region }}'"
+        style="cursor: pointer;">
+        <!-- 1. 이미지 영역 (CSS: .explore-card-image) -->
         <div class="explore-card-image">
-          <span>사진</span>
+          {% if spot.firstimage %}
+          <img src="{{ spot.firstimage }}" alt="{{ spot.title }}"
+            style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;">
+          {% else %}
+          <span>사진 없음</span>
+          {% endif %}
         </div>
+
+        <!-- 2. 본문 영역 (badge-pet explore-card-tag 적용) -->
         <div class="explore-card-body">
+          {% if spot.is_pet_allowed %}
           <span class="badge-pet explore-card-tag">반려동물 OK</span>
-          <h3><a href="{% url 'detail' %}">협재해수욕장</a></h3>
-          <p>제주시 한림읍 · 무료</p>
+          {% endif %}
+          <h3>{{ spot.title }}</h3>
+          <p>{{ spot.addr1|short_addr }}</p>
           <div class="explore-card-footer">
-            <span class="card-rating">★ 평점 4.6 (212)</span>
-            <button type="button" class="btn-bookmark">즐겨찾기에 추가</button>
+            <span class="card-rating">
+              <svg width="14" height="14" viewBox="0 0 24 24" style="fill: var(--color-rating); stroke: var(--color-rating); flex-shrink: 0;">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+              {% if spot.review_count %} {{ spot.avg_rating }} ({{ spot.review_count }}){% else %}0 (0){% endif %}
+            </span>
+            <button type="button" class="btn-bookmark {% if spot.contentid in favorited_spot_codes %}is-favorited{% endif %}"
+              data-spot-code="{{ spot.contentid }}" onclick="event.stopPropagation();">
+              {% if spot.contentid in favorited_spot_codes %}✓ 추가됨{% else %}즐겨찾기에 추가{% endif %}
+            </button>
           </div>
         </div>
       </article>
-
-      <!-- 카드 2 -->
-      <article class="explore-card">
-        <div class="explore-card-image">
-          <span>사진</span>
-        </div>
-        <div class="explore-card-body">
-          <span class="badge-pet explore-card-tag">반려동물 OK</span>
-          <h3><a href="{% url 'detail' %}">사려니숲길</a></h3>
-          <p>제주시 조천읍 · 무료</p>
-          <div class="explore-card-footer">
-            <span class="card-rating">★ 평점 4.8 (518)</span>
-            <button type="button" class="btn-bookmark">즐겨찾기에 추가</button>
-          </div>
-        </div>
-      </article>
-
-      <!-- 카드 3 -->
-      <article class="explore-card">
-        <div class="explore-card-image">
-          <span>사진</span>
-        </div>
-        <div class="explore-card-body">
-          <span class="badge-pet explore-card-tag">반려동물 OK</span>
-          <h3><a href="{% url 'detail' %}">새별오름</a></h3>
-          <p>제주시 애월읍 · 무료</p>
-          <div class="explore-card-footer">
-            <span class="card-rating">★ 평점 4.5 (342)</span>
-            <button type="button" class="btn-bookmark">즐겨찾기에 추가</button>
-          </div>
-        </div>
-      </article>
-
-      <!-- 카드 4 -->
-      <article class="explore-card">
-        <div class="explore-card-image">
-          <span>사진</span>
-        </div>
-        <div class="explore-card-body">
-          <span class="badge-pet explore-card-tag">반려동물 OK</span>
-          <h3><a href="{% url 'detail' %}">함덕해수욕장</a></h3>
-          <p>제주시 조천읍 · 무료</p>
-          <div class="explore-card-footer">
-            <span class="card-rating">★ 평점 4.7 (420)</span>
-            <button type="button" class="btn-bookmark">즐겨찾기에 추가</button>
-          </div>
-        </div>
-      </article>
+      {% endfor %}
+      {% else %}
+      <div style="grid-column: span 2; text-align: center; padding: 60px 0; color: #9ca3af;">
+        {% if selected_region == 'all' or not selected_region %}
+          조건에 맞는 관광지가 없습니다.
+        {% endif %}
+      </div>
+      {% endif %}
     </section>
 
     <!-- 하단 페이징 영역 -->
     <nav class="explore-pagination">
-      <button type="button" class="explore-page-button active">1</button>
-      <button type="button" class="explore-page-button">2</button>
-      <button type="button" class="explore-page-button">3</button>
-      <button type="button" class="explore-page-button">4</button>
+      {% if has_prev %}
+      <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}{% if selected_pet %}pet_allowed=1&{% endif %}{% if selected_sort %}sort={{ selected_sort }}&{% endif %}page={{ prev_page }}"
+         class="explore-page-button" style="text-decoration: none;">&lt;</a>
+      {% endif %}
+
+      {% for p in page_range %}
+      <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}{% if selected_pet %}pet_allowed=1&{% endif %}{% if selected_sort %}sort={{ selected_sort }}&{% endif %}page={{ p }}"
+         class="explore-page-button {% if p == cur_page %}active{% endif %}"
+         style="text-decoration: none;">
+        {{ p }}
+      </a>
+      {% endfor %}
+
+      {% if has_next %}
+      <a href="?{% if selected_region %}region={{ selected_region }}&{% endif %}{% if selected_rating %}min_rating={{ selected_rating }}&{% endif %}{% if selected_pet %}pet_allowed=1&{% endif %}{% if selected_sort %}sort={{ selected_sort }}&{% endif %}page={{ next_page }}"
+         class="explore-page-button" style="text-decoration: none;">&gt;</a>
+      {% endif %}
     </nav>
   </section>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const buttons = document.querySelectorAll('.btn-bookmark');
+
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const spotCode = btn.dataset.spotCode;
+
+      fetch('{% url "favorite_toggle" %}', {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': '{{ csrf_token }}',
+        },
+        body: new URLSearchParams({ spot_code: spotCode }),
+      })
+        .then(function (res) {
+          if (res.status === 401) {
+            alert('로그인이 필요합니다.');
+            window.location.href = '{% url "login" %}';
+            return null;
+          }
+          return res.json();
+        })
+        .then(function (data) {
+          if (!data) return;
+          if (data.result !== 'ok') {
+            alert(data.message || '즐겨찾기 처리에 실패했습니다.');
+            return;
+          }
+          if (data.is_favorited) {
+            btn.classList.add('is-favorited');
+            btn.textContent = '✓ 추가됨';
+          } else {
+            btn.classList.remove('is-favorited');
+            btn.textContent = '즐겨찾기에 추가';
+          }
+        })
+        .catch(function () {
+          alert('네트워크 오류가 발생했습니다.');
+        });
+    });
+  });
+});
+</script>
 {% endblock %}

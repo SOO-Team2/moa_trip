@@ -61,8 +61,7 @@
 }
 
 .admin-sidebar li a:hover,
-.admin-sidebar li.active a,
-.admin-sidebar li:first-child a {
+.admin-sidebar li.active a {
   background-color: rgba(124, 58, 237, 0.2);
   color: #C4B5FD;
   font-weight: 700;
@@ -269,17 +268,4 @@
   border-top: 1px solid #283548;
   color: #94A3B8;
   font-size: 13px;
-}
-
-.admin-table-bottom button {
-  padding: 8px 18px;
-  background-color: #DC2626;
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 700;
-  border-radius: var(--radius-sm);
-}
-
-.admin-table-bottom button:hover {
-  background-color: #B91C1C;
 }

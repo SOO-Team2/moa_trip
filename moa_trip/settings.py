@@ -10,11 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+from urllib.parse import unquote
+from dotenv import load_dotenv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# .env 파일 로드
+load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
@@ -37,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'moa_trip_app.apps.MoaTripAppConfig'
 ]
 
@@ -129,7 +134,26 @@ MAILERS = {
     'default': {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
+
 }
 
-# 공공데이터 API
-KMA_API_KEY = 'a2QRrEzCmxvn5HHIDRG8ql2FCynA0kAFDsse7JJ50NrjBn%2BTmI5iunhQoNnNeUJElublkgv8FcYckdN8hYsh8g%3D%3D'
+
+# ========================================================
+# 공공데이터 API 인증키 설정 (.env 연동 및 디코딩)[cite: 4]
+# ========================================================
+KMA_API_KEY = unquote(os.environ.get("KMA_API_KEY", "")) 
+
+# ========================================================
+# 네이버 지도 API (Dynamic Map) 설정
+# ========================================================
+NAVER_CLIENT_ID = os.environ.get("NAVER_CLIENT_ID", "")
+NAVER_CLIENT_SECRET = os.environ.get("NAVER_CLIENT_SECRET", "")
+
+# ========================================================
+# 미디어 파일 (관광지/프로필 이미지 업로드) 설정
+# ========================================================
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+
