@@ -112,7 +112,7 @@
 
 .mypage-nav ul {
   display: flex;
-  gap: 36px;
+  gap: 25px;
 }
 
 .mypage-nav li a {
@@ -126,14 +126,14 @@
 }
 
 .mypage-nav li a:hover,
-.mypage-nav li.active a,
-.mypage-nav li:first-child a {
+.mypage-nav li.active a
+{
   color: var(--color-primary);
   font-weight: 700;
 }
 
-.mypage-nav li.active a::after,
-.mypage-nav li:first-child a::after {
+.mypage-nav li.active a::after
+{
   content: '';
   position: absolute;
   bottom: -1px;
@@ -161,6 +161,41 @@
   gap: 48px;
 }
 
+/* 즐겨찾기 카드 삭제(✕) 버튼 (planner의 timeline-delete-btn과 동일한 스타일) */
+.mypage-spot-delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  padding: 0 0 0 1px;
+  border-radius: 50%;
+  border: 1.5px solid #ffffff;
+  background-color: #ffffff;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+  z-index: 2;
+  cursor: pointer;
+}
+
+.mypage-spot-card:hover .mypage-spot-delete-btn {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mypage-spot-delete-btn:hover {
+  border-color: #EF4444;
+  color: #EF4444;
+}
+
 /* Bookmarks Section */
 .bookmark-section-header {
   display: flex;
@@ -175,31 +210,25 @@
   color: var(--color-text);
 }
 
-.bookmark-nav-btns {
-  display: flex;
-  gap: 8px;
-}
-
-.bookmark-nav-btns button {
-  width: 34px;
-  height: 34px;
-  display: inline-flex;
+/* 전체보기 버튼 (대시보드) */
+.view-all {
+  display: none;
   align-items: center;
-  justify-content: center;
-  border: 1px solid var(--color-border);
+  gap: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #94A3B8;
+  text-decoration: none;
+  padding: 8px 8px 4px 8px;
   border-radius: var(--radius-sm);
-  background-color: #ffffff;
-  color: var(--color-text);
-  font-weight: 700;
   transition: var(--transition);
 }
 
-.bookmark-nav-btns button:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+.mypage-main-layout.dashboard-active .view-all {
+  display: inline-flex;
 }
 
-/* Spot Card Grid (3-column inside mypage) */
+/* Spot Card Grid (3-column inside mypage dashboard) */
 .mypage-spot-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -214,17 +243,20 @@
   box-shadow: var(--shadow-sm);
   transition: var(--transition);
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
 }
 
 .mypage-spot-card:hover {
   transform: translateY(-3px);
   border-color: var(--color-primary-light);
-  box-shadow: var(--shadow-card);
 }
 
 .mypage-spot-thumb {
   width: 100%;
-  height: 140px;
+  aspect-ratio: 16 / 10;
+  height: auto;
+  min-height: 150px;
   background-color: #EDE9FE;
   position: relative;
   display: flex;
@@ -232,6 +264,11 @@
   justify-content: center;
   color: var(--color-primary);
   font-size: 28px;
+  overflow: hidden;
+}
+
+.mypage-spot-thumb img {
+  transition: transform 0.3s ease;
 }
 
 .mypage-spot-card h3 {
@@ -239,19 +276,23 @@
   font-weight: 700;
   color: var(--color-text);
   margin: 14px 16px 4px;
+  line-height: 1.35;
 }
 
 .mypage-spot-card p {
   font-size: 13px;
   color: var(--color-text-muted);
   margin: 0 16px 16px;
+  line-height: 1.4;
+  flex: 1;
 }
 
 .add-spot-card {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 210px;
+  min-height: 230px;
+  height: 100%;
   border: 2px dashed var(--color-border);
   border-radius: var(--radius-card);
   background-color: transparent;
@@ -270,12 +311,28 @@
   padding: 12px 20px;
 }
 
+/* 대시보드: 즐겨찾기 최대 6개 표시 */
+.mypage-main-layout.dashboard-active .mypage-spot-card:nth-child(n+7) {
+  display: none !important;
+}
+
+.mypage-main-layout.dashboard-active .mypage-spot-grid:has(.mypage-spot-card:nth-child(6)) .add-spot-card {
+  display: none !important;
+}
+
 /* Reviews Section */
-.mypage-review-section h2 {
+.review-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.review-section-header h2 {
   font-size: 20px;
   font-weight: 800;
   color: var(--color-text);
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .mypage-review-list {
@@ -287,17 +344,25 @@
 .mypage-review-item {
   display: flex;
   align-items: flex-start;
-  gap: 20px;
+  gap: 16px;
   background-color: var(--color-card-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
   padding: 20px;
   box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.mypage-review-item:hover {
+  transform: translateY(-2px);
 }
 
 .review-thumb {
-  width: 72px;
-  height: 72px;
+  width: 76px;
+  height: 76px;
   border-radius: var(--radius-sm);
   background-color: #EDE9FE;
   display: flex;
@@ -306,10 +371,20 @@
   font-size: 24px;
   color: var(--color-primary);
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.review-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  transition: transform 0.3s ease;
 }
 
 .review-content {
   flex: 1;
+  min-width: 0;
 }
 
 .review-content h3 {
@@ -322,13 +397,146 @@
 .review-content p {
   font-size: 14px;
   color: var(--color-text-muted);
-  line-height: 1.5;
+  line-height: 1.6;
+  word-break: break-word;
 }
 
 .review-date {
   font-size: 12px;
   color: var(--color-text-subtle);
   flex-shrink: 0;
+}
+
+/* 대시보드: 작성한 후기 최대 4개 표시 */
+.mypage-main-layout.dashboard-active .mypage-review-item:nth-child(n+5) {
+  display: none !important;
+}
+
+/* 대시보드: 작성한 후기가 4개 이하면 전체보기 숨기기 */
+.mypage-main-layout.dashboard-active .mypage-review-section:not(:has(.mypage-review-item:nth-child(5))) #review-view-all {
+  display: none !important;
+}
+
+/* '즐겨찾기' 탭 4열 배치 */
+.mypage-main-layout.bookmark-only .bookmark-section-header h2 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.mypage-main-layout.bookmark-only .bookmark-section-header {
+  margin-bottom: 24px;
+}
+
+.mypage-main-layout.bookmark-only .mypage-spot-grid {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+/* '후기' 탭 2열 배치 */
+.mypage-main-layout.review-only .review-section-header {
+  margin-bottom: 24px;
+}
+
+.mypage-main-layout.review-only .review-section-header h2 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 0;
+}
+
+.mypage-main-layout.review-only .mypage-review-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.mypage-main-layout.review-only .mypage-review-list > p {
+  grid-column: 1 / -1;
+}
+
+/* '여행 일정' 탭 3열 배치 */
+.mypage-main-layout.itinerary-only .mypage-left-content {
+  display: none;
+}
+
+.mypage-main-layout.itinerary-only .mypage-itinerary-aside {
+  flex: none;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  position: static;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.mypage-main-layout.itinerary-only .itinerary-section-header {
+  margin-bottom: 24px;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.mypage-main-layout.itinerary-only .itinerary-section-header h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-text);
+  letter-spacing: -0.5px;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.mypage-main-layout.itinerary-only .itinerary-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.mypage-main-layout.itinerary-only .itinerary-list > p {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 0;
+  color: #888;
+}
+
+.mypage-main-layout.itinerary-only .itinerary-card {
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background-color: var(--color-card-bg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  min-height: 140px;
+}
+
+.mypage-main-layout.itinerary-only .itinerary-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 6px;
+  line-height: 1.35;
+}
+
+.mypage-main-layout.itinerary-only .itinerary-card p {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.mypage-main-layout.itinerary-only .itinerary-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.mypage-main-layout.itinerary-only .itinerary-actions button {
+  flex: none;
+  padding: 7px 16px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 /* ==========================================================================
@@ -345,13 +553,22 @@
   top: 96px;
 }
 
-.mypage-itinerary-aside h2 {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--color-text);
+.itinerary-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 20px;
   padding-bottom: 14px;
   border-bottom: 1px solid var(--color-border);
+}
+
+.itinerary-section-header h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 .itinerary-list {
@@ -365,7 +582,6 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background-color: #FAFAFA;
-  transition: var(--transition);
 }
 
 .itinerary-card:hover {
@@ -408,4 +624,23 @@
   background-color: transparent;
   color: var(--color-danger);
   border: 1px solid #FCA5A5;
+}
+
+/* 대시보드: 저장한 여행 일정 최대 3개까지 표시 */
+.mypage-main-layout.dashboard-active .itinerary-card:nth-child(n+4) {
+  display: none !important;
+}
+
+/* 여행 일정 카드 및 열기/삭제 버튼의 모든 전환 애니메이션 및 움직임 완전 제거 */
+.itinerary-card,
+.itinerary-card *,
+.itinerary-actions,
+.itinerary-actions button {
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+.itinerary-actions button:first-child:hover {
+  background-color: var(--color-primary-hover);
 }

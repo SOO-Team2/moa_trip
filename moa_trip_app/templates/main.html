@@ -1,18 +1,20 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load filters %}
 
 {% block title %}
-모아트립 - 나만의 감성 여행
+모아트립 - 나만의 여행 만들기
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/main.css' %}">
+<link rel="stylesheet" href="{% static 'css/main.css' %}?v=1.1">
 {% endblock %}
 
 {% block content %}
+{% url 'detail' as detail_url %}
 <section class="hero-section">
     <h1 class="hero-title">어디로 떠날까요?</h1>
-    <p class="hero-subtitle">취향과 일정에 꼭 맞는 국내 여행지와 축제를 한눈에 발견해보세요</p>
+    <p class="hero-subtitle">내 일정과 조건에 맞는 국내 여행지를 한눈에 발견해보세요</p>
     <div class="hero-actions">
         <a href="{% url 'explore' %}" class="btn-primary">관광지 둘러보기</a>
         <a href="{% url 'planner' %}" class="btn-outline hero-btn-outline">여행 일정 만들기</a>
@@ -27,116 +29,68 @@
         </div>
 
         <div class="spot-grid-4">
-            <!-- 관광지 1 -->
-            <div class="card spot-card">
+            {% if tour_items %}
+            {% for item in tour_items %}
+            <article class="spot-card" onclick="location.href='{{ detail_url }}?contentid={{ item.contentid }}'">
+                <!-- 1. 썸네일 영역 -->
                 <div class="spot-card-thumb">
-                    <img src="#" alt="협재해수욕장">
+                    {% if item.firstimage %}
+                    <img src="{{ item.firstimage }}" alt="{{ item.title }}">
+                    {% endif %}
                 </div>
-                <div class="spot-card-badge">
-                    <span class="badge-pet">반려동물 OK</span>
-                </div>
-                <div class="spot-card-body">
-                    <h3><a href="{% url 'detail' %}">협재해수욕장</a></h3>
-                    <p class="spot-card-desc">제주 제주시 한림읍 · 무료</p>
-                </div>
-                <div class="spot-card-footer">
-                    <strong class="spot-card-rating">★ 4.6</strong>
-                    <span class="spot-review-count">(212)</span>
-                </div>
-            </div>
 
-            <!-- 관광지 2 -->
-            <div class="card spot-card">
-                <div class="spot-card-thumb">
-                    <img src="#" alt="경포해변">
-                </div>
+                <!-- 2. 본문 영역 -->
                 <div class="spot-card-body">
-                    <h3><a href="{% url 'detail' %}">경포해변</a></h3>
-                    <p class="spot-card-desc">강원 강릉시 강문동 · 무료</p>
+                    <h3>{{ item.title }}</h3>
+                    <p class="spot-card-desc">{{ item.addr1|short_addr }}</p>
                 </div>
-                <div class="spot-card-footer">
-                    <strong class="spot-card-rating">★ 4.5</strong>
-                    <span class="spot-review-count">(874)</span>
-                </div>
-            </div>
 
-            <!-- 관광지 3 -->
-            <div class="card spot-card">
-                <div class="spot-card-thumb">
-                    <img src="#" alt="불국사">
-                </div>
-                <div class="spot-card-badge">
-                    <span class="badge-pet">반려동물 OK</span>
-                </div>
-                <div class="spot-card-body">
-                    <h3><a href="{% url 'detail' %}">불국사</a></h3>
-                    <p class="spot-card-desc">경북 경주시 진현동 · 6,000원</p>
-                </div>
+                <!-- 3. 하단 평점/후기 영역 -->
                 <div class="spot-card-footer">
-                    <strong class="spot-card-rating">★ 4.7</strong>
-                    <span class="spot-review-count">(1,206)</span>
+                    <span class="spot-card-rating">
+                        <svg width="14" height="14" viewBox="0 0 24 24" style="fill: var(--color-rating); stroke: var(--color-rating); flex-shrink: 0;">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
+                        {% if item.review_count %}{{ item.avg_rating }}{% else %}0{% endif %}
+                    </span>
+                    <span class="spot-review-count">{% if item.review_count %} ({{ item.review_count }}) {% else %}(0){% endif %}</span>
                 </div>
-            </div>
-
-            <!-- 관광지 4 -->
-            <div class="card spot-card">
-                <div class="spot-card-thumb">
-                    <img src="#" alt="오동도">
-                </div>
-                <div class="spot-card-body">
-                    <h3><a href="{% url 'detail' %}">오동도</a></h3>
-                    <p class="spot-card-desc">전남 여수시 수정동 · 무료</p>
-                </div>
-                <div class="spot-card-footer">
-                    <strong class="spot-card-rating">★ 4.4</strong>
-                    <span class="spot-review-count">(533)</span>
-                </div>
-            </div>
+            </article>
+            {% endfor %}
+            {% else %}
+            <p style="grid-column: 1 / -1; text-align: center; color: #888; padding: 40px 0;">
+                관광지 정보를 준비 중입니다.
+            </p>
+            {% endif %}
         </div>
     </div>
 
     <div class="section-wrapper">
         <div class="section-header">
-            <h2 class="section-title">진행 중인 축제</h2>
-            <a href="{% url 'explore' %}" class="link-more">전체 보기 &gt;</a>
+            <h2 class="section-title">반려동물과 함께 떠나요</h2>
+            <!-- 클릭 시 탐색 페이지의 반려동물 필터(pet_allowed=1)로 이동 -->
+            <a href="{% url 'explore' %}?pet_allowed=1" class="link-more">전체 보기 &gt;</a>
         </div>
 
-        <div class="festival-grid-3">
-            <!-- 축제 1 -->
-            <div class="card festival-card">
-                <div class="festival-card-thumb">
-                    <img src="#" alt="제주 해녀 축제">
+        <div class="pet-grid-3">
+            {% if pet_items %}
+            {% for item in pet_items %}
+            <div class="pet-card" onclick="location.href='{{ detail_url }}?contentid={{ item.contentid }}'">
+                <div class="pet-card-thumb">
+                    {% if item.firstimage %}
+                    <img src="{{ item.firstimage}}" alt="{{ item.title}}">
+                    {% endif %}
                 </div>
-                <div class="festival-card-body">
-                    <span class="festival-date">09.05 — 09.14</span>
-                    <h3>제주 해녀 축제</h3>
-                    <p class="festival-location">제주시 구좌읍 해녀박물관</p>
-                </div>
-            </div>
-
-            <!-- 축제 2 -->
-            <div class="card festival-card">
-                <div class="festival-card-thumb">
-                    <img src="#" alt="서귀포 칠십리 축제">
-                </div>
-                <div class="festival-card-body">
-                    <span class="festival-date">09.10 — 09.20</span>
-                    <h3>서귀포 칠십리 축제</h3>
-                    <p class="festival-location">서귀포시 전지연 일대</p>
+                <div class="pet-card-body">
+                    <div style="margin-bottom: 8px;">
+                        <span class="badge-pet">반려동물 OK</span>
+                    </div>
+                    <h3>{{item.title}}</h3>
+                    <p class="pet-location">{{item.addr1 | short_addr}}</p>
                 </div>
             </div>
-
-            <!-- 축제 3 -->
-            <div class="card festival-card">
-                <div class="festival-card-thumb">
-                    <img src="#" alt="한라산 억새 축제">
-                </div>
-                <div class="festival-card-body">
-                    <span class="festival-date">09.19 — 09.22</span>
-                    <h3>한라산 억새 축제</h3>
-                    <p class="festival-location">제주시 애월읍 새별오름</p>
-                </div>
-            </div>
+            {% endfor %}
+            {% endif %}
         </div>
     </div>
 

@@ -101,14 +101,12 @@
 
 .auth-tabs a:hover,
 .auth-right-panel nav a:hover,
-.auth-tabs a.active,
-.auth-right-panel nav a:first-child {
+.auth-tabs a.active {
   color: var(--color-primary);
   font-weight: 700;
 }
 
-.auth-tabs a.active::after,
-.auth-right-panel nav a:first-child::after {
+.auth-tabs a.active::after {
   content: '';
   position: absolute;
   bottom: -2px;
