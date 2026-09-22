@@ -17,7 +17,6 @@ def mypage(request):
         ).order_by('itinerary_time_id').values('spot__region__region_name')[:1]
 
         itineraries = Itinerary.objects.filter(user_id=user_id).annotate(
-            spot_count=Count('itinerarytime'),
             region_name=Subquery(sub_region)
         )
         itineraries = Itinerary.objects.filter(user_id=user_id).annotate(spot_count=Count('itinerarytime'))
