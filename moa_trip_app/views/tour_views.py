@@ -71,7 +71,7 @@ def explore(request):
     selected_region = request.GET.get('region', 'all')
     selected_rating = request.GET.get('min_rating')
     selected_pet = request.GET.get('pet_allowed')
-    selected_sort = request.GET.get('sort', 'rating')
+    selected_sort = request.GET.get('sort', '')
     try:
         cur_page = max(1, int(request.GET.get('page', 1)))
     except (ValueError, TypeError):
@@ -131,9 +131,17 @@ def explore(request):
         except ValueError:
             pass
 
-    # --- 추가 (후기순 정렬: 실제 후기 개수 기준)
-    if selected_sort == 'review':
-        spots.sort(key=lambda spot: spot['review_count'], reverse=True)
+    # 정렬: 평점순 / 후기순
+    if selected_sort == 'rating':
+        spots.sort(
+            key=lambda spot: (float(spot.get('avg_rating') or 0), int(spot.get('review_count') or 0)),
+            reverse=True #오름차순이 기본
+        )
+    elif selected_sort == 'review':
+        spots.sort(
+            key=lambda spot: (int(spot.get('review_count') or 0), float(spot.get('avg_rating') or 0)),
+            reverse=True
+        )
 
     user_id = request.session.get('user_id')
     favorited_spot_codes = set(
@@ -291,14 +299,8 @@ def detail(request):
                 if not any(u_name == exist.split('/')[-1] for exist in images):
                     images.append(u)
 
-    # 3장의 사진이 반드시 서로 다르게 나오도록 보장하는 로직
-    backup_pool = [
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", # 푸른 바다/하늘
-        "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=800&q=80", # 잔디/자연
-        "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80", # 풍경/산
-        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80", # 호수/여행
-        "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80", # 로드트립
-    ]
+    # 백업 사진 풀 (비워둠)
+    backup_pool = []
 
     selected_photos = []
     # 1. API에서 가져온 실제 관광지 사진 중 중복 없이 순차 수집
@@ -306,17 +308,11 @@ def detail(request):
         if img and img not in selected_photos and len(selected_photos) < 3:
             selected_photos.append(img)
 
-    # 2. 3장이 부족한 경우 백업 이미지 풀에서 중복 없이 보충
-    for b_img in backup_pool:
-        if len(selected_photos) >= 3:
-            break
-        if b_img not in selected_photos:
-            selected_photos.append(b_img)
-
+    # 2. 3장이 부족한 경우 백업 사진 없이 빈 값으로 설정 (템플릿 기본 플레이스홀더 노출)
     gallery_photos = {
-        "photo1": selected_photos[0],
-        "photo2": selected_photos[1],
-        "photo3": selected_photos[2],
+        "photo1": selected_photos[0] if len(selected_photos) > 0 else "",
+        "photo2": selected_photos[1] if len(selected_photos) > 1 else "",
+        "photo3": selected_photos[2] if len(selected_photos) > 2 else "",
     }
 
     def clean_multiline_text(raw_text, max_lines=6, max_len=400):

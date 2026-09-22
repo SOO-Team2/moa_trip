@@ -485,14 +485,16 @@
 
 /* 즐겨찾기 완료 활성화 상태 스타일 */
 .sidebar-btn.is-favorited {
-  background-color: #F5F3FF;
-  color: var(--color-primary);
-  border-color: var(--color-primary);
+  background-color: #F3F4F6;
+  color: var(--color-text);
+  border-color: #D1D5DB;
   font-weight: 700;
 }
 
 .sidebar-btn.is-favorited:hover {
-  background-color: #EDE9FE;
+  background-color: #E5E7EB;
+  border-color: #9CA3AF;
+  color: var(--color-text);
 }
 
 /* Sidebar Mini Map */
