@@ -157,8 +157,13 @@
 
 <!-- 이미지 확대 오버레이-->
 <div id="imageZoomOverlay" class="image-zoom-overlay" onclick="closeZoom()" style="display: none;">
-    <img id="zoomImg" src="" alt="{{ spot.title }}">
+    <div class="zoom-img-wrap">
+        <button type="button" id="zoomPrevBtn" class="zoom-nav-btn zoom-prev" onclick="showPrevImage(event)">&#10094;</button>
+        <img id="zoomImg" src="" alt="{{ spot.title }}">
+        <button type="button" id="zoomNextBtn" class="zoom-nav-btn zoom-next" onclick="showNextImage(event)">&#10095;</button>
+    </div>
 </div>
+
 <!-- 후기 작성 모달 팝업 -->
 <div id="reviewModal" class="review-modal-overlay" style="display: none;">
     <div class="review-modal-box">
@@ -314,24 +319,44 @@
     // ==========================================
     // 이미지 크게 보기
     // ==========================================
+    var zoomImages = []; //갤러리에 있는 모든 사진 주소 목록
+    var zoomIndex = 0;   //지금 보고 있는 사진의 순서
+
+    function renderZoomImage() {
+        var zoomImg = document.getElementById('zoomImg');
+        var prevBtn = document.getElementById('zoomPrevBtn');
+        var nextBtn = document.getElementById('zoomNextBtn');
+        if (!zoomImg || zoomImages.length === 0) return;
+
+        zoomImg.src = zoomImages[zoomIndex];
+
+        //첫 번째 사진이면 왼쪽 화살표 숨김, 마지막 사진이면 오른쪽 화살표 숨김
+        if (prevBtn) prevBtn.style.display = (zoomIndex > 0) ? 'flex' : 'none';
+        if (nextBtn) nextBtn.style.display = (zoomIndex < zoomImages.length - 1) ? 'flex' : 'none';
+    }
+
     window.openZoom = function (el) {
-        var src = '';
+        var images = Array.prototype.map.call(
+            document.querySelectorAll('.spot-gallery img'),
+            function (img) { return img.src; }
+        );
+        if (images.length === 0) return;
+
+        var clickedImg = null;
         if (el) {
-            if (el.tagName === 'IMG') {
-                src = el.src;
-            } else {
-                var img = el.querySelector('img');
-                if (img) src = img.src;
-            }
+            clickedImg = (el.tagName === 'IMG') ? el : el.querySelector('img');
         }
-        if (src) {
-            var overlay = document.getElementById('imageZoomOverlay');
-            var zoomImg = document.getElementById('zoomImg');
-            if (overlay && zoomImg) {
-                zoomImg.src = src;
-                overlay.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-            }
+        var index = clickedImg ? images.indexOf(clickedImg.src) : 0;
+        if (index < 0) index = 0;
+
+        zoomImages = images;
+        zoomIndex = index;
+        renderZoomImage();
+
+        var overlay = document.getElementById('imageZoomOverlay');
+        if (overlay) {
+            overlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
     };
 
@@ -340,6 +365,22 @@
         if (overlay) {
             overlay.style.display = 'none';
             document.body.style.overflow = '';
+        }
+    };
+
+    window.showPrevImage = function (e) {
+        if (e) e.stopPropagation();
+        if (zoomIndex > 0) {
+            zoomIndex--;
+            renderZoomImage();
+        }
+    };
+
+    window.showNextImage = function (e) {
+        if (e) e.stopPropagation();
+        if (zoomIndex < zoomImages.length - 1) {
+            zoomIndex++;
+            renderZoomImage();
         }
     };
 

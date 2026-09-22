@@ -569,6 +569,41 @@
   animation: scaleIn 0.2s ease;
 }
 
+.zoom-img-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.zoom-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100000;
+  transition: background 0.2s ease;
+}
+
+.zoom-nav-btn:hover {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.zoom-prev {
+  left: 16px;
+}
+
+.zoom-next {
+  right: 16px;
+}
 
 @keyframes fadeIn {
   from {
