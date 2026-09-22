@@ -210,6 +210,7 @@ class Favorite(models.Model):
     fav_code = models.CharField(db_column='FAV_CODE', primary_key=True, max_length=20, verbose_name='즐겨찾기 코드')
     user = models.ForeignKey(Users, on_delete=models.DO_NOTHING, db_column='USER_ID', verbose_name='회원')
     spot = models.ForeignKey(TouristSpot, on_delete=models.DO_NOTHING, db_column='SPOT_CODE', verbose_name='관광지')
+    create_date = models.DateTimeField(db_column='CREATE_DATE', auto_now_add=True, verbose_name='추가 일시')
 
     class Meta:
         managed = False
