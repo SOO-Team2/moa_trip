@@ -485,7 +485,7 @@
 
 /* 즐겨찾기 완료 활성화 상태 스타일 */
 .sidebar-btn.is-favorited {
-  background-color: #F3F4F6;
+  background-color: #FFFFFF;
   color: var(--color-text);
   border-color: #D1D5DB;
   font-weight: 700;

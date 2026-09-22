@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/mypage.css' %}">
+<link rel="stylesheet" href="{% static 'css/mypage.css' %}?v=1.3">
 {% endblock %}
 
 
@@ -50,16 +50,12 @@
   </nav>
 
   <!-- 메인 콘텐츠 영역 -->
-  <main class="mypage-main-layout">
+  <main class="mypage-main-layout dashboard-active">
     <div class="mypage-left-content">
       <!-- 즐겨찾기 섹션 -->
       <section class="mypage-bookmark-section" data-panel="bookmark">
         <div class="bookmark-section-header">
           <h2>즐겨찾기 <span id="bookmark-section-count">{{ favorites.count }}</span>곳</h2>
-          <div class="bookmark-nav-btns">
-            <button type="button">&lt;</button>
-            <button type="button">&gt;</button>
-          </div>
         </div>
 
         <!-- 관광지 카드 그리드 (API 반복문) -->
@@ -258,11 +254,13 @@
             }
           });
 
-          // '저장한 여행 일정' 탭이면 가운데에 넓게, 아니면 원래 사이드바 모양으로
+          // '대시보드', '즐겨찾기', '후기', '여행 일정' 탭 전환 시 레이아웃 최적화
+          mainLayout.classList.toggle('dashboard-active', tab === 'dashboard');
           mainLayout.classList.toggle('itinerary-only', tab === 'itinerary');
+          mainLayout.classList.toggle('bookmark-only', tab === 'bookmark');
+          mainLayout.classList.toggle('review-only', tab === 'review');
         });
       });
-
     </script>
   </main>
 </div>
